@@ -21,6 +21,9 @@ export function Header() {
           <Link href="/firms/heliquant" className="hover:text-emerald-300">
             Firm
           </Link>
+          <Link href="/assets" className="hover:text-emerald-300">
+            Assets
+          </Link>
           <Link href="/whales" className="hover:text-emerald-300">
             Whales
           </Link>

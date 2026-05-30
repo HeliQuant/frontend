@@ -10,10 +10,10 @@ import {
 export const dynamic = "force-dynamic";
 
 const HERO_METRICS = [
-  { label: "Win rate (MNT 90d)", value: "77.78%", caption: "9 trades / 7 wins" },
-  { label: "ROI (90d MNT replay)", value: "+1.23%", caption: "vs buy-and-hold -7%" },
-  { label: "Outperformance", value: "+8.23pp", caption: "during MNT bear phase" },
-  { label: "Profit factor", value: "1.70", caption: "max drawdown 1.75%" },
+  { label: "Win rate (MNT 90d)", value: "69%", caption: "13 trades / 9 positive" },
+  { label: "ROI (90d MNT replay)", value: "+1.36%", caption: "vs buy-and-hold -7%" },
+  { label: "Outperformance", value: "+8.36pp", caption: "during MNT bear phase" },
+  { label: "Sharpe (annualised)", value: "21.24", caption: "small-sample disclaimer" },
 ];
 
 const LAYERS = [
