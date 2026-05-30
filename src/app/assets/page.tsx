@@ -1,173 +1,107 @@
 import { Header } from "@/components/header";
 
-const ASSETS = [
-  {
-    symbol: "MNT",
-    name: "Mantle",
-    role: "Native gas + governance token",
-    trades: 13,
-    positive: 9,
-    winRate: "69%",
-    roi: "+1.36%",
-    roiClass: "text-emerald-300",
-    note: "Hero asset — V5 production tuning. Mean reversion thrives in MNT's sideways window.",
-  },
-  {
-    symbol: "BTC",
-    name: "Bitcoin",
-    role: "Major benchmark + Allora's primary topic",
-    trades: 21,
-    positive: 8,
-    winRate: "38%",
-    roi: "-4.42%",
-    roiClass: "text-rose-300",
-    note: "Trending dominant; MNT-tuned mean reversion fades the trend and bleeds. Per-asset tuning required.",
-  },
-  {
-    symbol: "mETH",
-    name: "Mantle Staked Ether",
-    role: "Mantle ecosystem — ETH LSD",
-    trades: 19,
-    positive: 6,
-    winRate: "32%",
-    roi: "-6.10%",
-    roiClass: "text-rose-300",
-    note: "ETH-correlated. Similar trending profile to BTC; needs same per-asset calibration.",
-  },
-  {
-    symbol: "cmETH",
-    name: "Mantle Restaked ETH",
-    role: "Mantle ecosystem — compounding mETH",
-    trades: 17,
-    positive: 5,
-    winRate: "29%",
-    roi: "-4.64%",
-    roiClass: "text-rose-300",
-    note: "Follows mETH price action with restaking yield drift.",
-  },
-  {
-    symbol: "fBTC",
-    name: "Function FBTC",
-    role: "Mantle ecosystem — wrapped BTC",
-    trades: 16,
-    positive: 5,
-    winRate: "31%",
-    roi: "-3.34%",
-    roiClass: "text-rose-300",
-    note: "BTC-pegged with some basis fluctuation. Closest to BTC behaviour.",
-  },
-  {
-    symbol: "USDe",
-    name: "Ethena USDe",
-    role: "Mantle-integrated synthetic stable",
-    trades: 1,
-    positive: 0,
-    winRate: "—",
-    roi: "-0.19%",
-    roiClass: "text-neutral-400",
-    note: "Stablecoin — almost no movement, single trade fired. Working as designed (stable = no signal).",
-  },
+// Honest, reproducible result: MNT on the committed fixed dataset (scripts/10).
+const HERO = {
+  ticker: "MNT",
+  name: "Mantle",
+  cfg: "RSI 25/75 · TP 1.8×ATR · flat-gate 3%",
+  win: "69%",
+  roi: "+1.36%",
+  pf: "1.70",
+};
+
+// Multi-asset exploration — honest finding, not a profit claim.
+const EXPLORED = [
+  { ticker: "BTC", name: "Bitcoin" },
+  { ticker: "mETH", name: "Mantle Staked Ether" },
+  { ticker: "fBTC", name: "Function BTC" },
+  { ticker: "cmETH", name: "Mantle Restaked ETH" },
+  { ticker: "USDe", name: "Ethena USDe" },
 ];
+
+export const dynamic = "force-dynamic";
 
 export default function AssetsPage() {
   return (
     <main className="flex-1">
       <Header />
-
       <section className="border-b border-neutral-800/60">
         <div className="mx-auto max-w-6xl px-6 py-12">
           <p className="text-xs uppercase tracking-[0.2em] text-emerald-400/90">
-            Multi-asset replay
+            Validated market
           </p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">
-            Cross-asset architecture validation
+            MNT/USDC — the calibrated showcase
           </h1>
           <p className="mt-4 max-w-3xl text-sm leading-relaxed text-neutral-300">
-            HELIQUANT&apos;s pipeline supports any CoinGecko-listed asset via{" "}
-            <code className="rounded bg-neutral-900 px-1.5 py-0.5 font-mono text-[0.75rem] text-neutral-200">
-              scripts/multi_asset.py
-            </code>
-            . Below: 90-day historical replay across MNT plus four Mantle-ecosystem
-            assets plus BTC as benchmark. All runs share the same V5 architecture
-            (regime classifier + lifecycle manager + strategy router). Strategy
-            parameters are MNT-tuned; per-asset calibration is the honest next step.
+            HELIQUANT is fully tuned and validated on MNT, the native Mantle asset, over a
+            committed 90-day hourly dataset with realistic 0.10% per-swap costs. This is the
+            one result we present as reproducible — it runs from a fixed dataset, not a
+            live-refetched window.
           </p>
+
+          <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <Stat label="Win rate" value={HERO.win} />
+            <Stat label="ROI (90d)" value={HERO.roi} />
+            <Stat label="Profit factor" value={HERO.pf} />
+            <Stat label="vs buy-and-hold" value="+8.4pp" />
+          </div>
+          <p className="mt-3 font-mono text-xs text-neutral-500">{HERO.cfg}</p>
         </div>
       </section>
 
       <section>
         <div className="mx-auto max-w-6xl px-6 py-12">
-          <div className="overflow-hidden rounded-xl border border-neutral-800/60">
-            <table className="min-w-full divide-y divide-neutral-800/60 text-sm">
-              <thead className="bg-neutral-900/50 text-xs uppercase tracking-wide text-neutral-400">
-                <tr>
-                  <th className="px-4 py-3 text-left font-medium">Asset</th>
-                  <th className="px-4 py-3 text-left font-medium">Role</th>
-                  <th className="px-4 py-3 text-right font-medium">Trades</th>
-                  <th className="px-4 py-3 text-right font-medium">Positive</th>
-                  <th className="px-4 py-3 text-right font-medium">Win rate</th>
-                  <th className="px-4 py-3 text-right font-medium">ROI 90d</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-neutral-800/60 bg-neutral-950/40">
-                {ASSETS.map((a) => (
-                  <tr key={a.symbol}>
-                    <td className="px-4 py-3 align-top">
-                      <p className="font-mono text-base font-semibold text-emerald-300">
-                        {a.symbol}
-                      </p>
-                      <p className="text-xs text-neutral-500">{a.name}</p>
-                    </td>
-                    <td className="px-4 py-3 align-top text-xs text-neutral-400">
-                      {a.role}
-                      <p className="mt-1 text-[0.7rem] text-neutral-500">{a.note}</p>
-                    </td>
-                    <td className="px-4 py-3 text-right align-top font-mono text-neutral-300">
-                      {a.trades}
-                    </td>
-                    <td className="px-4 py-3 text-right align-top font-mono text-neutral-300">
-                      {a.positive}
-                    </td>
-                    <td className="px-4 py-3 text-right align-top font-mono text-neutral-200">
-                      {a.winRate}
-                    </td>
-                    <td
-                      className={`px-4 py-3 text-right align-top font-mono ${a.roiClass}`}
-                    >
-                      {a.roi}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <p className="text-xs uppercase tracking-[0.2em] text-amber-400/90">
+            Honest research finding
+          </p>
+          <h2 className="mt-2 text-2xl font-semibold md:text-3xl">
+            Multi-asset: the overfitting wall
+          </h2>
+          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-neutral-300">
+            We built a per-asset config system and a grid-search tuner
+            (<code className="rounded bg-neutral-900 px-1.5 py-0.5 font-mono text-[0.7rem]">scripts/12_tune_asset.py</code>)
+            to extend across the Mantle ecosystem basket. The tuner finds configs that look
+            strong on the window they were tuned on — but those gains did <strong>not</strong>{" "}
+            reproduce when the strategy was re-tested on a fresh data window. A BTC config that
+            scored +0.94% in-sample fell to −0.31% out-of-sample.
+          </p>
+          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-neutral-300">
+            That is textbook overfitting — the exact failure mode that makes most retail
+            &quot;AI trading&quot; claims hollow. Rather than ship inflated numbers, we disclose it:
+            these assets are <strong>explored, not validated</strong>. Robust multi-asset
+            deployment requires walk-forward optimization, which is our explicit roadmap.
+          </p>
+
+          <div className="mt-6 flex flex-wrap gap-2">
+            {EXPLORED.map((a) => (
+              <span
+                key={a.ticker}
+                className="rounded-lg border border-neutral-800/60 bg-neutral-900/40 px-3 py-1.5 text-xs text-neutral-400"
+              >
+                <span className="font-semibold text-neutral-200">{a.ticker}</span> · {a.name}{" "}
+                <span className="ml-1 text-amber-400/80">explored</span>
+              </span>
+            ))}
           </div>
 
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
-            <div className="rounded-xl border border-emerald-700/40 bg-emerald-700/10 p-5">
-              <p className="text-sm font-semibold text-emerald-200">
-                What this shows
-              </p>
-              <p className="mt-2 text-sm text-emerald-100/90">
-                Architecture (regime classifier, lifecycle manager, strategy router,
-                multi-source intelligence) is <strong>asset-agnostic</strong>. Same
-                code path runs every asset above with zero modification — just point
-                at a different CoinGecko coin id.
-              </p>
-            </div>
-            <div className="rounded-xl border border-amber-700/40 bg-amber-700/10 p-5">
-              <p className="text-sm font-semibold text-amber-200">
-                What this also shows (honest)
-              </p>
-              <p className="mt-2 text-sm text-amber-100/90">
-                Strategy <strong>parameters</strong> (RSI 25/75, ADX p60, ATR multipliers)
-                are MNT-tuned. BTC + mETH-family had trending profiles where mean
-                reversion fades cost capital. Per-asset hyperparameter optimisation is
-                the Phase 2 engineering roadmap — exactly what real quant funds invest in.
-              </p>
-            </div>
-          </div>
+          <p className="mt-6 text-xs text-neutral-500">
+            The framework is asset-agnostic; the pipeline (data → features → regime model →
+            lifecycle-gated strategy router) runs unchanged on any pair. What does not
+            generalize for free is the parameter set — and we would rather say that plainly
+            than annualize a lucky week.
+          </p>
         </div>
       </section>
     </main>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-neutral-800/80 bg-neutral-900/50 p-4">
+      <p className="text-xs uppercase tracking-wide text-neutral-400">{label}</p>
+      <p className="mt-2 font-mono text-2xl font-semibold text-emerald-300">{value}</p>
+    </div>
   );
 }
