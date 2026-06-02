@@ -1,26 +1,104 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ───────────────────────── HeliQuant theme — "Antimetal" (navy → chartreuse) ─────────────────────────
+   Electric storm over a blueprint: deep-navy hero snapping to a light technical product canvas,
+   bridged by one vivid chartreuse CTA. Blue-tinted shadows; serif display + tight-tracked sans.
+   Static tokens live in @theme; anything referencing a runtime var (next/font) lives in @theme inline. */
+@theme {
+  /* Colors */
+  --color-midnight-navy: #1b2540;   /* structural ink: text, headings, borders on light */
+  --color-deep-cosmos: #001033;     /* dark hero base + dark filled actions */
+  --color-chartreuse: #d0f100;      /* THE single accent — primary CTA only */
+  --color-ice-veil: #e0f6ff;        /* ghost-button borders on dark, atmospheric wash */
+  --color-ghost-canvas: #f8f9fc;    /* primary light page background */
+  --color-pure-surface: #ffffff;    /* elevated cards */
+  --color-slate-ink: #6b7184;       /* secondary text */
+  --color-ash-medium: #7c8293;      /* tertiary text, hairline borders */
+  --color-storm-gray: #596075;      /* mid-tone body on darker surfaces */
+  --color-fog-border: #b1b5c0;      /* hairline borders on light */
+
+  /* Functional status — data punctuation, used sparingly like indicator lights */
+  --color-win: #15a06b;             /* TP / win */
+  --color-loss: #e5484d;            /* SL / loss */
+  --color-onchain: #0080f8;         /* verified / on-chain */
+  --color-aggressive: #7c5cff;      /* AGGRESSIVE sizing */
+  --color-abstain: #7c8293;         /* ABSTAIN (disciplined) */
+
+  /* Hero gradient stops */
+  --color-hero-from: #001033;
+  --color-hero-via: #0050f8;
+  --color-hero-to: #5fbdf7;
+
+  /* Type scale (Antimetal) */
+  --text-caption: 13px;
+  --text-body: 16px;
+  --text-subheading: 18px;
+  --text-heading-sm: 22px;
+  --text-heading: 28px;
+  --text-heading-lg: 40px;
+  --text-display: 48px;
+
+  /* Radii */
+  --radius-card: 20px;
+  --radius-card-md: 16px;
+  --radius-card-sm: 6px;
+  --radius-badge: 16px;
+  --radius-pill-lg: 60px;
+
+  /* Blue-tinted elevation (NEVER neutral-black shadows on light) */
+  --shadow-card: rgba(0, 39, 80, 0.03) 0px 56px 72px -16px, rgba(0, 39, 80, 0.03) 0px 32px 32px -16px, rgba(0, 39, 80, 0.04) 0px 6px 12px -3px, rgba(0, 39, 80, 0.04) 0px 0px 0px 1px;
+  --shadow-badge: rgba(0, 39, 80, 0.08) 0px 6px 16px -3px, rgba(0, 39, 80, 0.04) 0px 0px 0px 1px;
+  --shadow-cta: rgba(24, 37, 66, 0.32) 0px 1px 3px 0px, rgba(24, 37, 66, 0.44) 0px 12px 24px -12px, rgba(219, 247, 255, 0.48) 0px 0.5px 0.5px 0px inset;
 }
 
+/* inline: values that reference runtime CSS vars (next/font, :root) must stay as var() references */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display-serif), ui-serif, Georgia, serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --background: #f8f9fc; /* ghost-canvas */
+  --foreground: #1b2540; /* midnight-navy */
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before {
+    border-color: var(--color-fog-border);
+  }
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    letter-spacing: -0.011em; /* Antimetal tight tracking */
+    -webkit-font-smoothing: antialiased;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ───────────────────────── utilities ───────────────────────── */
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+.hero-gradient {
+  background: linear-gradient(180deg, var(--color-hero-from) 0%, var(--color-hero-via) 55%, var(--color-hero-to) 100%);
+}
+.text-balance {
+  text-wrap: balance;
+}
+.dot-grid {
+  background-image: radial-gradient(rgba(224, 246, 255, 0.18) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+@keyframes hq-pulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+.hq-pulse {
+  animation: hq-pulse 2.2s ease-in-out infinite;
 }
