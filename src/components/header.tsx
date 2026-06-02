@@ -1,37 +1,35 @@
-import Link from "next/link";
-
 import { ConnectWallet } from "@/components/connect-wallet";
+
+const NAV = [
+  { href: "#org", label: "Live org" },
+  { href: "#edge", label: "The edge" },
+  { href: "#findings", label: "Findings" },
+  { href: "#ledger", label: "Ledger" },
+  { href: "#architecture", label: "Architecture" },
+];
 
 export function Header() {
   return (
-    <header className="border-b border-neutral-800/60 bg-neutral-950/80 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="grid h-9 w-9 place-items-center rounded-lg bg-emerald-500/15 text-emerald-300">
-            <span className="font-mono text-lg font-bold">H</span>
-          </div>
-          <div>
-            <p className="text-sm font-semibold tracking-wide">HELIQUANT</p>
-            <p className="text-xs text-neutral-400">
-              Multi-source intelligence on Mantle
-            </p>
-          </div>
-        </Link>
-        <nav className="flex items-center gap-4 text-sm text-neutral-300">
-          <Link href="/firms/heliquant" className="hover:text-emerald-300">
-            Firm
-          </Link>
-          <Link href="/assets" className="hover:text-emerald-300">
-            Assets
-          </Link>
-          <Link href="/whales" className="hover:text-emerald-300">
-            Whales
-          </Link>
-          <Link href="/jobs/new" className="hover:text-emerald-300">
-            Hire
-          </Link>
-          <ConnectWallet />
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-deep-cosmos/80 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-3.5">
+        <a href="#top" className="flex items-center gap-2.5">
+          <span className="grid h-8 w-8 place-items-center rounded-full bg-chartreuse font-mono text-sm font-bold text-midnight-navy">
+            H
+          </span>
+          <span className="font-display text-lg text-white">HeliQuant</span>
+        </a>
+        <nav className="hidden items-center gap-7 md:flex">
+          {NAV.map((n) => (
+            <a
+              key={n.href}
+              href={n.href}
+              className="text-sm text-ice-veil/70 transition-colors hover:text-white"
+            >
+              {n.label}
+            </a>
+          ))}
         </nav>
+        <ConnectWallet />
       </div>
     </header>
   );
