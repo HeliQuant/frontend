@@ -10,13 +10,25 @@ const NAV = [
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-deep-cosmos/80 backdrop-blur-xl">
+    <header
+      className="sticky top-0 z-50 border-b border-white/5 backdrop-blur-xl"
+      style={{ backgroundColor: "rgba(10,10,10,0.72)" }}
+    >
       <div className="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-3.5">
         <a href="#top" className="flex items-center gap-2.5">
-          <span className="grid h-8 w-8 place-items-center rounded-full bg-chartreuse font-mono text-sm font-bold text-midnight-navy">
+          <span
+            className="grid h-8 w-8 place-items-center rounded-full font-mono text-sm font-bold"
+            style={{
+              background: "radial-gradient(circle at 50% 38%, #ffd06a 0%, #fa520f 68%, #a1131a 100%)",
+              color: "#0a0a0a",
+              boxShadow: "0 0 14px -2px rgba(250,82,15,0.6)",
+            }}
+          >
             H
           </span>
-          <span className="font-display text-lg text-white">HeliQuant</span>
+          <span className="font-display text-lg" style={{ color: "#e0f6ff" }}>
+            HeliQuant
+          </span>
         </a>
         <nav className="hidden items-center gap-7 md:flex">
           {NAV.map((n) => (

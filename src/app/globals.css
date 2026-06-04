@@ -24,6 +24,21 @@
   --color-aggressive: #7c5cff;      /* AGGRESSIVE sizing */
   --color-abstain: #7c8293;         /* ABSTAIN (disciplined) */
 
+  /* ── Observatory / Hero4 standard palette (dark "Antimetal" engine) ──
+     Deep void → midnight base, ice-blue instrument text, ONE solar core + flame,
+     ONE chartreuse vein (the validated edge / primary CTA). bull/bear = data only. */
+  --color-void: #030408;            /* deepest backdrop / gear cores */
+  --color-midnight: #05060f;        /* midnight abyss — hero base */
+  --color-glass-border: rgba(186, 215, 247, 0.08); /* hairline on dark glass */
+  --color-solar-core: #ffd06a;      /* incandescent core (PM agent) */
+  --color-solar-flame: #fa520f;     /* solar flame (corona / gradient end) */
+  --color-ice-text: #d8ecf8;        /* comet — primary text on dark */
+  --color-ice-muted: #81899b;       /* interstellar gray — secondary */
+  --color-ice-glow: #b6d9fc;        /* celestial light — desk gear rims */
+  --color-cta: #d0f100;             /* chartreuse — the one vein (OI edge + CTA) */
+  --color-bull: #10b981;            /* up / online indicator */
+  --color-bear: #ef4444;            /* down / risk indicator */
+
   /* Hero gradient stops */
   --color-hero-from: #001033;
   --color-hero-via: #0050f8;
@@ -49,15 +64,25 @@
   --shadow-card: rgba(0, 39, 80, 0.03) 0px 56px 72px -16px, rgba(0, 39, 80, 0.03) 0px 32px 32px -16px, rgba(0, 39, 80, 0.04) 0px 6px 12px -3px, rgba(0, 39, 80, 0.04) 0px 0px 0px 1px;
   --shadow-badge: rgba(0, 39, 80, 0.08) 0px 6px 16px -3px, rgba(0, 39, 80, 0.04) 0px 0px 0px 1px;
   --shadow-cta: rgba(24, 37, 66, 0.32) 0px 1px 3px 0px, rgba(24, 37, 66, 0.44) 0px 12px 24px -12px, rgba(219, 247, 255, 0.48) 0px 0.5px 0.5px 0px inset;
+
+  /* ── Observatory / Hero4 glass elevation (dark surfaces) ── */
+  --shadow-glass-subtle: rgba(186, 215, 247, 0.12) 0px 0px 0px 1px inset;
+  --shadow-glass-form: rgba(216, 236, 248, 0.15) 0px 1px 1px 0px inset, rgba(168, 216, 245, 0.04) 0px 24px 48px 0px inset, rgba(0, 0, 0, 0.5) 0px 16px 32px 0px;
+  --shadow-cta-btn: rgba(208, 241, 0, 0.4) 0px 0px 12px 0px, rgba(255, 255, 255, 0.4) 0px 1px 1px 0px inset;
 }
 
-/* inline: values that reference runtime CSS vars (next/font, :root) must stay as var() references */
+/* inline: values that reference runtime CSS vars (next/font, :root) must stay as var() references.
+   Standard faces (Hero4 / Observatory): display = Space Grotesk, mono = JetBrains Mono, sans = Inter.
+   The legacy Geist/Fraunces vars are still emitted by layout.tsx and remain available by name
+   (--font-geist-sans / --font-display-serif / --font-geist-mono) for any older light-canvas section. */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-display-serif), ui-serif, Georgia, serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans: var(--font-sans), var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono), var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* legacy serif display kept addressable for sections that opt in explicitly */
+  --font-display-serif: var(--font-display-serif), ui-serif, Georgia, serif;
 }
 
 :root {
@@ -101,4 +126,41 @@
 }
 .hq-pulse {
   animation: hq-pulse 2.2s ease-in-out infinite;
+}
+
+/* ───────────────────────── Observatory / Hero4 utilities (dark engine) ───────────────────────── */
+
+/* Blueprint grid — 40px ruled lines on the void, faded to a centred radial vignette (from Hero4) */
+.bg-blueprint {
+  background-image:
+    linear-gradient(to right, rgba(186, 215, 247, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(186, 215, 247, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  -webkit-mask-image: radial-gradient(ellipse at center, black 10%, transparent 80%);
+  mask-image: radial-gradient(ellipse at center, black 10%, transparent 80%);
+}
+
+/* Solar text fill — incandescent core → flame, clipped to glyphs (the "all-seeing" word) */
+.text-solar-gradient {
+  background: linear-gradient(90deg, var(--color-solar-core), var(--color-solar-flame));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Continuous gear rotation — driven entirely in CSS so it never re-renders React.
+   Direction + duration are set inline per-gear; .gear-paused freezes for reduced-motion. */
+@keyframes hq-gear-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.gear-spin {
+  animation: hq-gear-spin linear infinite;
+}
+.gear-spin-reverse {
+  animation: hq-gear-spin linear infinite reverse;
+}
+.gear-paused {
+  animation-play-state: paused !important;
 }
