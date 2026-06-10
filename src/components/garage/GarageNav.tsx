@@ -13,6 +13,7 @@ const LINKS = [
   { href: "/whales", label: "Telemetry" },
   { href: "/assets", label: "Dyno bays" },
   { href: "/firms/heliquant", label: "License" },
+  { href: "/setup", label: "Ignition" },
 ];
 
 export default function GarageNav() {
