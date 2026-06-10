@@ -29,7 +29,8 @@ import {
 } from "wagmi";
 import { formatUnits, parseUnits, type Address, type Hex } from "viem";
 
-import PillNav from "@/components/observatory/PillNav";
+import GarageNav from "@/components/garage/GarageNav";
+import RadialEngine from "@/components/garage/RadialEngine";
 import {
   ADDRESSES,
   CHAIN_ID,
@@ -45,23 +46,23 @@ import {
   tradingVaultAbi,
 } from "@/lib/contracts";
 
-// ───────────────────────────── the LAW: local palette (mirrors the hero standard tokens) ─────────────────────────────
-const VOID = "#030408";
-const MIDNIGHT = "#05060f";
-const PANEL = "#0d0d0e";
-const SURFACE_1 = "#141416";
-const HAIRLINE = "rgba(186, 215, 247, 0.08)";
-const HAIRLINE_HOVER = "rgba(186, 215, 247, 0.2)";
-const ICE = "#d8ecf8";
-const ICE_GLOW = "#b6d9fc";
-const MUTE = "#81899b";
-const MUTE_2 = "#4d535d";
-const SOLAR = "#ffd06a";
-const FLAME = "#fa520f";
-const AMBER = "#ffd600"; // Active / ABSTAIN
-const EMERALD = "#72ce7b"; // Settled / profit
-const CRIMSON = "#ff6467"; // loss / error
-const CHARTREUSE = "#d0f100"; // RATIONED — the ONE primary action only
+// ───────────────────────────── the LAW: local palette (NIGHT GARAGE tokens — brand v2) ─────────────────────────────
+const VOID = "#0b0b0b"; // pitch — deepest backdrop
+const MIDNIGHT = "#0b0b0b"; // pitch — page base
+const PANEL = "#161614"; // carbon panel
+const SURFACE_1 = "#1e1e1b"; // carbon2 raised
+const HAIRLINE = "rgba(242, 239, 230, 0.14)"; // bone hairline
+const HAIRLINE_HOVER = "rgba(242, 239, 230, 0.36)";
+const ICE = "#f2efe6"; // bone — ink on dark
+const ICE_GLOW = "#f2efe6";
+const MUTE = "#8b8b80"; // steel
+const MUTE_2 = "#5b5b53";
+const SOLAR = "#f2efe6"; // warm accents fold into bone (no solar in the garage)
+const FLAME = "#ff5a1f"; // signal — rare alert only
+const AMBER = "#f2efe6"; // Active / ABSTAIN — discipline reads bone, never warning-colored
+const EMERALD = "#c9f24b"; // Settled / profit — chartreuse is the win color
+const CRIMSON = "#ff5a1f"; // loss / error
+const CHARTREUSE = "#c9f24b"; // RATIONED — the ONE primary action only
 
 const MONO = "var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)";
 const DISPLAY = "var(--font-display, ui-sans-serif, system-ui, sans-serif)";
@@ -1017,19 +1018,18 @@ export default function AppPage() {
 
   return (
     <>
-      <PillNav />
+      <GarageNav />
       <main
-        className="relative isolate min-h-screen w-full overflow-hidden px-5 pb-24 pt-28 sm:px-8 md:pt-32 lg:px-12"
+        className="relative isolate min-h-screen w-full overflow-hidden px-5 pb-24 pt-16 sm:px-8 md:pt-20 lg:px-12"
         style={{ backgroundColor: MIDNIGHT, color: ICE }}
       >
-        {/* atmosphere — blueprint grid + faint warm bias (matches the hero) */}
-        <div aria-hidden className="bg-blueprint pointer-events-none absolute inset-0 z-0 opacity-30" />
+        {/* atmosphere — carbon dots + faint overhead chartreuse lamp (the garage standard) */}
+        <div aria-hidden className="gr-carbon-dots pointer-events-none absolute inset-0 z-0 opacity-40" />
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 z-0"
           style={{
-            background:
-              "radial-gradient(110% 80% at 80% 0%, rgba(250,82,15,0.06) 0%, rgba(161,19,26,0.02) 38%, transparent 66%)",
+            background: "radial-gradient(ellipse 70% 50% at 50% 0%, rgba(201,242,75,0.06), transparent 70%)",
           }}
         />
 
@@ -1043,21 +1043,17 @@ export default function AppPage() {
               className="font-mono uppercase"
               style={{ color: MUTE, letterSpacing: "0.26em", fontSize: "11px" }}
             >
-              <span style={{ color: FLAME }}>◦</span>{" "}
-              <span style={{ color: ICE, opacity: 0.82 }}>THE PRODUCT · HIRE THE FIRM · MANTLE SEPOLIA</span>
+              <span style={{ color: CHARTREUSE }}>▮</span>{" "}
+              <span style={{ color: ICE, opacity: 0.82 }}>THE PRODUCT · FUEL THE MACHINE · MANTLE SEPOLIA</span>
             </motion.p>
             <motion.h1
               initial={reduce ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
               transition={reduce ? { duration: 0 } : { duration: 0.9, delay: 0.08, ease: [0.2, 0.8, 0.2, 1.05] }}
-              className="font-display mt-4 text-balance"
-              style={{ color: "#fff", fontWeight: 500, fontSize: "clamp(2.1rem, 5vw, 3.4rem)", lineHeight: 1.04, letterSpacing: "-0.015em" }}
+              className="font-display mt-4 text-balance uppercase"
+              style={{ color: ICE, fontWeight: 800, fontSize: "clamp(2.6rem, 6vw, 4.4rem)", lineHeight: 0.92, letterSpacing: "0.005em" }}
             >
-              Hire the{" "}
-              <i className="text-solar-gradient" style={{ fontStyle: "italic" }}>
-                all-seeing
-              </i>{" "}
-              quant.
+              Hire the <span style={{ color: CHARTREUSE }}>engine.</span>
             </motion.h1>
             <motion.p
               initial={reduce ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
@@ -1071,6 +1067,19 @@ export default function AppPage() {
               yours. No counterparty, full audit trail.
             </motion.p>
           </div>
+
+          {/* ── THE LIVE FLOOR — the 9-cylinder radial (the firm at work, runs hired or not) ── */}
+          <section aria-label="The live floor" className="mb-12 border-2 p-5 sm:p-7" style={{ borderColor: HAIRLINE, backgroundColor: PANEL }}>
+            <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+              <p className="font-mono uppercase" style={{ color: MUTE, letterSpacing: "0.26em", fontSize: "10px" }}>
+                THE LIVE FLOOR · A NINE-CYLINDER RADIAL · ONE CYLINDER PER DESK
+              </p>
+              <p className="font-mono uppercase" style={{ color: MUTE, letterSpacing: "0.18em", fontSize: "10px" }}>
+                pistons always run — <span style={{ color: ICE }}>the spark needs a validated edge</span>
+              </p>
+            </div>
+            <RadialEngine decision="ABSTAIN" />
+          </section>
 
           {/* ── body: gated by connection + chain ── */}
           {!mounted ? (
