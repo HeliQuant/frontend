@@ -163,11 +163,12 @@ export default function GearEngine() {
   useEffect(() => setMounted(true), []);
 
   return (
-    <div className="gr-rise relative mx-auto w-full max-w-[470px]" style={{ animationDelay: "0.18s" }}>
-      {/* the machine floor */}
-      <div className="relative mx-auto aspect-square w-full" style={{ maxWidth: 470 }}>
-        {/* scaled stage: coordinates live in a 560px space */}
-        <div className="absolute left-1/2 top-1/2" style={{ transform: "translate(-50%, -50%) scale(0.86)" }}>
+    <div className="gr-rise relative mx-auto w-full" style={{ animationDelay: "0.18s" }}>
+      {/* the machine floor — sized to dominate the column (user: gears 2x bigger) */}
+      <div className="relative mx-auto h-[480px] w-full sm:h-[620px] lg:h-[700px]">
+        {/* scaled stage: coordinates live in a 560px space; scale is THE size knob so the
+            meshed geometry (ring = sum of pitch radii) stays exact at every breakpoint */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 scale-[1.06] sm:scale-[1.38] lg:scale-[1.58]">
           <div className="relative" style={{ width: 560, height: 560 }}>
             {/* center PM gear — driven by the nine desks, counter-rotating (the decider) */}
             <motion.div
