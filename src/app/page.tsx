@@ -7,6 +7,7 @@
 
 import GarageNav from "@/components/garage/GarageNav";
 import HeroEngineBay from "@/components/garage/HeroEngineBay";
+import TheCore from "@/components/garage/TheCore";
 import EngineCycle from "@/components/garage/EngineCycle";
 import DynoRoom from "@/components/garage/DynoRoom";
 import CrashTest from "@/components/garage/CrashTest";
@@ -22,22 +23,25 @@ export default function HomePage() {
         {/* 1 — THE ENGINE BAY · tach + turbine + gearbox holding N */}
         <HeroEngineBay />
 
-        {/* 2 — THE ENGINE CYCLE · the org loop as a 4-stroke engine */}
+        {/* 2 — THE CORE · the literal V8, fully exploded, orbitable (live WebGL) */}
+        <TheCore />
+
+        {/* 3 — THE ENGINE CYCLE · the org loop as a 4-stroke engine */}
         <EngineCycle />
 
-        {/* 3 — THE DYNO ROOM · 24 in, 23 scrapped, 1 passed → retired */}
+        {/* 4 — THE DYNO ROOM · 24 in, 23 scrapped, 1 passed → retired */}
         <DynoRoom />
 
-        {/* 4 — THE CRASH TEST · the +96% we rejected ourselves */}
+        {/* 5 — THE CRASH TEST · the +96% we rejected ourselves */}
         <CrashTest />
 
-        {/* 5 — THE SHOP REPORT · the full teardown log, every verdict stamped */}
+        {/* 6 — THE SHOP REPORT · the full teardown log, every verdict stamped */}
         <ShopReport />
 
-        {/* 6 — THE BLACK BOX · decisions sealed on Mantle, publicly readable */}
+        {/* 7 — THE BLACK BOX · decisions sealed on Mantle, publicly readable */}
         <BlackBox />
 
-        {/* 7 — THE GARAGE · the always-on machinery */}
+        {/* 8 — THE GARAGE · the always-on machinery */}
         <TheGarage />
       </main>
 

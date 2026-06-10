@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeliQuant — V8 Core</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Three.js & OrbitControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #0b0b0b; /* HeliQuant Pitch */
+            font-family: 'Space Mono', monospace;
+        }
+        .bg-dot-grid {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image: radial-gradient(#E7E2D4 1px, transparent 1px);
+            background-size: 24px 24px;
+            opacity: 0.08;
+        }
+        #webgl-container {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+        }
+        /* Label Minimalis Brutalis */
+        .brutalist-label {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            background: #0B0B0A;
+            color: #BFF205;
+            padding: 8px 16px;
+            border: 2px solid #0B0B0A;
+            box-shadow: 4px 4px 0 #FF5A1F;
+            z-index: 20;
+            font-weight: bold;
+            font-size: 14px;
+            pointer-events: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .instructions {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #F1EEE5;
+            color: #0B0B0A;
+            padding: 8px 16px;
+            border: 2px solid #0B0B0A;
+            box-shadow: 4px 4px 0 #0B0B0A;
+            z-index: 20;
+            font-weight: bold;
+            font-size: 12px;
+            pointer-events: none;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+        /* Kursor saat berinteraksi */
+        #webgl-container { cursor: grab; }
+        #webgl-container:active { cursor: grabbing; }
+    </style>
+</head>
+<body>
+
+    <!-- Dot-grid backdrop -->
+    <div class="bg-dot-grid"></div>
+
+    <!-- Brutalist labels -->
+    <div class="brutalist-label">
+        HELIQUANT · V8 CORE
+    </div>
+
+    <div class="instructions">
+        [ DRAG: ROTATE 360° ] • [ SCROLL: ZOOM ]
+    </div>
+
+    <!-- Kanvas Render 3D Layar Penuh -->
+    <div id="webgl-container"></div>
+
+    <script>
+        window.onload = function() {
+            // 1. SETUP SCENE & KAMERA UTAMA
+            const container = document.getElementById('webgl-container');
+            const scene = new THREE.Scene();
+            
+            const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(38, 24, 40); // Sudut pandang isometrik mekanis optimal
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            // Kontrol Orbit (Rotasi & Zoom Bebas)
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.target.set(0, 3, 0);
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            // 2. MATERIAL BRUTALIS (Warna Solid + Garis Tepi Tinta Hitam)
+            const matBone = new THREE.MeshBasicMaterial({ color: '#E7E2D4' });
+            const matSilver = new THREE.MeshBasicMaterial({ color: '#FFFFFF' }); // Warna gear putih cerah dan sangat kontras
+            const matSignal = new THREE.MeshBasicMaterial({ color: '#FF5A1F' }); // Blok Mesin Orange
+            const matLime = new THREE.MeshBasicMaterial({ color: '#BFF205' });   // Piston Lime
+            const matInk = new THREE.MeshBasicMaterial({ color: '#3a3a33' });    // dark machined metal — reads on pitch
+            const matBlue = new THREE.MeshBasicMaterial({ color: '#0055FF' });   // Filter Oli Biru
+            const matLine = new THREE.LineBasicMaterial({ color: '#E7E2D4', linewidth: 2 });  // bone edges on pitch
+
+            function createBrutalistMesh(geometry, material) {
+                const mesh = new THREE.Mesh(geometry, material);
+                const edges = new THREE.EdgesGeometry(geometry);
+                const lines = new THREE.LineSegments(edges, matLine);
+                mesh.add(lines);
+                return mesh;
+            }
+
+            const engineGroup = new THREE.Group();
+            scene.add(engineGroup);
+
+            // =================================================================
+            // 3. GENERATOR BLOK MESIN V8 NATURAL (Bentuk Sculpted & Chamfered)
+            // =================================================================
+            
+            const cylRadius = 1.9;
+            const spacing = 4.6;
+            const bankLength = 20;
+            const bankWidth = 6.5;
+            const bankDepth = 5.2; 
+            const vAngle = Math.PI / 4; 
+
+            const shape = new THREE.Shape();
+            // Bentuk dasar yang dichamfer di sudutnya agar terlihat seperti logam tuang mekanis yang lebih organik
+            shape.moveTo(-bankWidth/2 + 1.2, -bankLength/2);
+            shape.lineTo(bankWidth/2 - 1.2, -bankLength/2);
+            shape.lineTo(bankWidth/2, -bankLength/2 + 1.2);
+            shape.lineTo(bankWidth/2, bankLength/2 - 1.2);
+            shape.lineTo(bankWidth/2 - 1.2, bankLength/2);
+            shape.lineTo(-bankWidth/2 + 1.2, bankLength/2);
+            shape.lineTo(-bankWidth/2, bankLength/2 - 1.2);
+            shape.lineTo(-bankWidth/2, -bankLength/2 + 1.2);
+
+            // Memotong 4 lubang silinder di sepanjang sumbu Y
+            for(let i=0; i<4; i++) {
+                const hole = new THREE.Path();
+                const yOffset = (i - 1.5) * spacing;
+                hole.absarc(0, yOffset, cylRadius, 0, Math.PI * 2, false);
+                shape.holes.push(hole);
+            }
+
+            // bevelEnabled: true memberikan tepian mesin yang lebih real dan lekukan di setiap lubangnya
+            const extrudeSettings = { depth: bankDepth, bevelEnabled: true, bevelThickness: 0.25, bevelSize: 0.25, bevelSegments: 3, curveSegments: 24 };
+            const bankGeom = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+            
+            bankGeom.rotateX(-Math.PI / 2); 
+            bankGeom.translate(0, -bankDepth/2, 0); 
+            
+            // =================================================================
+            // 4. MERAKIT STRUKTUR BLOK KIRI & KANAN (WARNA ORANGE SIGNAL)
+            // =================================================================
+            
+            const blockYPos = 7.5; // Ketinggian blok dari sumbu tengah
+            
+            const leftBank = new THREE.Group();
+            leftBank.rotation.z = vAngle;
+            engineGroup.add(leftBank);
+
+            const blockL = createBrutalistMesh(bankGeom, matSignal);
+            blockL.position.y = blockYPos; 
+            leftBank.add(blockL);
+
+            const rightBank = new THREE.Group();
+            rightBank.rotation.z = -vAngle;
+            // Geser bank kanan sedikit ke belakang (Staggered offset mesin V sejati)
+            const offsetZ = spacing / 2;
+            rightBank.position.z = offsetZ; 
+            engineGroup.add(rightBank);
+
+            const blockR = createBrutalistMesh(bankGeom, matSignal);
+            blockR.position.y = blockYPos;
+            rightBank.add(blockR);
+
+            // =================================================================
+            // 4B. EKSPOS DAN LUBANGI BAGIAN DALAM V-VALLEY ATAS (Pemandangan Internal)
+            // =================================================================
+            // Kami membuang balok tengah yang menutupi bagian atas.
+            // Diganti dengan jembatan penghubung melintang agar internal terekspos total.
+            const valleyCenterGroup = new THREE.Group();
+            engineGroup.add(valleyCenterGroup);
+
+            for (let i = 0; i < 4; i++) {
+                const zVal = (i - 1.5) * spacing + offsetZ / 4;
+                const archGeom = new THREE.TorusGeometry(3.6, 0.5, 8, 16, Math.PI);
+                const arch = createBrutalistMesh(archGeom, matBone);
+                arch.position.set(0, 3.8, zVal);
+                arch.rotation.z = Math.PI; // Menghadap ke bawah menyelimuti area poros engkol
+                valleyCenterGroup.add(arch);
+            }
+
+            // =================================================================
+            // 5. DETAIL BLOK BAWAH & BAK OLI LENGKUNG ORGANIK (OIL PAN SCULPTED)
+            // =================================================================
+            
+            const blockLowerGroup = new THREE.Group();
+            engineGroup.add(blockLowerGroup);
+
+            // Crankcase Bawah (Kini berupa Dinding Kiri & Kanan, bukan blok solid)
+            // MENGHILANGKAN BAGIAN TENGAH AGAR POROS ENGKOL TERLIHAT DARI ATAS
+            const wallGeom = new THREE.BoxGeometry(1.6, 5.5, bankLength + 4);
+            const wallL = createBrutalistMesh(wallGeom, matBone);
+            wallL.position.set(-4.0, 1.25, offsetZ / 2);
+            blockLowerGroup.add(wallL);
+
+            const wallR = createBrutalistMesh(wallGeom, matBone);
+            wallR.position.set(4.0, 1.25, offsetZ / 2);
+            blockLowerGroup.add(wallR);
+
+            // FLENSA GASKET CARTER (Piringan pembatas)
+            const gasketGeom = new THREE.BoxGeometry(10.2, 0.4, bankLength + 4.2);
+            const gasket = createBrutalistMesh(gasketGeom, matInk);
+            gasket.position.set(0, -1.4, offsetZ / 2);
+            blockLowerGroup.add(gasket);
+
+            // BAUT-BAUT PENGIKAT HEKSAGONAL FISIK (Gasket Bolts)
+            const boltGeom = new THREE.CylinderGeometry(0.18, 0.18, 0.4, 6);
+            for(let z = -bankLength/2; z <= bankLength/2 + 2; z += 3.8) {
+                const boltL = createBrutalistMesh(boltGeom, matBone);
+                boltL.position.set(-4.7, -1.2, z);
+                blockLowerGroup.add(boltL);
+
+                const boltR = createBrutalistMesh(boltGeom, matBone);
+                boltR.position.set(4.7, -1.2, z);
+                blockLowerGroup.add(boltR);
+            }
+
+            // PEMBUATAN BAK OLI ORGANIS / LENGKUNG (Sculpted Sump)
+            const panProfile = new THREE.Shape();
+            panProfile.moveTo(bankLength/2 + 2, 0);       
+            panProfile.lineTo(bankLength/2 + 2, -1.5);    
+            panProfile.lineTo(2, -1.5);                   
+            panProfile.quadraticCurveTo(-1, -1.5, -3, -4.5); 
+            panProfile.lineTo(-bankLength/2 - 2, -4.5);   
+            panProfile.lineTo(-bankLength/2 - 2, 0);      
+            panProfile.closePath();
+
+            const panExtrudeSettings = { depth: 8.6, bevelEnabled: true, bevelThickness: 0.2, bevelSize: 0.2, bevelSegments: 3, curveSegments: 24 };
+            const panGeom = new THREE.ExtrudeGeometry(panProfile, panExtrudeSettings);
+            panGeom.rotateY(Math.PI / 2); 
+            panGeom.translate(-4.3, -1.4, offsetZ / 2); 
+
+            const oilPanSculpted = createBrutalistMesh(panGeom, matInk);
+            blockLowerGroup.add(oilPanSculpted);
+
+            // SIRIP-SIRIP PENDINGIN CARTER RADIAL
+            const finShape = new THREE.Shape();
+            finShape.moveTo(-4.6, 0);
+            finShape.quadraticCurveTo(-4.3, -2.6, -2.6, -4.0);
+            finShape.lineTo(2.6, -4.0);
+            finShape.quadraticCurveTo(4.3, -2.6, 4.6, 0);
+            finShape.closePath();
+
+            const finExtrudeSettings = { depth: 0.25, bevelEnabled: false };
+            const finGeom = new THREE.ExtrudeGeometry(finShape, finExtrudeSettings);
+            finGeom.rotateX(Math.PI);
+            finGeom.translate(0, -1.45, 0);
+
+            for(let z = -bankLength/2 + 2; z <= bankLength/2 + 1; z += 2.5) {
+                const fin = createBrutalistMesh(finGeom, matInk);
+                fin.position.z = z;
+                blockLowerGroup.add(fin);
+            }
+
+            // Baut Pembuangan Oli Mekanis
+            const plugGeom = new THREE.CylinderGeometry(0.5, 0.5, 0.6, 6);
+            const plug = createBrutalistMesh(plugGeom, matSilver);
+            plug.position.set(0, -5.5, -4);
+            blockLowerGroup.add(plug);
+
+            // Filter Oli Biru
+            const oilFilterGeom = new THREE.CylinderGeometry(1.2, 1.2, 2.5, 12);
+            const oilFilter = createBrutalistMesh(oilFilterGeom, matBlue);
+            oilFilter.rotation.z = Math.PI / 3;
+            oilFilter.position.set(4.5, -2, offsetZ);
+            blockLowerGroup.add(oilFilter);
+
+            // =================================================================
+            // 6. POROS ENGKOL DENGAN DAUN PENYEIMBANG & RODA GILA
+            // =================================================================
+            const crankshaftGroup = new THREE.Group();
+            engineGroup.add(crankshaftGroup);
+
+            const mainShaftGeom = new THREE.CylinderGeometry(0.6, 0.6, bankLength + 4, 12);
+            const mainShaft = createBrutalistMesh(mainShaftGeom, matInk);
+            mainShaft.rotation.x = Math.PI / 2;
+            mainShaft.position.z = offsetZ / 2;
+            crankshaftGroup.add(mainShaft);
+
+            const webGeom = new THREE.BoxGeometry(4.2, 1.2, 1.4);
+            const webs = [];
+            for(let i = 0; i < 5; i++) {
+                const webZ = (i - 2) * (spacing + 0.3) + offsetZ / 2;
+                const web = createBrutalistMesh(webGeom, matBone);
+                web.position.set(0, 0, webZ);
+                crankshaftGroup.add(web);
+                webs.push(web);
+            }
+
+            // MENGEMBALIKAN RODA GILA RAKSASA (Flywheel) DI BELAKANG
+            function createGearGeomFlywheel(radius, thickness, teeth) {
+                const gearShape = new THREE.Shape();
+                const innerRadius = radius * 0.90;
+                for (let i = 0; i < teeth * 2; i++) {
+                    const angle = (i / (teeth * 2)) * Math.PI * 2;
+                    const r = i % 2 === 0 ? radius : innerRadius;
+                    if (i === 0) gearShape.moveTo(Math.cos(angle) * r, Math.sin(angle) * r);
+                    else gearShape.lineTo(Math.cos(angle) * r, Math.sin(angle) * r);
+                }
+                gearShape.closePath();
+                const holePath = new THREE.Path();
+                holePath.absarc(0, 0, radius * 0.15, 0, Math.PI * 2, false);
+                gearShape.holes.push(holePath);
+
+                const gearExtrude = { depth: thickness, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.05, bevelSegments: 2, curveSegments: 24 };
+                const geom = new THREE.ExtrudeGeometry(gearShape, gearExtrude);
+                geom.translate(0, 0, -thickness/2);
+                return geom;
+            }
+
+            const flywheelGeom = createGearGeomFlywheel(4.8, 0.8, 48);
+            const flywheel = createBrutalistMesh(flywheelGeom, matInk);
+            flywheel.position.set(0, 0, -bankLength/2 - 1.5);
+            crankshaftGroup.add(flywheel);
+
+            // =================================================================
+            // 7. PISTON LIME & KINEMATIKA BATANG PENGHUBUNG (CONRODS)
+            // =================================================================
+            const pistonHeight = 2.2;
+            const pistonGeom = new THREE.CylinderGeometry(cylRadius * 0.95, cylRadius * 0.95, pistonHeight, 24);
+            const conrodGeom = new THREE.BoxGeometry(0.5, 1, 0.6); 
+            const crankPinGeom = new THREE.CylinderGeometry(0.45, 0.45, 1.1, 12);
+
+            const pistons = [];
+            const crankRadius = 2.6;
+            const conrodLength = 8.5;
+
+            const offsetsL = [0, Math.PI, Math.PI/2, Math.PI*1.5];
+            const offsetsR = [Math.PI/2, Math.PI*1.5, Math.PI, 0];
+
+            function createPistonAssembly(bank, zLocal, offset) {
+                const pistonMesh = createBrutalistMesh(pistonGeom, matLime);
+                bank.add(pistonMesh);
+
+                const conrodMesh = createBrutalistMesh(conrodGeom, matInk);
+                engineGroup.add(conrodMesh);
+
+                const crankPinMesh = createBrutalistMesh(crankPinGeom, matBone);
+                crankPinMesh.rotation.x = Math.PI / 2;
+                engineGroup.add(crankPinMesh);
+
+                return { mesh: pistonMesh, conrod: conrodMesh, crankPin: crankPinMesh, offset: offset, bank: bank, zLocal: zLocal };
+            }
+
+            for(let i=0; i<4; i++) {
+                const zL = (i - 1.5) * spacing;
+                pistons.push(createPistonAssembly(leftBank, zL, offsetsL[i]));
+
+                const zR = (i - 1.5) * spacing;
+                pistons.push(createPistonAssembly(rightBank, zR, offsetsR[i]));
+            }
+
+            // =================================================================
+            // 8. DETAIL DEPAN: GEOMETRI GEAR REALISTIS CERAH & SEGMENTED CHAIN
+            // =================================================================
+            
+            const frontDriveGroup = new THREE.Group();
+            frontDriveGroup.position.set(0, 4, bankLength/2 + 3.8); 
+            engineGroup.add(frontDriveGroup);
+
+            // Profil Gigi Ekstrem agar menyembul keluar jelas dari sabuk
+            function createGearGeom(radius, thickness, teeth, numHoles = 5) {
+                const gearShape = new THREE.Shape();
+                const innerRadius = radius * 0.70; // Gigi dibuat sangat dalam & ekstrem
+                for (let i = 0; i < teeth * 2; i++) {
+                    const angle = (i / (teeth * 2)) * Math.PI * 2;
+                    const r = i % 2 === 0 ? radius : innerRadius;
+                    if (i === 0) gearShape.moveTo(Math.cos(angle) * r, Math.sin(angle) * r);
+                    else gearShape.lineTo(Math.cos(angle) * r, Math.sin(angle) * r);
+                }
+                gearShape.closePath();
+                
+                const holePath = new THREE.Path();
+                holePath.absarc(0, 0, radius * 0.25, 0, Math.PI * 2, false);
+                gearShape.holes.push(holePath);
+
+                if(numHoles > 0) {
+                    const holeRadius = radius * 0.18;
+                    const distFromCenter = radius * 0.55;
+                    for(let i = 0; i < numHoles; i++) {
+                        const angle = (i / numHoles) * Math.PI * 2;
+                        const hX = Math.cos(angle) * distFromCenter;
+                        const hY = Math.sin(angle) * distFromCenter;
+                        const lightHole = new THREE.Path();
+                        lightHole.absarc(hX, hY, holeRadius, 0, Math.PI * 2, false);
+                        gearShape.holes.push(lightHole);
+                    }
+                }
+
+                const gearExtrude = { depth: thickness, bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.08, bevelSegments: 2, curveSegments: 24 };
+                const geom = new THREE.ExtrudeGeometry(gearShape, gearExtrude);
+                geom.translate(0, 0, -thickness/2);
+                return geom;
+            }
+
+            // KETEBALAN GEAR 2.6 (Sangat Lebar) vs Rantai 0.5 -> Gigi bertonjolan keluar drastis
+            const crankGearGeom = createGearGeom(2.0, 2.6, 18, 5); 
+            const crankGear = createBrutalistMesh(crankGearGeom, matSilver);
+            crankGear.position.set(0, -4, 0);
+            frontDriveGroup.add(crankGear);
+
+            const crankHubGeom = new THREE.CylinderGeometry(0.8, 0.8, 2.8, 8);
+            const crankHub = createBrutalistMesh(crankHubGeom, matLime);
+            crankHub.rotation.x = Math.PI / 2;
+            crankHub.position.set(0, -4, 0);
+            frontDriveGroup.add(crankHub);
+
+            const camGearGeom = createGearGeom(1.6, 2.2, 14, 5);
+            const camGearL = createBrutalistMesh(camGearGeom, matSilver);
+            camGearL.position.set(-4.5, 3.5, 0);
+            frontDriveGroup.add(camGearL);
+
+            const camGearR = createBrutalistMesh(camGearGeom, matSilver);
+            camGearR.position.set(4.5, 3.5, 0);
+            frontDriveGroup.add(camGearR);
+
+            const altPulleyGeom = createGearGeom(1.0, 1.8, 8, 0); 
+            const altPulley = createBrutalistMesh(altPulleyGeom, matSilver);
+            altPulley.position.set(-4.0, -1.0, 0);
+            frontDriveGroup.add(altPulley);
+
+            const altFanGeom = new THREE.CylinderGeometry(1.4, 1.4, 0.3, 10);
+            const altFan = createBrutalistMesh(altFanGeom, matInk);
+            altFan.rotation.x = Math.PI / 2;
+            altFan.position.set(-4.0, -1.0, -1.0);
+            frontDriveGroup.add(altFan);
+
+            const tensionPulleyGeom = new THREE.CylinderGeometry(0.7, 0.7, 1.8, 12);
+            const tensionPulley = createBrutalistMesh(tensionPulleyGeom, matSilver);
+            tensionPulley.rotation.x = Math.PI / 2;
+            tensionPulley.position.set(3.5, -1.5, 0);
+            frontDriveGroup.add(tensionPulley);
+
+            // =================================================================
+            // RUTE RANTAI & GENERATOR MATA RANTAI INDEPENDEN (SEGMENTED CHAIN)
+            // =================================================================
+            // Path ditarik keluar dari inti gear agar menyelimuti lekukan gigi
+            const beltPoints = [
+                new THREE.Vector3(-4.5, 5.2, 0),    
+                new THREE.Vector3(0, 3.3, 0),       
+                new THREE.Vector3(4.5, 5.2, 0),    
+                new THREE.Vector3(5.9, 2.5, 0),    
+                new THREE.Vector3(3.5, -1.5, 0),   
+                new THREE.Vector3(2.0, -4.0, 0),   
+                new THREE.Vector3(0, -6.1, 0),     
+                new THREE.Vector3(-2.0, -4.0, 0),  
+                new THREE.Vector3(-4.0, -2.0, 0),  
+                new THREE.Vector3(-6.1, 2.5, 0),   
+                new THREE.Vector3(-4.5, 5.2, 0)
+            ];
+            
+            const beltCurve = new THREE.CatmullRomCurve3(beltPoints, true); 
+
+            const numLinks = 60;
+            const chainLinks = [];
+            
+            // Geometri Rantai Dibuat Lebih Tipis Namun Padat agar Gigi Menyembul
+            const linkGeom = new THREE.BoxGeometry(0.9, 0.25, 0.7); 
+
+            for(let i = 0; i < numLinks; i++) {
+                let linkMat = matInk;
+                if(i % 2 === 0) linkMat = matBone; 
+                if(i % 15 === 0) linkMat = matSignal; 
+
+                const linkMesh = createBrutalistMesh(linkGeom, linkMat);
+                frontDriveGroup.add(linkMesh);
+                chainLinks.push(linkMesh);
+            }
+
+            // =================================================================
+            // 9. PIPA MANIFES KNALPOT (Meliuk Organis di Sisi Luar)
+            // =================================================================
+            
+            function buildExhaust(bank, direction) {
+                for(let i=0; i<4; i++) {
+                    const z = (i - 1.5) * spacing;
+                    const dir = direction === 'left' ? -1 : 1;
+                    const startY = blockYPos - 1; 
+                    
+                    const exPoints = [
+                        new THREE.Vector3(dir * (bankWidth/2), startY, z),
+                        new THREE.Vector3(dir * (bankWidth/2 + 1.5), startY, z),
+                        new THREE.Vector3(dir * (bankWidth/2 + 2.5), startY - 2.2, z),
+                        new THREE.Vector3(dir * (bankWidth/2 + 2.5), -1.8, z)
+                    ];
+                    const exCurve = new THREE.CatmullRomCurve3(exPoints);
+                    const exGeom = new THREE.TubeGeometry(exCurve, 12, 0.6, 8, false);
+                    const exhaust = createBrutalistMesh(exGeom, matInk);
+                    bank.add(exhaust);
+                }
+            }
+            buildExhaust(leftBank, 'left');
+            buildExhaust(rightBank, 'right');
+
+            // Kolektor Gas Buang Bawah
+            const collectorGeom = new THREE.CylinderGeometry(0.8, 0.8, bankLength + 2, 12);
+            
+            const collectorL = createBrutalistMesh(collectorGeom, matInk);
+            collectorL.rotation.x = Math.PI / 2;
+            collectorL.position.set(-6.1, -1.8, 0);
+            leftBank.add(collectorL); 
+
+            const collectorR = createBrutalistMesh(collectorGeom, matInk);
+            collectorR.rotation.x = Math.PI / 2;
+            collectorR.position.set(6.1, -1.8, 0);
+            rightBank.add(collectorR);
+
+
+            // =================================================================
+            // 10. LOOP ANIMASI KINEMATIK MATEMATIS SEJATI
+            // =================================================================
+            
+            const clock = new THREE.Clock();
+            const speedModifier = 0.35; 
+
+            const localY = new THREE.Vector3(0, 1, 0);
+
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update(); 
+                
+                const speed = clock.getElapsedTime() * speedModifier * 5;
+
+                // Animasi Rotasi Crankshaft & Webs Penyeimbang
+                crankshaftGroup.rotation.z = -speed;
+
+                // Rotasi Gigi Depan Sinkron
+                crankGear.rotation.z = -speed;
+                camGearL.rotation.z = -speed * 0.5; 
+                camGearR.rotation.z = -speed * 0.5;
+                altPulley.rotation.z = -speed * 1.8; 
+                
+                altFan.rotation.y = speed * 1.8;
+                tensionPulley.rotation.y = -speed * 1.2;
+
+                webs.forEach((web, idx) => {
+                    web.rotation.z = -speed;
+                });
+
+                // UPDATE ANIMASI JALAN TIMING CHAIN (SEGMENTED LINKS)
+                const chainProgress = speed * 0.05; 
+                
+                chainLinks.forEach((link, idx) => {
+                    let t = (idx / numLinks + chainProgress) % 1.0;
+                    if(t < 0) t += 1.0;
+
+                    const pos = beltCurve.getPointAt(t);
+                    link.position.copy(pos);
+
+                    const tangent = beltCurve.getTangentAt(t).normalize();
+                    const normal = new THREE.Vector3(-tangent.y, tangent.x, 0).normalize();
+                    const binormal = new THREE.Vector3(0, 0, 1);
+
+                    const matrix = new THREE.Matrix4().makeBasis(normal, tangent, binormal);
+                    link.rotation.setFromRotationMatrix(matrix);
+                });
+
+                pistons.forEach((p) => {
+                    const cycle = speed + p.offset;
+                    
+                    const crankZ = p.bank === rightBank ? p.zLocal + offsetZ : p.zLocal;
+                    const crankPinWorld = new THREE.Vector3(
+                        Math.sin(cycle) * crankRadius,
+                        Math.cos(cycle) * crankRadius,
+                        crankZ
+                    );
+                    p.crankPin.position.copy(crankPinWorld);
+
+                    const crankPinLocal = crankPinWorld.clone();
+                    p.bank.worldToLocal(crankPinLocal);
+
+                    const dx = crankPinLocal.x; 
+                    const dy = Math.sqrt(conrodLength * conrodLength - dx * dx); 
+                    
+                    const pistonLocalY = crankPinLocal.y + dy;
+                    p.mesh.position.set(0, pistonLocalY, p.zLocal); 
+
+                    const pistonWorld = new THREE.Vector3();
+                    p.mesh.getWorldPosition(pistonWorld);
+
+                    p.conrod.position.copy(crankPinWorld).lerp(pistonWorld, 0.5);
+                    
+                    const direction = new THREE.Vector3().subVectors(pistonWorld, crankPinWorld);
+                    p.conrod.scale.set(1, direction.length(), 1); 
+                    
+                    const quaternion = new THREE.Quaternion().setFromUnitVectors(localY, direction.clone().normalize());
+                    p.conrod.setRotationFromQuaternion(quaternion);
+                });
+
+                renderer.render(scene, camera);
+            }
+
+            animate();
+        };
+    </script>
+</body>
+</html>
