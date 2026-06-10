@@ -1,57 +1,49 @@
 "use client";
 
 /**
- * GEAR ENGINE — the firm as interlocking machinery (ported from the user's Hero4.htm right
- * column, re-skinned to the Night Garage language and grown to the CURRENT 9-desk floor).
+ * GEAR ENGINE — the firm as interlocking machinery (Hero4 ported to the Night Garage,
+ * grown to the current 9-desk floor).
  *
- * Hero4 → garage translation:
- *   glow/glass/3D-tilt → hard offset shadows + flat carbon (brutalist depth)
- *   rounded HUD pills → square bone-bordered plates
- *   GSAP timeline     → motion springs (center rises, desks slam in staggered, then spin)
- *   ice/solar palette → bone rims, ONE chartreuse accent: the PM hub (the spark decider)
- * Desk gears spin in alternating directions (meshed teeth), speed up on hover, and the
- * whole machine idles forever — the loop never stops. Under it, the honest readout:
- * regime 82.6% OOS and the gearbox holding N (registry empty).
+ * MECHANICAL TRUTH (user-directed): the nine desk gears MESH the PM gear and DRIVE it —
+ * exactly like the firm, where the desks feed the PM and the PM moves to decide. So:
+ *   • every desk gear's teeth touch the PM's teeth (ring distance = sum of pitch radii),
+ *   • all desks spin the SAME direction, the PM spins OPPOSITE (meshed gears counter-rotate),
+ *   • angular speeds follow the real gear ratio (same rim speed at the contact point).
+ * The slow continuous spin is NEVER killed by prefers-reduced-motion (doctrine §8 — a
+ * frozen engine reads as dead); reduced motion only skips the entrance springs.
  */
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
-
-type DeskGear = {
-  label: string;
-  size: number;
-  x: number; // final center offset from PM hub (px, 560-box space)
-  y: number;
-  speed: number; // seconds per revolution
-};
-
-// the CURRENT nine-desk floor (manifold roster), placed in a tight meshed ring
-const DESKS: DeskGear[] = [
-  { label: "REGIME", size: 138, x: 0, y: -196, speed: 26 },
-  { label: "MACRO", size: 114, x: 128, y: -152, speed: 21 },
-  { label: "ON-CHAIN", size: 146, x: 196, y: -32, speed: 30 },
-  { label: "SMART-$", size: 122, x: 170, y: 102, speed: 23 },
-  { label: "RSRCH", size: 106, x: 66, y: 186, speed: 19 },
-  { label: "OI", size: 142, x: -70, y: 188, speed: 28 },
-  { label: "FLOW", size: 116, x: -174, y: 100, speed: 22 },
-  { label: "WHALE", size: 134, x: -198, y: -34, speed: 27 },
-  { label: "MANTLE", size: 120, x: -126, y: -154, speed: 24 },
-];
 
 const BONE = "#f2efe6";
 const CHART = "#c9f24b";
 
+// ── meshed geometry ──
+// Teeth (pitch) radius = (size/2) * (45/50)  — the r=45 teeth circle in a 100-box SVG.
+const PM_SIZE = 210; // PM pitch radius ≈ 94.5
+const DESK_SIZE = 106; // desk pitch radius ≈ 47.7
+const RING = 141; // ≈ 94.5 + 47.7 − 1 (one tooth of overlap = visibly interlocked)
+const PM_SPEED = 44; // s/rev
+const DESK_SPEED = PM_SPEED * ((DESK_SIZE / 2) * 0.9) / ((PM_SIZE / 2) * 0.9); // real ratio ≈ 22.2
+
+// the CURRENT nine-desk floor, evenly meshed around the PM (40° pitch, from the top)
+const DESKS = ["REGIME", "MACRO", "ON-CHAIN", "SMART-$", "RSRCH", "OI", "FLOW", "WHALE", "MANTLE"].map(
+  (label, i) => {
+    const a = ((-90 + i * 40) * Math.PI) / 180;
+    return { label, x: Math.cos(a) * RING, y: Math.sin(a) * RING, ux: Math.cos(a), uy: Math.sin(a) };
+  }
+);
+
 function GearSvg({
   color,
   isCenter,
-  spinning,
   reverse,
   speed,
   hovered,
 }: {
   color: string;
   isCenter?: boolean;
-  spinning: boolean;
   reverse: boolean;
   speed: number;
   hovered: boolean;
@@ -59,7 +51,7 @@ function GearSvg({
   return (
     <svg
       viewBox="0 0 100 100"
-      className={`absolute h-full w-full ${spinning ? (reverse ? "gear-spin-reverse" : "gear-spin") : ""}`}
+      className={`absolute h-full w-full ${reverse ? "gear-spin-reverse" : "gear-spin"}`}
       style={{
         animationDuration: `${hovered ? speed * 0.45 : speed}s`,
         filter: hovered
@@ -71,14 +63,14 @@ function GearSvg({
       <circle cx="50" cy="50" r="41" fill="#161614" />
       <circle cx="50" cy="50" r="39" fill="none" stroke="rgba(242,239,230,0.07)" strokeWidth="1" />
 
-      {/* outer teeth — thick mechanical cogs */}
+      {/* outer teeth — thick mechanical cogs on the pitch circle */}
       <circle
         cx="50"
         cy="50"
         r="45"
         fill="none"
         stroke={color}
-        strokeOpacity={isCenter ? 0.85 : 0.45}
+        strokeOpacity={isCenter ? 0.85 : 0.5}
         strokeWidth="8"
         strokeDasharray="6 8"
       />
@@ -122,33 +114,36 @@ function Gear({
   label,
   size,
   isCenter = false,
-  spinning,
   reverse,
   speed,
+  labelDir,
 }: {
   label: string;
   size: number;
   isCenter?: boolean;
-  spinning: boolean;
   reverse: boolean;
   speed: number;
+  labelDir?: { ux: number; uy: number }; // unit vector pointing AWAY from the PM
 }) {
   const [hovered, setHovered] = useState(false);
   const color = isCenter ? CHART : BONE;
+  // engraved plate sits radially OUTWARD so it never collides with the meshed PM
+  const lx = labelDir ? labelDir.ux * (size / 2 + 4) : 0;
+  const ly = labelDir ? labelDir.uy * (size / 2 + 4) : 0;
   return (
     <div
       className="relative flex items-center justify-center transition-transform duration-300 ease-out"
-      style={{ width: size, height: size, transform: hovered ? "scale(1.14)" : "scale(1)", zIndex: hovered ? 50 : isCenter ? 10 : 20 }}
+      style={{ width: size, height: size, transform: hovered ? "scale(1.12)" : "scale(1)", zIndex: hovered ? 50 : isCenter ? 10 : 20 }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <GearSvg color={color} isCenter={isCenter} spinning={spinning} reverse={reverse} speed={speed} hovered={hovered} />
-      {/* engraved plate — square, bone-bordered (no pills in the garage) */}
+      <GearSvg color={color} isCenter={isCenter} reverse={reverse} speed={speed} hovered={hovered} />
       <div
-        className="absolute z-30 border-2 px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] transition-colors duration-200"
+        className="absolute z-30 whitespace-nowrap border-2 px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] transition-colors duration-200"
         style={{
-          bottom: isCenter ? "50%" : -6,
-          transform: isCenter ? "translateY(50%)" : undefined,
+          left: "50%",
+          top: "50%",
+          transform: `translate(-50%, -50%) translate(${lx}px, ${ly}px)`,
           background: isCenter ? CHART : "rgba(11,11,11,0.92)",
           borderColor: hovered ? CHART : isCenter ? "#0b0b0b" : "rgba(242,239,230,0.4)",
           color: isCenter ? "#0b0b0b" : hovered ? CHART : "rgba(242,239,230,0.75)",
@@ -163,26 +158,18 @@ function Gear({
 
 export default function GearEngine() {
   const reduced = useReducedMotion();
-  const [spinning, setSpinning] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-    // gears engage once the entrance choreography lands (center + 9 staggered desks)
-    const t = setTimeout(() => setSpinning(!reduced), reduced ? 0 : 1900);
-    return () => clearTimeout(t);
-  }, [reduced]);
-
-  const desks = useMemo(() => DESKS, []);
+  useEffect(() => setMounted(true), []);
 
   return (
     <div className="gr-rise relative mx-auto w-full max-w-[470px]" style={{ animationDelay: "0.18s" }}>
       {/* the machine floor */}
       <div className="relative mx-auto aspect-square w-full" style={{ maxWidth: 470 }}>
         {/* scaled stage: coordinates live in a 560px space */}
-        <div className="absolute left-1/2 top-1/2" style={{ transform: "translate(-50%, -50%) scale(0.82)" }}>
+        <div className="absolute left-1/2 top-1/2" style={{ transform: "translate(-50%, -50%) scale(0.86)" }}>
           <div className="relative" style={{ width: 560, height: 560 }}>
-            {/* center PM gear — the spark decider, the one chartreuse mass */}
+            {/* center PM gear — driven by the nine desks, counter-rotating (the decider) */}
             <motion.div
               className="absolute left-1/2 top-1/2"
               initial={reduced ? false : { opacity: 0, scale: 0.55 }}
@@ -190,27 +177,33 @@ export default function GearEngine() {
               transition={{ type: "spring", stiffness: 130, damping: 14, delay: 0.1 }}
               style={{ x: "-50%", y: "-50%" }}
             >
-              <Gear label="PM" size={186} isCenter spinning={spinning} reverse={false} speed={40} />
+              <Gear label="PM" size={PM_SIZE} isCenter reverse={false} speed={PM_SPEED} />
             </motion.div>
 
-            {/* nine desk gears slam in staggered, meshed alternating directions */}
-            {desks.map((d, i) => (
+            {/* nine desk gears — teeth ON the PM's teeth, all driving the same direction */}
+            {DESKS.map((d, i) => (
               <motion.div
                 key={d.label}
                 className="absolute left-1/2 top-1/2"
                 initial={
                   reduced
                     ? false
-                    : { opacity: 0, scale: 0.35, x: d.x * 2.1 - d.size / 2, y: d.y * 2.1 - d.size / 2 }
+                    : { opacity: 0, scale: 0.35, x: d.x * 2.3 - DESK_SIZE / 2, y: d.y * 2.3 - DESK_SIZE / 2 }
                 }
                 animate={
                   mounted
-                    ? { opacity: 1, scale: 1, x: d.x - d.size / 2, y: d.y - d.size / 2 }
+                    ? { opacity: 1, scale: 1, x: d.x - DESK_SIZE / 2, y: d.y - DESK_SIZE / 2 }
                     : {}
                 }
-                transition={{ type: "spring", stiffness: 90, damping: 13, mass: 0.9, delay: reduced ? 0 : 0.45 + i * 0.14 }}
+                transition={{ type: "spring", stiffness: 95, damping: 13, mass: 0.9, delay: reduced ? 0 : 0.4 + i * 0.12 }}
               >
-                <Gear label={d.label} size={d.size} spinning={spinning} reverse={i % 2 === 0} speed={d.speed} />
+                <Gear
+                  label={d.label}
+                  size={DESK_SIZE}
+                  reverse
+                  speed={DESK_SPEED}
+                  labelDir={{ ux: d.ux, uy: d.uy }}
+                />
               </motion.div>
             ))}
           </div>
