@@ -5,8 +5,8 @@
  *
  * Running your own HeliQuant needs credentials — this page is the startup switch panel:
  * each credential is a switch row (status lamp lights chartreuse when armed), the right
- * side live-renders the .env, and the launch checklist walks the deploy (Railway →
- * UptimeRobot heartbeat → local telemetry feeder).
+ * side live-renders the .env, and the launch checklist walks the deploy (Railway in the
+ * Amsterdam region → paste .env → UptimeRobot heartbeat → the cloud self-refreshes its data).
  *
  * SECURITY (the design constraint that shapes everything here):
  *   • This page makes ZERO network calls with your values — no fetch, no analytics, no
@@ -55,16 +55,17 @@ const CREDS: Cred[] = [
   {
     key: "SUPABASE_URL",
     label: "Supabase URL",
-    why: "state that survives redeploys: positioning, carry, whales, exploration, decisions",
+    why: "HeliQuant's shared project is pre-filled — swap it for your own Supabase to self-host. Holds state that survives redeploys: positioning, carry, whales, exploration, decisions",
     group: "memory",
     required: true,
     secret: false,
     placeholder: "https://xxxx.supabase.co",
+    defaultValue: "https://dreexbadvlxufkrvvwrq.supabase.co",
   },
   {
     key: "SUPABASE_KEY",
     label: "Supabase service-role key",
-    why: "server-side writes to hq_state + decisions_hq (never ship this to a browser app)",
+    why: "service-role key for THAT project — server-side writes to hq_state + decisions_hq. Never expose it in a browser app; it lives only in your Railway env",
     group: "memory",
     required: true,
     secret: true,
@@ -72,33 +73,34 @@ const CREDS: Cred[] = [
   },
   // ── THE GUARDS ──
   {
-    key: "INGEST_TOKEN",
-    label: "Ingest token",
-    why: "any random string — guards POST /ingest so only YOUR feeder can push data",
-    group: "guards",
-    required: true,
-    secret: true,
-    placeholder: "hq_yourRandomString",
-  },
-  {
     key: "ASSETS",
     label: "Assets",
-    why: "what the floor analyzes, comma-separated (one per cycle, rotated)",
+    why: "what the floor analyzes, comma-separated — rotated one per cycle (basket size doesn't spike LLM calls)",
     group: "guards",
     required: true,
     secret: false,
-    placeholder: "MNT,BTC",
-    defaultValue: "MNT,BTC",
+    placeholder: "MNT,BTC,ETH,SOL,HYPE,SUI",
+    defaultValue: "MNT,BTC,ETH,SOL,HYPE,SUI",
   },
   {
     key: "INTERVAL_MIN",
     label: "Cycle interval (min)",
-    why: "60 keeps a free Groq tier comfortable",
+    why: "minutes between cycles — code default 30; raise it (60+) to keep a free Groq tier comfortable",
     group: "guards",
     required: true,
     secret: false,
-    placeholder: "60",
-    defaultValue: "60",
+    placeholder: "30",
+    defaultValue: "30",
+  },
+  {
+    key: "REFRESH_DATA",
+    label: "Self-refresh data (0/1)",
+    why: "1 = the cloud re-fetches fresh market data each cycle — no external feeder needed (run the Railway service in EU West / Amsterdam so Bybit is reachable)",
+    group: "guards",
+    required: true,
+    secret: false,
+    placeholder: "1",
+    defaultValue: "1",
   },
   {
     key: "EXECUTE",
@@ -130,6 +132,15 @@ const CREDS: Cred[] = [
     placeholder: "optional",
   },
   {
+    key: "BYBIT_TESTNET",
+    label: "Bybit testnet (0/1)",
+    why: "1 = stay on testnet (safe). 0 = mainnet spot only (derivatives are geo-banned in some regions)",
+    group: "fuel",
+    required: false,
+    secret: false,
+    placeholder: "1 (if using Bybit)",
+  },
+  {
     key: "DEPLOYER_PRIVATE_KEY",
     label: "Mantle wallet private key",
     why: "anchors decisions on-chain (testnet wallet with faucet MNT — never your main wallet)",
@@ -139,9 +150,36 @@ const CREDS: Cred[] = [
     placeholder: "optional — testnet wallet only",
   },
   {
+    key: "ALLORA_API_KEY",
+    label: "Allora API key",
+    why: "Macro desk — Allora decentralized-AI 8h BTC/ETH prediction — optional, desk degrades gracefully without it",
+    group: "fuel",
+    required: false,
+    secret: true,
+    placeholder: "optional",
+  },
+  {
     key: "NANSEN_API_KEY",
     label: "Nansen API key",
-    why: "extra smart-money desk depth on majors — optional",
+    why: "Smart-Money desk depth — funds' real ETH netflow on majors — optional",
+    group: "fuel",
+    required: false,
+    secret: true,
+    placeholder: "optional",
+  },
+  {
+    key: "ELFA_API_KEY",
+    label: "Elfa API key",
+    why: "Smart-Social desk — narrative / mindshare from smart accounts (not retail noise) — optional",
+    group: "fuel",
+    required: false,
+    secret: true,
+    placeholder: "optional",
+  },
+  {
+    key: "MANTLESCAN_API_KEY",
+    label: "Mantlescan API key",
+    why: "On-chain desk — Etherscan-v2 Mantle (chainid 5000) reads — optional",
     group: "fuel",
     required: false,
     secret: true,
@@ -157,11 +195,11 @@ const GROUPS: Array<{ id: Cred["group"]; title: string; sub: string }> = [
 ];
 
 const LAUNCH = [
-  { step: "T-3", text: "Railway → New Project → deploy the HeliQuant agents repo (Python detected automatically)" },
+  { step: "T-3", text: "Railway → New Project → deploy the HeliQuant agents repo (Python auto-detected). Pick the EU West / Amsterdam region so Bybit is reachable." },
   { step: "T-2", text: "Variables → paste the .env you built here → save (auto-redeploys)" },
-  { step: "T-1", text: "UptimeRobot (free) → HTTP monitor → GET https://<your-app>/run-cycle every 5 min — the heartbeat that drives cycles" },
-  { step: "T-0", text: "Local telemetry rig: run scripts/85 (positioning → /ingest, hourly) + scripts/88 (carry+whales → Supabase) with WARP on" },
-  { step: "GO", text: "Watch /logs and /decisions — the floor analyzes, seals every cycle, and holds N until an edge validates. That restraint is the product." },
+  { step: "T-1", text: "UptimeRobot (free) → HTTP monitor → GET https://<your-app>/run-cycle every ~5 min — the heartbeat that drives cycles" },
+  { step: "T-0", text: "REFRESH_DATA=1 lets the cloud self-refresh market data each cycle — no local feeder needed" },
+  { step: "GO", text: "Watch /logs, /decisions and /campaign — the floor analyzes, seals every cycle, and holds N until an edge validates. That restraint is the product." },
 ];
 
 function mask(v: string) {
