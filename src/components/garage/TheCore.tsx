@@ -30,17 +30,14 @@ export default function TheCore() {
           </p>
         </div>
 
-        {/* the engine — isolated WebGL document */}
-        <div className="gr-shadow-bone mt-10 border-2 border-bone/25 bg-pitch">
-          <div aria-hidden className="gr-hazard h-[10px] opacity-90" />
-          <iframe
-            src="/engine/v8.html"
-            title="HeliQuant V8 Core — interactive 3D engine"
-            loading="lazy"
-            className="block w-full border-0 bg-pitch"
-            style={{ height: "clamp(440px, 72vh, 760px)" }}
-          />
-        </div>
+        {/* the engine — isolated WebGL document, borderless so it melds into the pitch backdrop */}
+        <iframe
+          src="/engine/v8.html"
+          title="HeliQuant V8 Core — interactive 3D engine"
+          loading="lazy"
+          className="mt-10 block w-full border-0 bg-transparent"
+          style={{ height: "clamp(460px, 76vh, 820px)" }}
+        />
 
         <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.18em] text-steel">
           discipline, made of moving parts —{" "}

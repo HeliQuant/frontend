@@ -8,9 +8,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     
-    <!-- Three.js & OrbitControls -->
+    <!-- Three.js & OrbitControls + CSS2D labels -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
     
     <style>
         body {
@@ -74,6 +75,29 @@
         /* Kursor saat berinteraksi */
         #webgl-container { cursor: grab; }
         #webgl-container:active { cursor: grabbing; }
+
+        /* DESK HOLOGRAMS — borderless: pure glow + leader dot so they meld with the pitch backdrop */
+        .holo {
+            font-family: 'Space Mono', monospace;
+            text-transform: uppercase;
+            white-space: nowrap;
+            pointer-events: none;
+            padding-left: 14px;
+            position: relative;
+        }
+        .holo::before {
+            content: "";
+            position: absolute;
+            left: 0; top: 7px;
+            width: 6px; height: 6px;
+            background: #BFF205;
+            box-shadow: 0 0 9px #BFF205, 0 0 3px #BFF205;
+            animation: holopulse 2.4s ease-in-out infinite;
+        }
+        .holo .t { display: block; font-size: 12px; font-weight: 700; color: #BFF205; letter-spacing: 2px; text-shadow: 0 0 12px rgba(191,242,5,.55), 0 1px 3px #0b0b0b; }
+        .holo .p { display: block; font-size: 9px; font-weight: 700; color: #FF5A1F; letter-spacing: 2px; text-shadow: 0 1px 3px #0b0b0b, 0 0 6px rgba(255,90,31,.4); }
+        .holo .r { display: block; font-size: 9px; color: rgba(231,226,212,.72); letter-spacing: 1px; text-shadow: 0 1px 4px #0b0b0b; margin-top: 1px; }
+        @keyframes holopulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -107,6 +131,16 @@
             renderer.setPixelRatio(window.devicePixelRatio);
             container.appendChild(renderer.domElement);
 
+            // CSS2D overlay for the desk hologram labels (HTML pinned to 3D component positions)
+            const cssRenderer = new THREE.CSS2DRenderer();
+            cssRenderer.setSize(window.innerWidth, window.innerHeight);
+            cssRenderer.domElement.style.position = 'absolute';
+            cssRenderer.domElement.style.top = '0';
+            cssRenderer.domElement.style.left = '0';
+            cssRenderer.domElement.style.pointerEvents = 'none';
+            cssRenderer.domElement.style.zIndex = '15';
+            container.appendChild(cssRenderer.domElement);
+
             // Kontrol Orbit (Rotasi & Zoom Bebas)
             const controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
@@ -117,6 +151,7 @@
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
                 renderer.setSize(window.innerWidth, window.innerHeight);
+                cssRenderer.setSize(window.innerWidth, window.innerHeight);
             });
 
             // 2. MATERIAL BRUTALIS (Warna Solid + Garis Tepi Tinta Hitam)
@@ -546,9 +581,34 @@
 
 
             // =================================================================
+            // 9B. DESK HOLOGRAMS — each HeliQuant desk pinned to the component that represents it
+            // =================================================================
+            // PM + the 7 specialist desks (firm/organization.py), mapped to the part whose JOB
+            // mirrors the desk's: the crank is the decision everything drives, the cam sets timing
+            // like the regime read, a lime piston is the one validated edge that fires, etc.
+            const DESKS = [
+                { pos: [0, 0.5, -11.5],  t: "PM",            p: "CRANKSHAFT",  r: "synthesizes 7 desks · sparks ENTER" },
+                { pos: [5.8, 8.5, 13.8], t: "REGIME",        p: "CAM TIMING",  r: "XGBoost regime · 82.6% OOS" },
+                { pos: [-5.0, 10.5, 0],  t: "OI-CONTRARIAN", p: "PISTON",      r: "the one OOS-validated edge" },
+                { pos: [6.2, -2.6, 2.3], t: "SMART-MONEY",   p: "OIL FILTER",  r: "flow engine + Nansen netflow" },
+                { pos: [8.2, -1.8, -4],  t: "ON-CHAIN",      p: "EXHAUST",     r: "whales + GoPlus · logged on Mantle" },
+                { pos: [-6.4, 3, 14.5],  t: "MACRO",         p: "ALTERNATOR",  r: "Allora 8h BTC/ETH forecast" },
+                { pos: [0, 7.5, 5.5],    t: "SMART-SOCIAL",  p: "INTAKE",      r: "Elfa narrative / mindshare" },
+                { pos: [-2.8, -5.6, 3],  t: "RESEARCH",      p: "OIL PAN",     r: "Fear&Greed + global macro" },
+            ];
+            DESKS.forEach((d) => {
+                const el = document.createElement('div');
+                el.className = 'holo';
+                el.innerHTML = `<span class="t">${d.t}</span><span class="p">${d.p}</span><span class="r">${d.r}</span>`;
+                const label = new THREE.CSS2DObject(el);
+                label.position.set(d.pos[0], d.pos[1], d.pos[2]);
+                engineGroup.add(label);
+            });
+
+            // =================================================================
             // 10. LOOP ANIMASI KINEMATIK MATEMATIS SEJATI
             // =================================================================
-            
+
             const clock = new THREE.Clock();
             const speedModifier = 0.35; 
 
@@ -627,6 +687,7 @@
                 });
 
                 renderer.render(scene, camera);
+                cssRenderer.render(scene, camera);
             }
 
             animate();
