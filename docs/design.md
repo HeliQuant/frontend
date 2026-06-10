@@ -155,6 +155,49 @@ COPY:        part numbers as repo names; "RUNS WHILE YOU SLEEP" line
 
 Footer: license-plate plaque "HELIQUANT · MANTLE TURING TEST 2026" on a hazard seam.
 
+### 6.7 /whales — "THE TIMING TOWER" (F1 pit wall)
+```
+PROCESS:     tracking other drivers on the track (smart-money wallets on Mantle DEX)
+CORE OBJECT: an F1 TIMING TOWER — each whale = a driver row in the standings
+RELATIONSHIP:ranked by composite rank_score; gap-to-leader = score delta
+METAPHOR:    vertical timing tower + per-row telemetry (research: F1 TCDS/pit-wall patterns —
+             position, gap, tire-compound chips, purple fastest)
+ENCODING:    row position = rank; bar length = net DEX volume; chip color = bias
+             (accumulating=chartreuse / distributing=signal / neutral=bone); buys|sells =
+             sector counts; "last pit stop" = last_seen
+CONTINUOUS:  leader row spark; tower rows stagger in
+HONESTY:     plate states what this IS: pit-wall CONTEXT, not alpha (these are DEX churners;
+             the live firm tracks Hyperliquid top-PnL whales per-asset in the cloud)
+COPY:        terse mono; no cards — rows encode data in geometry
+```
+
+### 6.8 /assets — "THE DYNO BAYS" (test cells per asset)
+```
+PROCESS:     per-asset character read + edge history — what the lab measured per machine
+CORE OBJECT: each asset = an ENGINE ON A TEST STAND (a dyno bay), gauges + verdict plate
+METAPHOR:    a row of garage test bays (NOT cards: each bay = gauges + stamped verdict)
+ENCODING:    pattern gauge (return-autocorrelation: <0.05 = efficient -> "follow flow");
+             carry line (live funding-carry read); verdict stamp (RETIRED / FEE-EATEN /
+             REJECTED / PROBATION / NO VENUE)
+HONESTY:     replaces the STALE page (MNT 69%/+1.36% in-sample — superseded). Every bay
+             tells the current truth: all majors EFFICIENT, MNT edge decayed->retired, BTC
+             fee-eaten (7 rounds), mETH thin-liquidity (the crash test), HYPE carry best in
+             backtest but thin today, registry EMPTY -> firm in N.
+```
+
+### 6.9 /firms/heliquant — "THE HOMOLOGATION PAPERS" (racing license)
+```
+PROCESS:     the firm's verifiable identity + the rules it races under
+CORE OBJECT: a stamped RACING LICENSE: chassis plate (ERC-8004 identity), scrutineering
+             stamps (6 deployed contracts -> Mantlescan), crew roster (9 desks), license
+             conditions (the gates), service history (real milestones)
+METAPHOR:    homologation document as riveted metal plates — not cards, STAMPS
+ENCODING:    every address real (lib/contracts CONTRACTS), every milestone real
+HONESTY:     replaces the STALE firm page (V5 77.78%/+1.23% + fake strategy roster = the
+             SCRUBBED metrics — must never reappear). License conditions ARE the honesty
+             rules: validate-or-abstain, publish failures, seal every decision.
+```
+
 ## 7. Honesty rules (non-negotiable, carried from the firm)
 
 Every figure on the page is real and verified: 82.6% regime OOS · +28.9% OOS ledger (the
