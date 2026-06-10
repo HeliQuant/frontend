@@ -14,7 +14,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 
-import GarageNav from "@/components/garage/GarageNav";
+import AppNav from "@/components/garage/AppNav";
 
 interface WhaleProfile {
   address: string;
@@ -71,7 +71,7 @@ export default async function WhalesPage() {
 
   return (
     <>
-      <GarageNav />
+      <AppNav />
       <main className="min-h-screen bg-pitch pb-20">
         <div aria-hidden className="gr-carbon-dots fixed inset-0 opacity-40" />
 

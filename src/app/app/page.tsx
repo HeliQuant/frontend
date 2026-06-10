@@ -29,7 +29,7 @@ import {
 } from "wagmi";
 import { formatUnits, parseUnits, type Address, type Hex } from "viem";
 
-import GarageNav from "@/components/garage/GarageNav";
+import AppNav from "@/components/garage/AppNav";
 import RadialEngine from "@/components/garage/RadialEngine";
 import {
   ADDRESSES,
@@ -1018,7 +1018,7 @@ export default function AppPage() {
 
   return (
     <>
-      <GarageNav />
+      <AppNav />
       <main
         className="relative isolate min-h-screen w-full overflow-hidden px-5 pb-24 pt-16 sm:px-8 md:pt-20 lg:px-12"
         style={{ backgroundColor: MIDNIGHT, color: ICE }}

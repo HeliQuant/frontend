@@ -16,7 +16,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 
-import GarageNav from "@/components/garage/GarageNav";
+import AppNav from "@/components/garage/AppNav";
 import { fetchCampaign, laneFrac, type CampaignStatus, type OpenPosition } from "@/lib/campaign";
 
 const POLL_MS = 20000;
@@ -108,7 +108,7 @@ export default function CampaignPage() {
 
   return (
     <>
-      <GarageNav />
+      <AppNav />
       <main className="min-h-screen bg-pitch pb-20">
         <div aria-hidden className="gr-carbon-dots fixed inset-0 opacity-40" />
 

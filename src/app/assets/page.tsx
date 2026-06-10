@@ -9,7 +9,7 @@
  * decayed and was retired, the registry is empty, the firm holds N.
  */
 
-import GarageNav from "@/components/garage/GarageNav";
+import AppNav from "@/components/garage/AppNav";
 
 type Bay = {
   no: string;
@@ -110,7 +110,7 @@ const stampCls = (tone: Bay["verdict"]["tone"]) =>
 export default function AssetsPage() {
   return (
     <>
-      <GarageNav />
+      <AppNav />
       <main className="min-h-screen bg-pitch pb-20">
         <div aria-hidden className="gr-carbon-dots fixed inset-0 opacity-40" />
 

@@ -18,7 +18,7 @@
 
 import { useMemo, useState } from "react";
 
-import GarageNav from "@/components/garage/GarageNav";
+import AppNav from "@/components/garage/AppNav";
 
 type Cred = {
   key: string;
@@ -220,7 +220,7 @@ export default function SetupPage() {
 
   return (
     <>
-      <GarageNav />
+      <AppNav />
       <main className="min-h-screen bg-pitch pb-20">
         <div aria-hidden className="gr-carbon-dots fixed inset-0 opacity-40" />
 

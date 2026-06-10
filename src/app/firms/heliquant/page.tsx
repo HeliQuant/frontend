@@ -13,7 +13,7 @@
  * decision sealed.
  */
 
-import GarageNav from "@/components/garage/GarageNav";
+import AppNav from "@/components/garage/AppNav";
 import { CONTRACTS, FIRST_ANCHOR, MANTLESCAN } from "@/lib/heliquant";
 
 const CREW = [
@@ -50,7 +50,7 @@ const HISTORY = [
 export default function HeliQuantFirmPage() {
   return (
     <>
-      <GarageNav />
+      <AppNav />
       <main className="min-h-screen bg-pitch pb-20">
         <div aria-hidden className="gr-carbon-dots fixed inset-0 opacity-40" />
 
