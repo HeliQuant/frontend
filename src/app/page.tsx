@@ -10,6 +10,7 @@ import HeroEngineBay from "@/components/garage/HeroEngineBay";
 import EngineCycle from "@/components/garage/EngineCycle";
 import DynoRoom from "@/components/garage/DynoRoom";
 import CrashTest from "@/components/garage/CrashTest";
+import ShopReport from "@/components/garage/ShopReport";
 import BlackBox from "@/components/garage/BlackBox";
 import TheGarage from "@/components/garage/TheGarage";
 
@@ -30,10 +31,13 @@ export default function HomePage() {
         {/* 4 — THE CRASH TEST · the +96% we rejected ourselves */}
         <CrashTest />
 
-        {/* 5 — THE BLACK BOX · decisions sealed on Mantle, publicly readable */}
+        {/* 5 — THE SHOP REPORT · the full teardown log, every verdict stamped */}
+        <ShopReport />
+
+        {/* 6 — THE BLACK BOX · decisions sealed on Mantle, publicly readable */}
         <BlackBox />
 
-        {/* 6 — THE GARAGE · the always-on machinery */}
+        {/* 7 — THE GARAGE · the always-on machinery */}
         <TheGarage />
       </main>
 

@@ -10,6 +10,7 @@ const LINKS = [
   { href: "/#engine", label: "Engine" },
   { href: "/campaign", label: "The grid" },
   { href: "/#dyno", label: "Dyno" },
+  { href: "/#report", label: "Findings" },
   { href: "/whales", label: "Telemetry" },
   { href: "/assets", label: "Dyno bays" },
   { href: "/firms/heliquant", label: "License" },
