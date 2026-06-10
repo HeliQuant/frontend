@@ -3,9 +3,9 @@ import {
   Geist,
   Geist_Mono,
   Fraunces,
-  Space_Grotesk,
-  JetBrains_Mono,
-  Inter,
+  Saira_Extra_Condensed,
+  Saira,
+  IBM_Plex_Mono,
 } from "next/font/google";
 
 import { Providers } from "./providers";
@@ -20,28 +20,30 @@ const displaySerif = Fraunces({
   weight: ["400", "500"],
 });
 
-// ── HeliQuant standard faces (Hero4 / "Antimetal" observatory) ──
-const displayGrotesk = Space_Grotesk({
+// ── HeliQuant brand faces — "NIGHT GARAGE" (dark automotive brutalism) ──
+// Display: condensed motorsport headline face. Body: its grotesk family. Mono: telemetry figures.
+const displayCondensed = Saira_Extra_Condensed({
   variable: "--font-display",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["500", "600", "700", "800"],
 });
-const monoJetBrains = JetBrains_Mono({
-  variable: "--font-mono",
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-});
-const sansInter = Inter({
+const sansSaira = Saira({
   variable: "--font-sans",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+});
+const monoPlex = IBM_Plex_Mono({
+  variable: "--font-mono",
   subsets: ["latin"],
   weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
-  title: "HeliQuant — The all-seeing quant",
+  title: "HeliQuant — The disciplined trading engine",
   description:
-    "Autonomous multi-source intelligence trading firm on Mantle. Seven AI desks debate, a PM " +
-    "decides, every call is gated, sized by validated edge, and anchored on-chain. Honesty-by-design.",
+    "Autonomous multi-desk AI trading firm on Mantle, built like an engine: desks ingest, debate " +
+    "compresses, the PM sparks ENTER only on a validated edge — otherwise it holds gear (ABSTAIN). " +
+    "Every decision sealed on-chain. We publish what doesn't work too.",
 };
 
 export default function RootLayout({
@@ -50,7 +52,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${displaySerif.variable} ${displayGrotesk.variable} ${monoJetBrains.variable} ${sansInter.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${displaySerif.variable} ${displayCondensed.variable} ${monoPlex.variable} ${sansSaira.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>

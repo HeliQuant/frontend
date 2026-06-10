@@ -164,3 +164,115 @@
 .gear-paused {
   animation-play-state: paused !important;
 }
+
+/* ═══════════════════════ NIGHT GARAGE — dark automotive brutalism (brand v2) ═══════════════════════
+   The HeliQuant landing language: pitch shop floor, carbon panels, bone ink, ONE chartreuse livery
+   accent, hazard seams, racing-sticker plates with hard offset shadows. Tokens additive — the old
+   Observatory tokens above stay until the app pages migrate. Spec: frontend/docs/design.md */
+
+@theme {
+  --color-pitch: #0b0b0b;       /* page base — night shop floor */
+  --color-carbon: #161614;      /* panel surface */
+  --color-carbon2: #1e1e1b;     /* raised panel / inset */
+  --color-bone: #f2efe6;        /* ink on dark: text, borders, plates */
+  --color-chartreuse: #c9f24b;  /* THE accent — livery, spark, validated, CTA */
+  --color-steel: #8b8b80;       /* muted text */
+  --color-signal2: #ff5a1f;     /* rare alert: rejected / crash / risk only */
+}
+
+/* Hazard stripe seam — the signature motif (45° chartreuse/pitch tape between sections) */
+.gr-hazard {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--color-chartreuse) 0 14px,
+    var(--color-pitch) 14px 28px
+  );
+}
+@keyframes gr-stripe-scroll {
+  from { background-position: 0 0; }
+  to { background-position: 39.6px 0; }
+}
+.gr-hazard-live { animation: gr-stripe-scroll 1.6s linear infinite; }
+
+/* Carbon dot grid — panel texture */
+.gr-carbon-dots {
+  background-image: radial-gradient(rgba(242, 239, 230, 0.06) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+/* Hard offset shadows — brutalist sticker depth */
+.gr-shadow-chart { box-shadow: 6px 6px 0 var(--color-chartreuse); }
+.gr-shadow-bone { box-shadow: 4px 4px 0 rgba(242, 239, 230, 0.92); }
+.gr-shadow-ink { box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.55); }
+
+/* Press-down button: shadow collapses, plate drops */
+.gr-press { transition: transform 120ms ease, box-shadow 120ms ease; }
+.gr-press:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--color-chartreuse); }
+
+/* Pit-wall marquee */
+@keyframes gr-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.gr-marquee { animation: gr-marquee 36s linear infinite; }
+
+/* Rotor turbine idle — slow spin (duration set inline) */
+@keyframes gr-rotor {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.gr-rotor { animation: gr-rotor linear infinite; }
+
+/* Tach needle: breathe ±1.6° around its resting angle (--gr-angle, set inline) */
+@keyframes gr-needle-breathe {
+  0%, 100% { transform: rotate(calc(var(--gr-angle) - 1.6deg)); }
+  50% { transform: rotate(calc(var(--gr-angle) + 1.6deg)); }
+}
+.gr-needle { animation: gr-needle-breathe 3.4s ease-in-out infinite; transform-origin: 50% 100%; }
+
+/* Spark pulse — the combustion beat (chartreuse) */
+@keyframes gr-spark {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.12); }
+}
+.gr-spark { animation: gr-spark 1.8s ease-in-out infinite; }
+
+/* Telemetry cursor blink */
+@keyframes gr-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+.gr-blink { animation: gr-blink 1.1s steps(1) infinite; }
+
+/* Slam-in entrance (headline) + rise-in (panels, stagger via animation-delay) */
+@keyframes gr-slam {
+  0% { opacity: 0; transform: translateY(-26px) scale(1.06); }
+  62% { opacity: 1; transform: translateY(4px) scale(0.995); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.gr-slam { animation: gr-slam 0.62s cubic-bezier(0.22, 1.2, 0.36, 1) both; }
+@keyframes gr-rise {
+  0% { opacity: 0; transform: translateY(22px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.gr-rise { animation: gr-rise 0.7s cubic-bezier(0.22, 1.1, 0.36, 1) both; }
+
+/* Piston loop — the 4-stroke cylinders (phase via animation-delay) */
+@keyframes gr-piston {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(14px); }
+}
+.gr-piston { animation: gr-piston 2.4s ease-in-out infinite; }
+
+/* REJECTED stamp pop + crash shake */
+@keyframes gr-stamp {
+  0% { opacity: 0; transform: scale(2.1) rotate(-14deg); }
+  60% { opacity: 1; transform: scale(0.94) rotate(-8deg); }
+  100% { opacity: 1; transform: scale(1) rotate(-8deg); }
+}
+.gr-stamp { animation: gr-stamp 0.5s cubic-bezier(0.2, 1.4, 0.3, 1) both; }
+@keyframes gr-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-7px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(2px); }
+}
+.gr-shake { animation: gr-shake 0.45s ease-out both; }
