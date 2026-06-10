@@ -1,247 +1,203 @@
-import Link from "next/link";
+/**
+ * /firms/heliquant — "THE HOMOLOGATION PAPERS" (Night Garage §6.9)
+ *
+ * A racing team doesn't get on track by claiming it's fast — it gets HOMOLOGATED:
+ * registered, scrutineered, bound by rules. This page is the firm's license: the chassis
+ * plate (ERC-8004 identity), the scrutineering stamps (six deployed contracts, every
+ * address real and linked), the crew roster (nine desks), the license conditions (the
+ * honesty gates), and the service history (real milestones only).
+ *
+ * REPLACES the stale firm page that still showed the SCRUBBED V5 77.78% / +1.23% metrics
+ * and a fictional strategy roster — those numbers were retired by the lab and must never
+ * reappear. The license states what is true today: registry empty, firm in N, every
+ * decision sealed.
+ */
 
-import { Header } from "@/components/header";
+import GarageNav from "@/components/garage/GarageNav";
+import { CONTRACTS, FIRST_ANCHOR, MANTLESCAN } from "@/lib/heliquant";
 
-const STRATEGY_TABLE = [
-  {
-    name: "Mean Reversion",
-    state: "ACTIVE",
-    trades: 9,
-    wins: 7,
-    winRate: "77.78%",
-    totalPnl: "+$12.30",
-    role: "Workhorse — fades RSI extremes when regime classifies Ranging.",
-  },
-  {
-    name: "Momentum Breakout",
-    state: "PENDING",
-    trades: 0,
-    wins: 0,
-    winRate: "n/a",
-    totalPnl: "$0",
-    role: "Auto-disabled by Strategy Lifecycle Manager during sideways/bear MNT phase. Re-activates when 30-day macro trend confirms.",
-  },
-  {
-    name: "Defensive (kill-switch)",
-    state: "STANDBY",
-    trades: 0,
-    wins: 0,
-    winRate: "n/a",
-    totalPnl: "$0",
-    role: "Triggers on High_Volatility regime or rugpull veto. Rotates principal to stablecoin yield.",
-  },
+const CREW = [
+  { role: "REGIME / TECHNICAL", duty: "reads the tape's state — trend, range, chop" },
+  { role: "MACRO · ALLORA", duty: "decentralized AI inference as the macro read" },
+  { role: "ON-CHAIN / RISK", duty: "wallet flows, token safety, rug veto" },
+  { role: "SMART-MONEY FLOW", duty: "DEX + staking flow of informed wallets" },
+  { role: "RESEARCH", duty: "public-source diligence on the asset" },
+  { role: "OI-CONTRARIAN", duty: "crowd positioning extremes (the retired edge's desk)" },
+  { role: "FLOW-INTEL", duty: "self-learning which flow signals validate — FDR-gated" },
+  { role: "WHALE TRACKER", duty: "Hyperliquid top-PnL wallets, per traded asset" },
+  { role: "MANTLE FUNDAMENTALS", duty: "DeFiLlama chain TVL + fees — ecosystem risk-on/off" },
 ];
 
-const SOURCES = [
-  {
-    name: "Allora Network",
-    description:
-      "Decentralised AI inference — pulls BTC 8h price prediction (Topic 14) signed via EIP-712.",
-    role: "Macro filter",
-    status: "Live on Mantle (first relayer submission tx 0x0d7c...c469)",
-  },
-  {
-    name: "On-chain Whale Flow",
-    description:
-      "Auto-detected smart-money wallets from Mantle DEX swap events across 5 top MNT pools.",
-    role: "Smart money confirmation",
-    status: "GeckoTerminal indexer, top 20 ranked by composite score",
-  },
-  {
-    name: "Sentiment proxy",
-    description:
-      "Composite price/volume/trending sentiment from CoinGecko free API.",
-    role: "Crowd/momentum side-check",
-    status: "Live, 100% data coverage",
-  },
-  {
-    name: "Rugpull screener",
-    description:
-      "GoPlus token security for the traded asset. Hard veto on honeypot or extreme holder concentration.",
-    role: "Safety layer",
-    status: "Hard veto, sub-second response",
-  },
+const CONDITIONS = [
+  "ENTER only on an edge that survives cost-aware OOS + anchored walk-forward + FDR",
+  "no validated edge → ABSTAIN (the gearbox holds N) — restraint over fee donation",
+  "every decision, including the abstain, is sealed on-chain on Mantle",
+  "winners get crash-tested; survivors get re-tested on fresh data; decayed edges are retired",
+  "failures are published — the scrap shelf is part of the product",
+  "position sizing: quarter-Kelly, hard caps, drawdown breaker — never a full-send",
 ];
 
-const ITERATIONS = [
-  { v: "V0", desc: "Baseline replay (raw multi-strategy)", winRate: "49.02%", roi: "-5.27%" },
-  { v: "V1", desc: "+Defensive priority for HighVol regime", winRate: "52.78%", roi: "-3.47%" },
-  { v: "V2", desc: "+ADX 35 + volume confirmation on momentum", winRate: "61.11%", roi: "-1.31%" },
-  { v: "V3", desc: "+EMA trend stack + RSI non-extreme", winRate: "63.64%", roi: "-0.66%" },
-  { v: "V4", desc: "+Strategy Lifecycle Manager (PENDING fallback)", winRate: "63.64%", roi: "-0.66%" },
-  { v: "V5", desc: "Momentum disabled per MNT bear context", winRate: "77.78%", roi: "+1.23%" },
+const HISTORY = [
+  { date: "2026-05", event: "regime classifier validated — 82.6% OOS accuracy" },
+  { date: "2026-06-02", event: `first decision anchored on Mantle — block ${FIRST_ANCHOR.block.toLocaleString("en-US")} (ABSTAIN, sealed)` },
+  { date: "2026-06-02", event: "OI-contrarian edge validated +28.9% OOS — licensed to trade" },
+  { date: "2026-06-02", event: "mETH/ETH +96% backtest crash-tested → REJECTED (−73 bps slippage)" },
+  { date: "2026-06-07", event: "execution proven — 100/100 live spot round-trips filled on Bybit" },
+  { date: "2026-06-07", event: "the validated edge DECAYED on fresh data → retired; registry now empty" },
+  { date: "2026-06-08", event: "always-on cloud floor live on Railway — cycles self-driving, state persisted" },
 ];
 
 export default function HeliQuantFirmPage() {
   return (
-    <main className="flex-1">
-      <Header />
+    <>
+      <GarageNav />
+      <main className="min-h-screen bg-pitch pb-20">
+        <div aria-hidden className="gr-carbon-dots fixed inset-0 opacity-40" />
 
-      <section className="border-b border-neutral-800/60">
-        <div className="mx-auto max-w-6xl px-6 py-12">
-          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-emerald-400/90">
-                Firm
-              </p>
-              <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-5xl">
-                HELIQUANT
-              </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-neutral-300">
-                Autonomous adaptive trading firm. Currently configured for MNT/USDC on
-                Mantle DEX with Strategy Lifecycle Manager keeping Momentum dormant
-                during the asset&apos;s bear phase.
-              </p>
-            </div>
-            <Link
-              href="/jobs/new"
-              className="inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-3 text-sm font-semibold text-neutral-950 transition hover:bg-emerald-400"
-            >
-              Hire HELIQUANT
-            </Link>
-          </div>
-
-          <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <Stat label="Win rate" value="77.78%" caption="9 of last 9 setups" />
-            <Stat label="ROI 90d" value="+1.23%" caption="vs buy-and-hold -7%" />
-            <Stat label="Profit factor" value="1.70" caption="gains / losses" />
-            <Stat label="Max drawdown" value="1.75%" caption="V5 production" />
-          </div>
-        </div>
-      </section>
-
-      <section className="border-b border-neutral-800/60">
-        <div className="mx-auto max-w-6xl px-6 py-12">
-          <h2 className="text-xl font-semibold md:text-2xl">Strategy roster</h2>
-          <div className="mt-6 overflow-hidden rounded-xl border border-neutral-800/60">
-            <table className="min-w-full divide-y divide-neutral-800/60 text-sm">
-              <thead className="bg-neutral-900/50 text-xs uppercase tracking-wide text-neutral-400">
-                <tr>
-                  <th className="px-4 py-3 text-left font-medium">Strategy</th>
-                  <th className="px-4 py-3 text-left font-medium">State</th>
-                  <th className="px-4 py-3 text-right font-medium">Trades</th>
-                  <th className="px-4 py-3 text-right font-medium">Win rate</th>
-                  <th className="px-4 py-3 text-right font-medium">PnL (90d)</th>
-                  <th className="px-4 py-3 text-left font-medium">Role</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-neutral-800/60 bg-neutral-950/40">
-                {STRATEGY_TABLE.map((s) => (
-                  <tr key={s.name}>
-                    <td className="px-4 py-3 font-medium text-neutral-100">{s.name}</td>
-                    <td className="px-4 py-3">
-                      <StateBadge state={s.state} />
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono text-neutral-300">
-                      {s.trades}
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono text-emerald-300">
-                      {s.winRate}
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono text-neutral-200">
-                      {s.totalPnl}
-                    </td>
-                    <td className="px-4 py-3 text-neutral-400">{s.role}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <section className="border-b border-neutral-800/60">
-        <div className="mx-auto max-w-6xl px-6 py-12">
-          <h2 className="text-xl font-semibold md:text-2xl">
-            Intelligence sources
-          </h2>
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
-            {SOURCES.map((src) => (
-              <div
-                key={src.name}
-                className="rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-5"
-              >
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-semibold text-emerald-300">{src.name}</p>
-                  <span className="text-[0.65rem] uppercase tracking-wide text-neutral-500">
-                    {src.role}
-                  </span>
-                </div>
-                <p className="mt-3 text-sm text-neutral-300">{src.description}</p>
-                <p className="mt-3 text-xs text-neutral-500">{src.status}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <div className="mx-auto max-w-6xl px-6 py-12">
-          <h2 className="text-xl font-semibold md:text-2xl">Iteration history</h2>
-          <p className="mt-3 max-w-2xl text-sm text-neutral-300">
-            Data-driven tuning across 6 architecture revisions, all replayed against the
-            same 90-day MNT/USD dataset.
+        <section className="relative z-10 mx-auto max-w-[1280px] px-6 pt-16 sm:px-10 xl:px-4">
+          <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-steel">
+            <span className="text-chartreuse">▮</span> HOMOLOGATION · ERC-8004 · MANTLE
+          </p>
+          <h1
+            className="mt-4 font-display font-extrabold uppercase leading-[0.9] text-bone"
+            style={{ fontSize: "clamp(2.8rem, 6.4vw, 5.2rem)" }}
+          >
+            Racing <span className="text-chartreuse">license</span>
+          </h1>
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-bone/65">
+            A firm doesn&apos;t earn trust by claiming it&apos;s fast. It gets registered, scrutineered,
+            and bound by rules it can&apos;t quietly break. All of it on-chain.
           </p>
 
-          <div className="mt-6 overflow-hidden rounded-xl border border-neutral-800/60">
-            <table className="min-w-full divide-y divide-neutral-800/60 text-sm">
-              <thead className="bg-neutral-900/50 text-xs uppercase tracking-wide text-neutral-400">
-                <tr>
-                  <th className="px-4 py-3 text-left font-medium">Version</th>
-                  <th className="px-4 py-3 text-left font-medium">Change</th>
-                  <th className="px-4 py-3 text-right font-medium">Win rate</th>
-                  <th className="px-4 py-3 text-right font-medium">ROI</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-neutral-800/60 bg-neutral-950/40">
-                {ITERATIONS.map((it, idx) => (
-                  <tr
-                    key={it.v}
-                    className={idx === ITERATIONS.length - 1 ? "bg-emerald-900/10" : ""}
-                  >
-                    <td className="px-4 py-3 font-mono text-emerald-300">{it.v}</td>
-                    <td className="px-4 py-3 text-neutral-300">{it.desc}</td>
-                    <td className="px-4 py-3 text-right font-mono text-neutral-200">
-                      {it.winRate}
-                    </td>
-                    <td
-                      className={`px-4 py-3 text-right font-mono ${it.roi.startsWith("+") ? "text-emerald-300" : "text-rose-300"}`}
-                    >
-                      {it.roi}
-                    </td>
-                  </tr>
+          <div className="mt-12 grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+            {/* ── left: chassis plate + scrutineering stamps ── */}
+            <div className="space-y-8">
+              {/* chassis plate */}
+              <div className="gr-shadow-chart relative border-2 border-bone bg-carbon p-6">
+                {/* rivets */}
+                {["left-2 top-2", "right-2 top-2", "left-2 bottom-2", "right-2 bottom-2"].map((pos) => (
+                  <span key={pos} aria-hidden className={`absolute ${pos} h-2 w-2 rounded-full border border-bone/50 bg-pitch`} />
                 ))}
-              </tbody>
-            </table>
+                <p className="font-mono text-[10px] uppercase tracking-[0.26em] text-steel">chassis plate · identity</p>
+                <p className="mt-3 font-display text-5xl font-extrabold uppercase leading-none text-bone">
+                  Heli<span className="text-chartreuse">Quant</span>
+                </p>
+                <div className="mt-4 space-y-1.5 font-mono text-[11px] tracking-wide text-bone/70">
+                  <p>
+                    <span className="text-steel">CLASS ▸</span> AUTONOMOUS TRADING FIRM · 9 DESKS · 1 PM
+                  </p>
+                  <p>
+                    <span className="text-steel">SERIES ▸</span> MANTLE TURING TEST 2026 · AI TRADING &amp; STRATEGY
+                  </p>
+                  <p>
+                    <span className="text-steel">IDENTITY ▸</span> ERC-8004 REGISTRY (on-chain, verifiable)
+                  </p>
+                  <p>
+                    <span className="text-steel">STATE ▸</span>{" "}
+                    <span className="text-bone">REGISTRY EMPTY → GEAR N · STILL SEALING EVERY CYCLE</span>
+                  </p>
+                </div>
+              </div>
+
+              {/* scrutineering stamps — the six deployed contracts */}
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.26em] text-steel">
+                  scrutineering stamps · deployed contracts (tap to verify)
+                </p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  {CONTRACTS.map((c, i) => (
+                    <a
+                      key={c.name}
+                      href={`${MANTLESCAN}/address/${c.address}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="gr-rise group border-2 border-bone/25 bg-pitch px-4 py-3 transition-colors hover:border-chartreuse"
+                      style={{ animationDelay: `${i * 0.06}s` }}
+                    >
+                      <p className="flex items-center justify-between font-display text-lg font-bold uppercase tracking-wide text-bone group-hover:text-chartreuse">
+                        {c.name}
+                        <span aria-hidden className="text-chartreuse">✓</span>
+                      </p>
+                      <p className="mt-1 break-all font-mono text-[10px] tracking-wide text-steel">{c.address}</p>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* ── right: crew + conditions ── */}
+            <div className="space-y-8">
+              {/* crew roster */}
+              <div className="border-2 border-bone/25 bg-carbon p-5">
+                <p className="font-mono text-[10px] uppercase tracking-[0.26em] text-steel">crew roster · the nine desks</p>
+                <ul className="mt-4 divide-y divide-bone/10">
+                  {CREW.map((c) => (
+                    <li key={c.role} className="flex items-baseline justify-between gap-4 py-2">
+                      <span className="shrink-0 font-display text-base font-bold uppercase tracking-wide text-bone">
+                        {c.role}
+                      </span>
+                      <span className="text-right font-mono text-[10px] uppercase leading-relaxed tracking-[0.1em] text-steel">
+                        {c.duty}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* license conditions — the honesty gates */}
+              <div className="border-2 border-chartreuse bg-carbon p-5" style={{ boxShadow: "6px 6px 0 rgba(201,242,75,0.5)" }}>
+                <p className="font-mono text-[10px] uppercase tracking-[0.26em] text-chartreuse">
+                  license conditions · breach = the product is void
+                </p>
+                <ul className="mt-4 space-y-2.5">
+                  {CONDITIONS.map((c, i) => (
+                    <li key={i} className="flex gap-3 text-[13px] leading-relaxed text-bone/75">
+                      <span className="font-mono text-chartreuse">{String(i + 1).padStart(2, "0")}</span>
+                      {c}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
+
+          {/* ── service history — real milestones only ── */}
+          <div className="mt-12">
+            <p className="font-mono text-[10px] uppercase tracking-[0.26em] text-steel">service history · stamped entries</p>
+            <div className="mt-4 border-2 border-bone/25 bg-carbon">
+              {HISTORY.map((h, i) => (
+                <div
+                  key={i}
+                  className="grid grid-cols-[96px_1fr] items-baseline gap-4 border-b border-bone/10 px-5 py-3 last:border-b-0"
+                >
+                  <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-steel">{h.date}</span>
+                  <span className="font-mono text-[12px] uppercase tracking-[0.1em] text-bone/75">{h.event}</span>
+                </div>
+              ))}
+            </div>
+            <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-steel">
+              first anchor tx ▸{" "}
+              <a
+                href={`${MANTLESCAN}/tx/${FIRST_ANCHOR.txHash}`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-chartreuse hover:underline"
+              >
+                {FIRST_ANCHOR.txHash.slice(0, 12)}…{FIRST_ANCHOR.txHash.slice(-8)} ↗
+              </a>
+            </p>
+          </div>
+        </section>
+      </main>
+
+      <footer className="relative z-10 bg-pitch">
+        <div aria-hidden className="gr-hazard h-[14px] opacity-90" />
+        <div className="mx-auto max-w-[1280px] px-6 py-8 sm:px-10 xl:px-4">
+          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-steel">
+            HELIQUANT · HOMOLOGATED ON MANTLE · the license is public, the rules are code
+          </p>
         </div>
-      </section>
-    </main>
-  );
-}
-
-function Stat({ label, value, caption }: { label: string; value: string; caption: string }) {
-  return (
-    <div className="rounded-xl border border-neutral-800/80 bg-neutral-900/50 p-4">
-      <p className="text-xs uppercase tracking-wide text-neutral-400">{label}</p>
-      <p className="mt-2 font-mono text-2xl font-semibold text-emerald-300">{value}</p>
-      <p className="mt-1 text-xs text-neutral-500">{caption}</p>
-    </div>
-  );
-}
-
-function StateBadge({ state }: { state: string }) {
-  const palette =
-    state === "ACTIVE"
-      ? "text-emerald-300 bg-emerald-500/10 border-emerald-500/30"
-      : state === "PENDING"
-        ? "text-amber-300 bg-amber-500/10 border-amber-500/30"
-        : "text-neutral-300 bg-neutral-500/10 border-neutral-500/30";
-  return (
-    <span
-      className={`inline-flex rounded border px-2 py-0.5 text-[0.65rem] uppercase tracking-wide ${palette}`}
-    >
-      {state}
-    </span>
+      </footer>
+    </>
   );
 }
