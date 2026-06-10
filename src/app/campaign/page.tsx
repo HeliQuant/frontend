@@ -161,6 +161,9 @@ export default function CampaignPage() {
                   <span className="text-chartreuse">🎯{data.exits_by_reason.TP}</span>
                   <span className="text-signal2">🛑{data.exits_by_reason.SL}</span>
                   <span className="text-bone/70">⏱{data.exits_by_reason.TIME}</span>
+                  {(data.exits_by_reason.TRAIL ?? 0) > 0 && (
+                    <span className="text-chartreuse">🪤{data.exits_by_reason.TRAIL}</span>
+                  )}
                 </div>
                 <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.16em] text-steel">{data.open_now} on track now</p>
               </div>
@@ -195,7 +198,7 @@ export default function CampaignPage() {
               <div className="flex flex-wrap gap-2">
                 {data.recent_closes.slice().reverse().map((c) => {
                   const win = (c.pnl_usd ?? 0) > 0;
-                  const icon = c.exit_reason === "TP" ? "🎯" : c.exit_reason === "SL" ? "🛑" : "⏱";
+                  const icon = c.exit_reason === "TP" ? "🎯" : c.exit_reason === "SL" ? "🛑" : c.exit_reason === "TRAIL" ? "🪤" : "⏱";
                   return (
                     <span key={c.id} className="flex items-center gap-1.5 border-2 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em]"
                       style={{ borderColor: win ? "rgba(201,242,75,0.5)" : "rgba(255,90,31,0.5)", color: win ? "var(--color-chartreuse)" : "var(--color-signal2)" }}>

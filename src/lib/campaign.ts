@@ -30,7 +30,7 @@ export type ClosedPosition = {
   asset: string;
   dir: "LONG" | "SHORT";
   exit: number | null;
-  exit_reason: "TP" | "SL" | "TIME" | null;
+  exit_reason: "TP" | "SL" | "TIME" | "TRAIL" | null;
   net_pct: number | null;
   pnl_usd: number | null;
   utc_close: string | null;
@@ -45,7 +45,9 @@ export type CampaignStatus = {
   net_usd: number;
   done: boolean;
   testnet_fills: number;
-  exits_by_reason: { TP: number; SL: number; TIME: number };
+  exits_by_reason: { TP: number; SL: number; TIME: number; TRAIL?: number };
+  edge_open?: number;
+  sized_up_open?: number;
   failed_conditions: number;
   horizon_h: number;
   risk_model: string;
