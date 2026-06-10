@@ -3,27 +3,16 @@
 /**
  * HERO — "THE ENGINE BAY" (Night Garage v2 · dark inverse of Aval's light brutalism)
  *
- * The firm idling at readiness, represented as a night-garage instrument cluster:
- *   • a giant TACHOMETER — the needle sweeps to 82.6% (regime classifier OOS accuracy,
- *     the one read the firm trusts) and breathes there; the red zone is the forced-trade
- *     territory the firm refuses to enter.
- *   • the brand rotor idles at the hub like a turbine (continuous slow spin).
- *   • a GEARBOX strip holds N — the registry is empty today, so the firm is in NEUTRAL.
- *     Restraint made physical: no validated edge, no spark, no gear.
- *   • a pit-wall ticker marquees the real, verified numbers (including the retired edge
- *     and the rejected +96% — honesty on the wall).
+ * Left: the claim — most bots redline, ours holds gear. Right: the GEAR ENGINE — the firm
+ * as interlocking machinery (PM hub + the 9-desk ring, ported from the user's Hero4 and
+ * re-skinned to the garage language; see GearEngine.tsx). Below: the pit-wall ticker
+ * marquees the real, verified numbers — including the retired edge and the rejected +96%.
  * Every figure on this screen is real. No invented metrics, ever.
  */
 
-import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
-import { animate, motion, useReducedMotion } from "motion/react";
+import { useReducedMotion } from "motion/react";
 
-// ── real, verified figures (see docs/design.md §7 — honesty rules) ──
-const REGIME_ACC = 82.6; // regime classifier OOS accuracy (%)
-const SWEEP_DEG = 210; // tach sweep
-const START_DEG = -105; // needle angle at 0%
-const NEEDLE_DEG = START_DEG + (SWEEP_DEG * REGIME_ACC) / 100; // ≈ +68.5°
+import GearEngine from "./GearEngine";
 
 const TICKER = [
   "REGIME CLASSIFIER 82.6% OOS",
@@ -35,46 +24,8 @@ const TICKER = [
   "WE PUBLISH WHAT DOESN'T WORK",
 ];
 
-const GEARS = ["R", "N", "1", "2", "3"];
-
-function polar(cx: number, cy: number, r: number, deg: number) {
-  const rad = ((deg - 90) * Math.PI) / 180;
-  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
-}
-
-/** SVG arc path between two angles (degrees, 0 = up). */
-function arc(cx: number, cy: number, r: number, a0: number, a1: number) {
-  const p0 = polar(cx, cy, r, a0);
-  const p1 = polar(cx, cy, r, a1);
-  const large = a1 - a0 > 180 ? 1 : 0;
-  return `M ${p0.x.toFixed(2)} ${p0.y.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${p1.x.toFixed(2)} ${p1.y.toFixed(2)}`;
-}
-
 export default function HeroEngineBay() {
   const reduced = useReducedMotion();
-  const [acc, setAcc] = useState(0);
-  const counted = useRef(false);
-
-  // count the headline figure up once (0 → 82.6), synced with the needle sweep
-  useEffect(() => {
-    if (counted.current) return;
-    counted.current = true;
-    if (reduced) {
-      setAcc(REGIME_ACC);
-      return;
-    }
-    const ctrl = animate(0, REGIME_ACC, {
-      duration: 1.4,
-      ease: [0.22, 1.1, 0.36, 1],
-      onUpdate: (v) => setAcc(v),
-    });
-    return () => ctrl.stop();
-  }, [reduced]);
-
-  // tach geometry
-  const CX = 170;
-  const CY = 175;
-  const R = 138;
 
   return (
     <section id="top" className="relative isolate overflow-hidden bg-pitch">
@@ -140,109 +91,8 @@ export default function HeroEngineBay() {
           </p>
         </div>
 
-        {/* ── RIGHT: the instrument cluster ── */}
-        <div className="gr-rise relative mx-auto w-full max-w-[460px]" style={{ animationDelay: "0.18s" }}>
-          {/* cluster plate */}
-          <div className="gr-shadow-ink relative border-2 border-bone/25 bg-carbon p-6 sm:p-8">
-            <div aria-hidden className="gr-carbon-dots absolute inset-0 opacity-40" />
-
-            {/* dial */}
-            <div className="relative">
-              <svg viewBox="0 0 340 210" className="relative z-10 w-full" role="img" aria-label={`Regime confidence ${REGIME_ACC}% out-of-sample`}>
-                {/* track */}
-                <path d={arc(CX, CY, R, START_DEG, START_DEG + SWEEP_DEG)} fill="none" stroke="rgba(242,239,230,0.16)" strokeWidth="13" />
-                {/* live zone (0 → 88%) */}
-                <path d={arc(CX, CY, R, START_DEG, START_DEG + SWEEP_DEG * 0.88)} fill="none" stroke="rgba(242,239,230,0.34)" strokeWidth="13" />
-                {/* redline — the forced-trade zone we refuse */}
-                <path d={arc(CX, CY, R, START_DEG + SWEEP_DEG * 0.88, START_DEG + SWEEP_DEG)} fill="none" stroke="#ff5a1f" strokeWidth="13" />
-                {/* needle reading (chartreuse fill to the value) */}
-                <path d={arc(CX, CY, R, START_DEG, NEEDLE_DEG)} fill="none" stroke="#c9f24b" strokeWidth="5" />
-
-                {/* major ticks + labels */}
-                {[0, 25, 50, 75, 100].map((t) => {
-                  const a = START_DEG + (SWEEP_DEG * t) / 100;
-                  const o = polar(CX, CY, R + 14, a);
-                  const i = polar(CX, CY, R - 13, a);
-                  const l = polar(CX, CY, R + 30, a);
-                  return (
-                    <g key={t}>
-                      <line x1={i.x} y1={i.y} x2={o.x} y2={o.y} stroke="rgba(242,239,230,0.5)" strokeWidth="2.5" />
-                      <text x={l.x} y={l.y + 4} textAnchor="middle" className="fill-steel font-mono" style={{ fontSize: 11 }}>
-                        {t}
-                      </text>
-                    </g>
-                  );
-                })}
-
-                {/* needle — outer owns the sweep-to-value (motion), inner breathe lives on the group */}
-                <motion.g
-                  initial={{ rotate: reduced ? NEEDLE_DEG : START_DEG }}
-                  animate={{ rotate: NEEDLE_DEG }}
-                  transition={{ type: "spring", stiffness: 42, damping: 11, mass: 1.2, delay: 0.15 }}
-                  style={{ originX: `${CX}px`, originY: `${CY}px` }}
-                >
-                  <line x1={CX} y1={CY} x2={CX} y2={CY - R + 22} stroke="#f2efe6" strokeWidth="4" strokeLinecap="round" />
-                  <line x1={CX} y1={CY} x2={CX} y2={CY - R + 52} stroke="#c9f24b" strokeWidth="2" strokeLinecap="round" />
-                </motion.g>
-
-                {/* hub ring */}
-                <circle cx={CX} cy={CY} r="34" fill="#0b0b0b" stroke="rgba(242,239,230,0.35)" strokeWidth="2" />
-              </svg>
-
-              {/* the rotor idles at the hub — the brand turbine, always turning */}
-              <div
-                className="pointer-events-none absolute z-20"
-                style={{ left: `${(CX / 340) * 100}%`, top: `${(CY / 210) * 100}%`, transform: "translate(-50%, -50%)" }}
-              >
-                <Image
-                  src="/brand/sixblade-chartreuse.png"
-                  alt=""
-                  width={52}
-                  height={55}
-                  className={reduced ? "" : "gr-rotor"}
-                  style={{ animationDuration: "9s" }}
-                  priority
-                />
-              </div>
-            </div>
-
-            {/* readout row */}
-            <div className="relative z-10 mt-2 flex items-end justify-between border-t-2 border-bone/15 pt-4">
-              <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.26em] text-steel">regime confidence · OOS</p>
-                <p className="font-display text-5xl font-extrabold leading-none text-bone">
-                  {acc.toFixed(1)}
-                  <span className="ml-1 text-2xl text-chartreuse">%</span>
-                </p>
-              </div>
-              <p className="max-w-[150px] text-right font-mono text-[10px] uppercase leading-relaxed tracking-[0.14em] text-steel">
-                redline = forced trades. <span className="text-signal2">we don&apos;t go there.</span>
-              </p>
-            </div>
-
-            {/* gearbox — N held (the honest state: registry empty) */}
-            <div className="relative z-10 mt-5 flex items-center gap-3 border-t-2 border-bone/15 pt-5">
-              <div className="flex gap-1.5">
-                {GEARS.map((g) => (
-                  <span
-                    key={g}
-                    className={
-                      g === "N"
-                        ? "gr-shadow-bone grid h-11 w-11 place-items-center border-2 border-bone bg-bone font-display text-xl font-extrabold text-pitch"
-                        : "grid h-11 w-11 place-items-center border-2 border-bone/20 font-display text-xl font-semibold text-bone/30"
-                    }
-                  >
-                    {g}
-                  </span>
-                ))}
-              </div>
-              <p className="font-mono text-[10px] uppercase leading-relaxed tracking-[0.16em] text-steel">
-                registry empty →<br />
-                <span className="text-bone">neutral until an edge validates</span>
-              </p>
-            </div>
-          </div>
-        </div>
+        {/* ── RIGHT: the gear engine (PM hub + 9-desk ring, meshed + idling) ── */}
+        <GearEngine />
       </div>
 
       {/* ── pit-wall ticker — the real numbers on the wall ── */}
