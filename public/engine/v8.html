@@ -81,7 +81,8 @@
             font-family: 'Space Mono', monospace;
             text-transform: uppercase;
             white-space: nowrap;
-            pointer-events: none;
+            pointer-events: auto;     /* the label is hoverable; empty space still orbits the engine */
+            cursor: help;
             padding-left: 14px;
             position: relative;
         }
@@ -98,6 +99,29 @@
         .holo .p { display: block; font-size: 9px; font-weight: 700; color: #FF5A1F; letter-spacing: 2px; text-shadow: 0 1px 3px #0b0b0b, 0 0 6px rgba(255,90,31,.4); }
         .holo .r { display: block; font-size: 9px; color: rgba(231,226,212,.72); letter-spacing: 1px; text-shadow: 0 1px 4px #0b0b0b; margin-top: 1px; }
         @keyframes holopulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
+
+        /* hover pop-up — how the desk works. Borderless: dark blur panel + glow, no hard line. */
+        .holo:hover { z-index: 50; }
+        .holo-card {
+            display: none;
+            position: absolute;
+            left: 14px;
+            top: calc(100% + 8px);
+            width: 246px;
+            white-space: normal;
+            padding: 13px 15px;
+            background: rgba(11, 11, 10, 0.85);
+            backdrop-filter: blur(7px);
+            -webkit-backdrop-filter: blur(7px);
+            box-shadow: 0 14px 36px rgba(0, 0, 0, 0.7), inset 0 0 30px rgba(191, 242, 5, 0.06);
+            z-index: 60;
+            animation: holocard .16s ease-out;
+        }
+        .holo:hover .holo-card { display: block; }
+        .holo-card .ch { display: block; font-size: 11px; font-weight: 700; letter-spacing: 2px; color: #BFF205; text-shadow: 0 0 10px rgba(191,242,5,.4); }
+        .holo-card .cp { display: block; font-size: 8px; font-weight: 700; letter-spacing: 2px; color: #FF5A1F; margin-bottom: 7px; }
+        .holo-card .cb { display: block; font-size: 11px; line-height: 1.55; letter-spacing: .3px; text-transform: none; color: rgba(231, 226, 212, 0.88); font-weight: 400; }
+        @keyframes holocard { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -587,19 +611,29 @@
             // mirrors the desk's: the crank is the decision everything drives, the cam sets timing
             // like the regime read, a lime piston is the one validated edge that fires, etc.
             const DESKS = [
-                { pos: [0, 0.5, -11.5],  t: "PM",            p: "CRANKSHAFT",  r: "synthesizes 7 desks · sparks ENTER" },
-                { pos: [5.8, 8.5, 13.8], t: "REGIME",        p: "CAM TIMING",  r: "XGBoost regime · 82.6% OOS" },
-                { pos: [-5.0, 10.5, 0],  t: "OI-CONTRARIAN", p: "PISTON",      r: "the one OOS-validated edge" },
-                { pos: [6.2, -2.6, 2.3], t: "SMART-MONEY",   p: "OIL FILTER",  r: "flow engine + Nansen netflow" },
-                { pos: [8.2, -1.8, -4],  t: "ON-CHAIN",      p: "EXHAUST",     r: "whales + GoPlus · logged on Mantle" },
-                { pos: [-6.4, 3, 14.5],  t: "MACRO",         p: "ALTERNATOR",  r: "Allora 8h BTC/ETH forecast" },
-                { pos: [0, 7.5, 5.5],    t: "SMART-SOCIAL",  p: "INTAKE",      r: "Elfa narrative / mindshare" },
-                { pos: [-2.8, -5.6, 3],  t: "RESEARCH",      p: "OIL PAN",     r: "Fear&Greed + global macro" },
+                { pos: [0, 0.5, -11.5],  t: "PM",            p: "CRANKSHAFT",  r: "synthesizes 7 desks · sparks ENTER",
+                  how: "Reads all seven desk outputs, weighs the dissent, and outputs ENTER or ABSTAIN. A hard rug-pull veto forces ABSTAIN; it defaults to HOLD unless a validated edge says go. The restraint is the product." },
+                { pos: [5.8, 8.5, 13.8], t: "REGIME",        p: "CAM TIMING",  r: "XGBoost regime · 82.6% OOS",
+                  how: "An XGBoost classifier (82.6% out-of-sample) labels the market regime from ADX, EMA slope and volatility, then sets a dynamic risk/reward. It allocates capital to the regime — it does not predict price." },
+                { pos: [-5.0, 10.5, 0],  t: "OI-CONTRARIAN", p: "PISTON",      r: "the one OOS-validated edge",
+                  how: "HeliQuant's single OOS-validated edge: fade open-interest extremes (hedge-like). Only when this desk reports edge_validated AND actionable may the PM ENTER — the one exception to default-HOLD." },
+                { pos: [6.2, -2.6, 2.3], t: "SMART-MONEY",   p: "OIL FILTER",  r: "flow engine + Nansen netflow",
+                  how: "The Dynamic Smart-Money Flow Engine reads net DEX flow per asset and folds in Nansen funds' real ETH netflow as a macro risk-on / risk-off signal." },
+                { pos: [8.2, -1.8, -4],  t: "ON-CHAIN",      p: "EXHAUST",     r: "whales + GoPlus · logged on Mantle",
+                  how: "Tracks the smart-money whale watchlist (GeckoTerminal Mantle DEX, ~24h) and runs a GoPlus token-security check on WMNT. A failed rug check vetoes the trade; every decision is sealed on Mantle." },
+                { pos: [-6.4, 3, 14.5],  t: "MACRO",         p: "ALTERNATOR",  r: "Allora 8h BTC/ETH forecast",
+                  how: "Pulls Allora's decentralized-AI 8h price prediction for BTC (topic 14) and ETH (topic 9) as the macro backdrop; falls back to a BTC-regime proxy if Allora is unavailable." },
+                { pos: [0, 7.5, 5.5],    t: "SMART-SOCIAL",  p: "INTAKE",      r: "Elfa narrative / mindshare",
+                  how: "Elfa mindshare — narratives and trend pulled from SMART social accounts (Twitter/X + Telegram), not retail noise. Flags when the asset's ticker is already in-trend." },
+                { pos: [-2.8, -5.6, 3],  t: "RESEARCH",      p: "OIL PAN",     r: "Fear&Greed + global macro",
+                  how: "External macro context via free public APIs — the Fear & Greed index plus global market cap and BTC dominance — for a clean risk-on / risk-off read." },
             ];
             DESKS.forEach((d) => {
                 const el = document.createElement('div');
                 el.className = 'holo';
-                el.innerHTML = `<span class="t">${d.t}</span><span class="p">${d.p}</span><span class="r">${d.r}</span>`;
+                el.innerHTML =
+                    `<span class="t">${d.t}</span><span class="p">${d.p}</span><span class="r">${d.r}</span>` +
+                    `<span class="holo-card"><span class="ch">${d.t}</span><span class="cp">${d.p} · HOW IT WORKS</span><span class="cb">${d.how}</span></span>`;
                 const label = new THREE.CSS2DObject(el);
                 label.position.set(d.pos[0], d.pos[1], d.pos[2]);
                 engineGroup.add(label);
