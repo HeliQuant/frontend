@@ -101,7 +101,9 @@
         @keyframes holopulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
 
         /* hover pop-up — how the desk works. Borderless: dark blur panel + glow, no hard line. */
-        .holo:hover { z-index: 50; }
+        /* CSS2DRenderer writes an inline per-depth z-index on every label, so a closer node would
+           cover this card — force the hovered node + its card above ALL others with !important. */
+        .holo:hover { z-index: 2147483646 !important; }
         .holo-card {
             display: none;
             position: absolute;
@@ -110,11 +112,11 @@
             width: 246px;
             white-space: normal;
             padding: 13px 15px;
-            background: rgba(11, 11, 10, 0.85);
-            backdrop-filter: blur(7px);
-            -webkit-backdrop-filter: blur(7px);
-            box-shadow: 0 14px 36px rgba(0, 0, 0, 0.7), inset 0 0 30px rgba(191, 242, 5, 0.06);
-            z-index: 60;
+            background: rgba(11, 11, 10, 0.92);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 14px 36px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(191, 242, 5, 0.06);
+            z-index: 2147483647;
             animation: holocard .16s ease-out;
         }
         .holo:hover .holo-card { display: block; }
