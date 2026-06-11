@@ -18,6 +18,7 @@ const LINKS = [
   { href: "/campaign", label: "The grid" },
   { href: "/whales", label: "Telemetry" },
   { href: "/assets", label: "Dyno bays" },
+  { href: "/hire", label: "Hire" },
   { href: "/firms/heliquant", label: "License" },
   { href: "/setup", label: "Ignition" },
 ];
