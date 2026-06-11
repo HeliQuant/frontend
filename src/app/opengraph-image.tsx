@@ -56,19 +56,19 @@ export default async function OpengraphImage() {
           <div
             style={{
               position: "absolute",
-              right: 66,
-              top: 112,
-              width: 410,
-              height: 410,
-              borderRadius: 205,
+              right: 96,
+              top: 150,
+              width: 328,
+              height: 328,
+              borderRadius: 164,
               background: "#f2efe6",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "12px 12px 0 rgba(201,242,75,0.55)",
+              boxShadow: "11px 11px 0 rgba(201,242,75,0.55)",
             }}
           >
-            <img src={logoUri} width={280} height={291} />
+            <img src={logoUri} width={296} height={314} />
           </div>
         ) : null}
 
