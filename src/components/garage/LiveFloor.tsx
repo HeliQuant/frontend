@@ -119,7 +119,7 @@ export default function LiveFloor() {
           </p>
         </div>
         <div className="grid grid-cols-2 gap-5 px-5 py-5 sm:grid-cols-3 lg:grid-cols-6">
-          <Stat label="opened" value={`${opened}/${camp?.target ?? 100}`} />
+          <Stat label={camp?.target == null ? "opened · live" : "opened"} value={camp?.target == null ? `${opened}` : `${opened}/${camp.target}`} />
           <Stat label="open now" value={`${camp?.open_now ?? 0}`} />
           <Stat label="closed" value={`${camp?.closed ?? 0}`} />
           <Stat label="win rate" value={`${(camp?.win_pct ?? 0).toFixed(0)}%`} />

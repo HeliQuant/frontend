@@ -37,7 +37,8 @@ export type ClosedPosition = {
 };
 
 export type CampaignStatus = {
-  target: number;
+  target: number | null; // null = continuous (no lifetime cap — fully autonomous)
+  continuous?: boolean;
   opened: number;
   closed: number;
   open_now: number;

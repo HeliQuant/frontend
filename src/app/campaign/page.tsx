@@ -136,14 +136,21 @@ export default function CampaignPage() {
           {/* ── lap board ── */}
           {data && (
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {/* progress to 100 */}
+              {/* positions opened — continuous (no cap) or progress-to-target */}
               <div className="border-2 border-bone/25 bg-carbon p-4">
-                <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-steel">positions opened</p>
+                <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-steel">
+                  positions opened {data.target == null ? "· always-on" : ""}
+                </p>
                 <p className="mt-1 font-display text-4xl font-extrabold leading-none text-bone">
-                  {data.opened}<span className="text-xl text-steel">/{data.target}</span>
+                  {data.opened}
+                  {data.target != null && <span className="text-xl text-steel">/{data.target}</span>}
                 </p>
                 <div className="mt-3 h-2 border border-bone/20 bg-pitch">
-                  <div className="h-full bg-chartreuse" style={{ width: `${(data.opened / data.target) * 100}%` }} />
+                  {data.target == null ? (
+                    <div className="h-full w-full animate-pulse bg-chartreuse/70" />
+                  ) : (
+                    <div className="h-full bg-chartreuse" style={{ width: `${(data.opened / data.target) * 100}%` }} />
+                  )}
                 </div>
               </div>
               {/* net pnl */}
