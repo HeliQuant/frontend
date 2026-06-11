@@ -112,6 +112,40 @@ export async function fetchEdges(): Promise<EdgeRegistry | null> {
   }
 }
 
+// ── the trade ledger (every resolved trade) ──
+export type Trade = {
+  id: number;
+  asset: string;
+  dir: "LONG" | "SHORT";
+  tier: string;
+  entry: number;
+  exit: number | null;
+  exit_reason: "TP" | "SL" | "TIME" | "TRAIL" | null;
+  net_pct: number | null;
+  pnl_usd: number | null;
+  size_usd: number;
+  regime: string | null;
+  reasons: string[] | null;
+  utc_open: string;
+  utc_close: string | null;
+};
+export type TradeLog = {
+  count: number;
+  wins: number;
+  win_pct: number;
+  net_usd: number;
+  open_now: number;
+  trades: Trade[];
+};
+export async function fetchTrades(): Promise<TradeLog | null> {
+  try {
+    const r = await fetch(`${AGENT_URL}/trades?cb=${Date.now()}`, { cache: "no-store" });
+    return r.ok ? ((await r.json()) as TradeLog) : null;
+  } catch {
+    return null;
+  }
+}
+
 // ── on-chain anchor ledger (THE BLACK BOX) ──
 export type OnchainTx = {
   hash: string;

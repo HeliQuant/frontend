@@ -1,11 +1,12 @@
 /**
- * /ledger — THE BLACK BOX. The firm's verifiable on-chain anchor trail (Mantle Sepolia), fetched live
- * from Etherscan v2. Every decision sealed in calldata, tappable to Mantlescan. Modular: trace any
- * wallet. Distinct metaphor — a flight-recorder tape.
+ * /ledger — THE LEDGER. HeliQuant's complete trade record (every resolved trade + data) on top, the
+ * on-chain verifiability trail (decision anchors on Mantle Sepolia, fetched from Etherscan) below.
+ * Honest split: trades are paper/testnet; DECISIONS are what get sealed on-chain.
  */
 
 import AppNav from "@/components/garage/AppNav";
 import OnchainLedger from "@/components/garage/OnchainLedger";
+import TradeLedger from "@/components/garage/TradeLedger";
 
 export default function LedgerPage() {
   return (
@@ -16,21 +17,36 @@ export default function LedgerPage() {
 
         <section className="relative z-10 mx-auto max-w-[1280px] px-6 pt-16 sm:px-10 xl:px-4">
           <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-steel">
-            <span className="inline-block h-2 w-2 animate-pulse bg-chartreuse align-middle" /> VERIFIABILITY · MANTLE SEPOLIA · ETHERSCAN-FETCHED · LIVE
+            <span className="inline-block h-2 w-2 animate-pulse bg-chartreuse align-middle" /> THE COMPLETE RECORD · EVERY TRADE · EVERY DECISION SEALED · LIVE
           </p>
           <h1
             className="mt-4 font-display font-extrabold uppercase leading-[0.9] text-bone"
             style={{ fontSize: "clamp(2.8rem, 6.4vw, 5.2rem)" }}
           >
-            The black <span className="text-chartreuse">box</span>
+            The <span className="text-chartreuse">ledger</span>
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-bone/65">
-            A flight recorder survives the crash — that&apos;s the point. Every decision the firm makes is
-            hashed and sealed into a Mantle transaction&apos;s calldata. This tape is fetched straight from
-            Etherscan; tap any row to verify it yourself on Mantlescan. The firm can&apos;t rewrite history.
+            Every trade the firm has resolved — direction, entry, exit, P&amp;L, why it exited, the regime
+            it opened in. And below it, the verifiability layer: each decision sealed as a hash on Mantle,
+            fetched straight from Etherscan and tappable to Mantlescan. Nothing hidden, nothing faked.
           </p>
 
+          {/* primary — the trades */}
           <div className="mt-12">
+            <p className="mb-5 font-display text-xl font-extrabold uppercase tracking-wide text-bone">
+              The trade record
+            </p>
+            <TradeLedger />
+          </div>
+
+          {/* verifiability — on-chain anchors */}
+          <div className="mt-20 border-t-2 border-bone/15 pt-12">
+            <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-steel">
+              verifiability · the black box
+            </p>
+            <p className="mb-6 mt-1 font-display text-xl font-extrabold uppercase tracking-wide text-bone">
+              Decisions sealed on Mantle <span className="text-chartreuse">·</span> Etherscan-fetched
+            </p>
             <OnchainLedger />
           </div>
         </section>
@@ -40,7 +56,7 @@ export default function LedgerPage() {
         <div aria-hidden className="gr-hazard h-[14px] opacity-90" />
         <div className="mx-auto max-w-[1280px] px-6 py-8 sm:px-10 xl:px-4">
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-steel">
-            HELIQUANT · THE BLACK BOX · decisions sealed on Mantle — public, verifiable, tamper-proof
+            HELIQUANT · THE LEDGER · every trade logged, every decision sealed — paper-honest, chain-verified
           </p>
         </div>
       </footer>
