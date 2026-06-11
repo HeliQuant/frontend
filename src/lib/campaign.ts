@@ -48,6 +48,8 @@ export type CampaignStatus = {
   exits_by_reason: { TP: number; SL: number; TIME: number; TRAIL?: number };
   edge_open?: number;
   sized_up_open?: number;
+  skips?: number;
+  recent_skips?: { asset: string; dir: string; regime: string; utc: string }[];
   failed_conditions: number;
   horizon_h: number;
   risk_model: string;

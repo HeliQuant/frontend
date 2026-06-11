@@ -132,8 +132,19 @@ export default function LiveFloor() {
           <span className="text-signal2">🛑 {exits.SL}</span>
           <span className="text-bone/70">⏱ {exits.TIME}</span>
           {(exits.TRAIL ?? 0) > 0 && <span className="text-chartreuse">🪤 {exits.TRAIL}</span>}
+          {(camp?.skips ?? 0) > 0 && <span className="text-bone/70">⊘ {camp!.skips} vetoed</span>}
           <span className="ml-auto text-bone/45">{camp?.risk_model}</span>
         </div>
+        {camp?.recent_skips && camp.recent_skips.length > 0 && (
+          <div className="border-t-2 border-bone/10 px-5 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-steel">
+            regime veto (don&apos;t fight the trend) · latest{" "}
+            <span className="text-bone/80">
+              {camp.recent_skips[camp.recent_skips.length - 1].asset}{" "}
+              {camp.recent_skips[camp.recent_skips.length - 1].dir} — regime{" "}
+              {camp.recent_skips[camp.recent_skips.length - 1].regime}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* honesty plate */}
