@@ -23,10 +23,11 @@ export default async function OpengraphImage() {
     fonts = undefined; // fall back to the system font if the bundled face can't be read
   }
 
-  // the SixBlade brand mark (chartreuse colorway reads on the pitch backdrop), embedded as a data-URI
+  // the full HeliQuant logo (rotor + eagle), bg removed. It's black+chartreuse so on the pitch backdrop
+  // it gets a bone "sticker" plate (garage livery) — the black reads, the chartreuse pops.
   let logoUri = "";
   try {
-    const png = readFileSync(join(process.cwd(), "public/brand/sixblade-chartreuse.png")).toString("base64");
+    const png = readFileSync(join(process.cwd(), "public/brand/logo-full.png")).toString("base64");
     logoUri = `data:image/png;base64,${png}`;
   } catch {
     logoUri = "";
@@ -49,9 +50,21 @@ export default async function OpengraphImage() {
           overflow: "hidden",
         }}
       >
-        {/* SixBlade brand mark (right, behind the text) */}
+        {/* HeliQuant logo on a bone livery plate (right) */}
         {logoUri ? (
-          <img src={logoUri} width={372} height={394} style={{ position: "absolute", right: 56, top: 128, opacity: 0.95 }} />
+          <div
+            style={{
+              position: "absolute",
+              right: 64,
+              top: 150,
+              display: "flex",
+              padding: 26,
+              background: "#f2efe6",
+              borderRadius: 18,
+            }}
+          >
+            <img src={logoUri} width={286} height={304} />
+          </div>
         ) : null}
 
         {/* hazard seam */}
