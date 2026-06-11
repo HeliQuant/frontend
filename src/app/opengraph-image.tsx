@@ -23,11 +23,11 @@ export default async function OpengraphImage() {
     fonts = undefined; // fall back to the system font if the bundled face can't be read
   }
 
-  // the full HeliQuant logo (rotor + eagle), bg removed. It's black+chartreuse so on the pitch backdrop
-  // it gets a bone "sticker" plate (garage livery) — the black reads, the chartreuse pops.
+  // the HeliQuant logo (rotor + eagle), bg removed AND recolored for dark — its black mass becomes bone,
+  // chartreuse stays — so it sits straight on the pitch backdrop with no plate, reading cleanly.
   let logoUri = "";
   try {
-    const png = readFileSync(join(process.cwd(), "public/brand/logo-full.png")).toString("base64");
+    const png = readFileSync(join(process.cwd(), "public/brand/logo-dark.png")).toString("base64");
     logoUri = `data:image/png;base64,${png}`;
   } catch {
     logoUri = "";
@@ -50,21 +50,9 @@ export default async function OpengraphImage() {
           overflow: "hidden",
         }}
       >
-        {/* HeliQuant logo on a bone livery plate (right) */}
+        {/* HeliQuant logo (dark-recolored, sits on pitch — no plate) */}
         {logoUri ? (
-          <div
-            style={{
-              position: "absolute",
-              right: 64,
-              top: 150,
-              display: "flex",
-              padding: 26,
-              background: "#f2efe6",
-              borderRadius: 18,
-            }}
-          >
-            <img src={logoUri} width={286} height={304} />
-          </div>
+          <img src={logoUri} width={340} height={362} style={{ position: "absolute", right: 70, top: 138 }} />
         ) : null}
 
         {/* hazard seam */}
