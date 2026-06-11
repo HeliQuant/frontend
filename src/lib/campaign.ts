@@ -112,6 +112,38 @@ export async function fetchEdges(): Promise<EdgeRegistry | null> {
   }
 }
 
+// ── on-chain anchor ledger (THE BLACK BOX) ──
+export type OnchainTx = {
+  hash: string;
+  block: number;
+  ts: number;
+  to: string;
+  from: string;
+  value: string;
+  method: string;
+  is_error: boolean;
+  self_anchor: boolean;
+};
+export type OnchainLedger = {
+  wallet: string;
+  chain: string;
+  chain_id: number;
+  explorer: string;
+  total: number;
+  txs: OnchainTx[];
+  configured: boolean;
+  error?: string;
+};
+export async function fetchOnchain(wallet?: string): Promise<OnchainLedger | null> {
+  try {
+    const q = wallet ? `&wallet=${encodeURIComponent(wallet)}` : "";
+    const r = await fetch(`${AGENT_URL}/onchain?cb=${Date.now()}${q}`, { cache: "no-store" });
+    return r.ok ? ((await r.json()) as OnchainLedger) : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Fraction 0..1 along the lane: 0 = at the stop (SL), 1 = at the target (TP). Works for both
  *  directions because (now-SL)/(TP-SL) is sign-stable. */
 export function laneFrac(p: OpenPosition): number | null {

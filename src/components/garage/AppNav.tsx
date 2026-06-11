@@ -17,6 +17,7 @@ const LINKS = [
   { href: "/app", label: "The floor" },
   { href: "/campaign", label: "The grid" },
   { href: "/learning", label: "Tuning bay" },
+  { href: "/ledger", label: "Black box" },
   { href: "/whales", label: "Telemetry" },
   { href: "/assets", label: "Dyno bays" },
   { href: "/hire", label: "Hire" },
