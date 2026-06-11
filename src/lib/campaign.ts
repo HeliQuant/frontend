@@ -71,6 +71,47 @@ export async function fetchCampaign(): Promise<CampaignStatus | null> {
   }
 }
 
+// ── strategic learning layers (for the Tuning Bay) ──
+export type DeskWeights = {
+  desks: string[];
+  bounds: [number, number];
+  min_samples: number;
+  weights: Record<string, number>;
+  detail: Record<string, { weight: number; samples: number; align_rate: number | null }>;
+};
+export type EdgeRec = {
+  edge: string;
+  asset: string;
+  validated: boolean;
+  horizon_h?: number;
+  p_win?: number;
+  payoff_b?: number;
+  sample_n?: number;
+  oos_roi_pct?: number;
+  pval?: number;
+  tier?: string;
+  confirmations?: number;
+  note?: string;
+};
+export type EdgeRegistry = { validated: Record<string, EdgeRec>; candidate: Record<string, EdgeRec> };
+
+export async function fetchDesks(): Promise<DeskWeights | null> {
+  try {
+    const r = await fetch(`${AGENT_URL}/desks?cb=${Date.now()}`, { cache: "no-store" });
+    return r.ok ? ((await r.json()) as DeskWeights) : null;
+  } catch {
+    return null;
+  }
+}
+export async function fetchEdges(): Promise<EdgeRegistry | null> {
+  try {
+    const r = await fetch(`${AGENT_URL}/edges?cb=${Date.now()}`, { cache: "no-store" });
+    return r.ok ? ((await r.json()) as EdgeRegistry) : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Fraction 0..1 along the lane: 0 = at the stop (SL), 1 = at the target (TP). Works for both
  *  directions because (now-SL)/(TP-SL) is sign-stable. */
 export function laneFrac(p: OpenPosition): number | null {
