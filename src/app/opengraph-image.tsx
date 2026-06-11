@@ -14,17 +14,6 @@ export const alt = "HeliQuant — The disciplined trading engine";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-/** A cog as an inline SVG data-URI (rendered as <img> so satori rasterizes the full SVG). */
-function gear(stroke: string): string {
-  const teeth = 9;
-  let t = "";
-  for (let i = 0; i < teeth; i++) {
-    t += `<rect x='45' y='5' width='10' height='13' rx='2' transform='rotate(${(360 / teeth) * i} 50 50)'/>`;
-  }
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='none' stroke='${stroke}' stroke-width='5'><circle cx='50' cy='50' r='30'/><circle cx='50' cy='50' r='12'/></g><g fill='${stroke}'>${t}</g></svg>`;
-  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
-}
-
 export default async function OpengraphImage() {
   let fonts;
   try {
@@ -32,6 +21,15 @@ export default async function OpengraphImage() {
     fonts = [{ name: "Saira", data, weight: 800 as const, style: "normal" as const }];
   } catch {
     fonts = undefined; // fall back to the system font if the bundled face can't be read
+  }
+
+  // the SixBlade brand mark (chartreuse colorway reads on the pitch backdrop), embedded as a data-URI
+  let logoUri = "";
+  try {
+    const png = readFileSync(join(process.cwd(), "public/brand/sixblade-chartreuse.png")).toString("base64");
+    logoUri = `data:image/png;base64,${png}`;
+  } catch {
+    logoUri = "";
   }
 
   return new ImageResponse(
@@ -51,9 +49,10 @@ export default async function OpengraphImage() {
           overflow: "hidden",
         }}
       >
-        {/* meshed gears (decorative, behind the text) */}
-        <img src={gear("#c9f24b")} width={360} height={360} style={{ position: "absolute", right: -70, top: 70, opacity: 0.16 }} />
-        <img src={gear("#8b8b80")} width={210} height={210} style={{ position: "absolute", right: 200, top: 360, opacity: 0.16 }} />
+        {/* SixBlade brand mark (right, behind the text) */}
+        {logoUri ? (
+          <img src={logoUri} width={372} height={394} style={{ position: "absolute", right: 56, top: 128, opacity: 0.95 }} />
+        ) : null}
 
         {/* hazard seam */}
         <div
