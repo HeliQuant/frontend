@@ -147,6 +147,26 @@ export async function fetchTrades(): Promise<TradeLog | null> {
   }
 }
 
+// ── the on-chain agent roster (ERC-8004) ──
+export type Agent = {
+  name: string;
+  kind: string;
+  tokenId: number | null;
+  ml: boolean;
+  role?: string;
+  weight?: number | null;
+  reputation?: { total_jobs: number; successful_jobs: number; cum_pnl: number } | null;
+};
+export type AgentRoster = { agents: Agent[]; identity?: string; explorer?: string; error?: string };
+export async function fetchAgents(): Promise<AgentRoster | null> {
+  try {
+    const r = await fetch(`${AGENT_URL}/agents?cb=${Date.now()}`, { cache: "no-store" });
+    return r.ok ? ((await r.json()) as AgentRoster) : null;
+  } catch {
+    return null;
+  }
+}
+
 // ── on-chain anchor ledger (THE BLACK BOX) ──
 export type OnchainTx = {
   hash: string;
