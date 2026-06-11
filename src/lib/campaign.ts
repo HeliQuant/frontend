@@ -51,6 +51,8 @@ export type CampaignStatus = {
   sized_up_open?: number;
   skips?: number;
   recent_skips?: { asset: string; dir: string; regime: string; utc: string }[];
+  learned?: { tracked: number; faded: number; records: { cond: string; n: number; wins: number; pnl: number }[] };
+  last_scan?: Record<string, string>;
   failed_conditions: number;
   horizon_h: number;
   risk_model: string;
