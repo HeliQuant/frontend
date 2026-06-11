@@ -5,7 +5,6 @@
  */
 
 import AppNav from "@/components/garage/AppNav";
-import OnchainLedger from "@/components/garage/OnchainLedger";
 import TradeLedger from "@/components/garage/TradeLedger";
 
 export default function LedgerPage() {
@@ -27,27 +26,13 @@ export default function LedgerPage() {
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-bone/65">
             Every trade the firm has resolved — direction, entry, exit, P&amp;L, why it exited, the regime
-            it opened in. And below it, the verifiability layer: each decision sealed as a hash on Mantle,
-            fetched straight from Etherscan and tappable to Mantlescan. Nothing hidden, nothing faked.
+            it opened in, and the <span className="text-chartreuse">Mantle transaction</span> that sealed its
+            outcome. Tap any tx to verify it yourself on Mantlescan. Nothing hidden, nothing faked.
           </p>
 
-          {/* primary — the trades */}
+          {/* the trade record — each row carries its own on-chain anchor */}
           <div className="mt-12">
-            <p className="mb-5 font-display text-xl font-extrabold uppercase tracking-wide text-bone">
-              The trade record
-            </p>
             <TradeLedger />
-          </div>
-
-          {/* verifiability — on-chain anchors */}
-          <div className="mt-20 border-t-2 border-bone/15 pt-12">
-            <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-steel">
-              verifiability · the black box
-            </p>
-            <p className="mb-6 mt-1 font-display text-xl font-extrabold uppercase tracking-wide text-bone">
-              Decisions sealed on Mantle <span className="text-chartreuse">·</span> Etherscan-fetched
-            </p>
-            <OnchainLedger />
           </div>
         </section>
       </main>

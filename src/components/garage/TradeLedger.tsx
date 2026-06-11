@@ -14,6 +14,8 @@ import { fetchTrades, type Trade, type TradeLog } from "@/lib/campaign";
 
 const POLL_MS = 20000;
 
+const MANTLESCAN = "https://sepolia.mantlescan.xyz";
+
 const REASON_META: Record<string, { color: string; label: string }> = {
   TP: { color: "text-chartreuse border-chartreuse/50", label: "take-profit" },
   SL: { color: "text-signal2 border-signal2/50", label: "stop-loss" },
@@ -82,13 +84,13 @@ export default function TradeLedger() {
       ) : (
         <div className="space-y-px bg-bone/10">
           {/* header row */}
-          <div className="hidden grid-cols-[120px_1fr_120px_120px_120px_70px] gap-3 bg-pitch px-5 py-2 font-mono text-[9px] uppercase tracking-[0.16em] text-steel lg:grid">
+          <div className="hidden grid-cols-[100px_1fr_80px_80px_95px_150px] gap-3 bg-pitch px-5 py-2 font-mono text-[9px] uppercase tracking-[0.16em] text-steel lg:grid">
             <span>asset · side</span>
             <span>entry → exit</span>
             <span className="text-right">net %</span>
             <span className="text-right">P&amp;L $</span>
             <span>exit · regime</span>
-            <span className="text-right">age</span>
+            <span>on-chain · age</span>
           </div>
           {log!.trades.map((t, i) => (
             <TradeRow key={t.id} t={t} delay={Math.min(i * 0.012, 0.3)} />
@@ -96,10 +98,10 @@ export default function TradeLedger() {
         </div>
       )}
 
-      <p className="border-l-2 border-steel bg-carbon px-5 py-3 font-mono text-[10px] uppercase leading-relaxed tracking-[0.16em] text-bone/70">
+      <p className="border-l-2 border-chartreuse bg-carbon px-5 py-3 font-mono text-[10px] uppercase leading-relaxed tracking-[0.16em] text-bone/70">
         honest scope — these are <span className="text-bone">paper trades at live prices</span> (real fills route
-        to Bybit testnet when armed). real capital still needs a validated edge; the chain seals the
-        <span className="text-chartreuse"> decisions</span>, verified in the anchor trail below.
+        to Bybit testnet when armed). real capital still needs a validated edge. every resolved trade&apos;s
+        outcome is <span className="text-chartreuse">sealed on Mantle</span> — tap any tx to verify on Mantlescan.
       </p>
     </div>
   );
@@ -116,7 +118,7 @@ function TradeRow({ t, delay }: { t: Trade; delay: number }) {
       initial={{ opacity: 0, x: -5 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.3, delay }}
-      className="grid grid-cols-2 items-center gap-3 bg-carbon px-5 py-3 lg:grid-cols-[120px_1fr_120px_120px_120px_70px]"
+      className="grid grid-cols-2 items-center gap-3 bg-carbon px-5 py-3 lg:grid-cols-[100px_1fr_80px_80px_95px_150px]"
     >
       {/* asset + side */}
       <div className="flex items-center gap-2">
@@ -150,8 +152,27 @@ function TradeRow({ t, delay }: { t: Trade; delay: number }) {
         </span>
         {t.regime ? <span className={`font-mono text-[9px] uppercase ${REGIME_COLOR[t.regime] ?? "text-steel"}`}>{t.regime}</span> : null}
       </div>
-      {/* age */}
-      <span className="text-right font-mono text-[10px] text-steel">{ago(t.utc_close)}</span>
+      {/* on-chain anchor + age */}
+      <div className="flex items-center justify-between gap-2">
+        {t.anchor_tx ? (
+          <a
+            href={`${MANTLESCAN}/tx/${t.anchor_tx}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={t.anchor_tx}
+            className="flex items-center gap-1 font-mono text-[10px] text-chartreuse hover:underline"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-chartreuse" />
+            {t.anchor_tx.slice(0, 6)}…{t.anchor_tx.slice(-4)} ↗
+          </a>
+        ) : (
+          <span className="flex items-center gap-1 font-mono text-[10px] text-steel">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-steel/70" />
+            sealing…
+          </span>
+        )}
+        <span className="font-mono text-[10px] text-steel">{ago(t.utc_close)}</span>
+      </div>
     </motion.div>
   );
 }

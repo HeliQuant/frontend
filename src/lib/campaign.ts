@@ -128,6 +128,7 @@ export type Trade = {
   reasons: string[] | null;
   utc_open: string;
   utc_close: string | null;
+  anchor_tx: string | null; // Mantle Sepolia tx that sealed this trade's outcome (null = pending)
 };
 export type TradeLog = {
   count: number;
