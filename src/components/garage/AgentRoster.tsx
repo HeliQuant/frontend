@@ -138,10 +138,10 @@ function AgentCard({ a, href, delay }: { a: Agent; href: string; delay: number }
       </div>
       <div className="mt-4 flex items-end justify-between border-t border-bone/10 pt-3 font-mono text-[10px]">
         <div>
-          <p className="text-steel">on-chain reputation</p>
-          <p className="text-bone/70">
-            {rep ? `${rep.successful_jobs}/${rep.total_jobs} jobs` : "—"}
-            {rep && rep.total_jobs === 0 ? <span className="text-steel"> · accruing</span> : null}
+          <p className="text-steel">outputs sealed on-chain</p>
+          <p className={rep?.credentials ? "text-chartreuse" : "text-bone/60"}>
+            {rep?.credentials ?? 0}
+            {rep && (rep.credentials ?? 0) === 0 ? <span className="text-steel"> · first cycle</span> : " sealed"}
           </p>
         </div>
         <div className="text-right">

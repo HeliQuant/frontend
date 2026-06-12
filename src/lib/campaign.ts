@@ -155,7 +155,7 @@ export type Agent = {
   ml: boolean;
   role?: string;
   weight?: number | null;
-  reputation?: { total_jobs: number; successful_jobs: number; cum_pnl: number } | null;
+  reputation?: { total_jobs: number; successful_jobs: number; cum_pnl: number; credentials?: number } | null;
 };
 export type AgentRoster = { agents: Agent[]; identity?: string; explorer?: string; error?: string };
 export async function fetchAgents(): Promise<AgentRoster | null> {
