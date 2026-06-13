@@ -23,6 +23,11 @@ export type OpenPosition = {
   utc_open: string;
   now?: number;
   upnl_pct?: number;
+  horizon_h?: number;        // the dynamic hold-time this position trades on (3h fade / 8h trend / 24h edge)
+  held_h?: number;           // hours held so far
+  tp_progress_pct?: number;  // 0..100 — how far price has travelled toward TP
+  near_tp?: boolean;         // in the near-TP band (>=80% to TP, not broken through)
+  near_tp_lock_in_s?: number; // seconds until the near-TP lock fires (banks the near-win)
 };
 
 export type ClosedPosition = {
@@ -30,7 +35,7 @@ export type ClosedPosition = {
   asset: string;
   dir: "LONG" | "SHORT";
   exit: number | null;
-  exit_reason: "TP" | "SL" | "TIME" | "TRAIL" | null;
+  exit_reason: "TP" | "SL" | "TIME" | "TRAIL" | "STALL" | "NEARTP" | null;
   net_pct: number | null;
   pnl_usd: number | null;
   utc_close: string | null;
@@ -46,7 +51,7 @@ export type CampaignStatus = {
   net_usd: number;
   done: boolean;
   testnet_fills: number;
-  exits_by_reason: { TP: number; SL: number; TIME: number; TRAIL?: number };
+  exits_by_reason: { TP: number; SL: number; TIME: number; TRAIL?: number; STALL?: number; NEARTP?: number };
   edge_open?: number;
   sized_up_open?: number;
   skips?: number;
@@ -120,7 +125,7 @@ export type Trade = {
   tier: string;
   entry: number;
   exit: number | null;
-  exit_reason: "TP" | "SL" | "TIME" | "TRAIL" | null;
+  exit_reason: "TP" | "SL" | "TIME" | "TRAIL" | "STALL" | "NEARTP" | null;
   net_pct: number | null;
   pnl_usd: number | null;
   size_usd: number;

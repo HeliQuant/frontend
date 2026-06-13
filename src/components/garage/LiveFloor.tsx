@@ -132,6 +132,8 @@ export default function LiveFloor() {
           <span className="text-signal2">🛑 {exits.SL}</span>
           <span className="text-bone/70">⏱ {exits.TIME}</span>
           {(exits.TRAIL ?? 0) > 0 && <span className="text-chartreuse">🪤 {exits.TRAIL}</span>}
+          {(exits.NEARTP ?? 0) > 0 && <span className="text-chartreuse">🏁 {exits.NEARTP}</span>}
+          {(exits.STALL ?? 0) > 0 && <span className="text-bone/70">✂ {exits.STALL}</span>}
           {(camp?.skips ?? 0) > 0 && <span className="text-bone/70">⊘ {camp!.skips} vetoed</span>}
           <span className="ml-auto text-bone/45">{camp?.risk_model}</span>
         </div>
@@ -214,6 +216,11 @@ function PositionRow({ p, candles }: { p: OpenPosition; candles: Candle[] }) {
             {p.dir}
           </span>
           <span className="border border-bone/30 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-bone/60">{p.tier}</span>
+          {p.horizon_h != null && (
+            <span className="border border-bone/20 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-bone/55">
+              ⏱ {(p.held_h ?? 0).toFixed(1)}/{p.horizon_h}h
+            </span>
+          )}
           {p.upnl_pct != null && (
             <span className={`font-mono text-sm font-bold ${up ? "text-chartreuse" : "text-signal2"}`}>
               {up ? "+" : ""}
@@ -226,6 +233,12 @@ function PositionRow({ p, candles }: { p: OpenPosition; candles: Candle[] }) {
           <Lvl label="stop" v={p.sl} color="text-signal2" pct={p.sl_pct} />
           <Lvl label="target" v={p.tp} color="text-chartreuse" pct={p.tp_pct} />
         </div>
+        {p.near_tp && (
+          <p className="mt-3 inline-block border border-chartreuse/50 bg-chartreuse/5 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-chartreuse">
+            🏁 near TP{p.tp_progress_pct != null ? ` ${p.tp_progress_pct.toFixed(0)}%` : ""} ·{" "}
+            {p.near_tp_lock_in_s != null ? `lock in ${mmss(p.near_tp_lock_in_s)}` : "banking the near-win"}
+          </p>
+        )}
         {p.now != null && (
           <p className="mt-3 font-mono text-[11px] text-bone/70">
             mark <span className="text-[#6ea8ff]">{fmt(p.now)}</span> · opened {ago(p.utc_open)}
@@ -259,4 +272,9 @@ function fmt(n: number): string {
   if (n >= 1000) return n.toLocaleString(undefined, { maximumFractionDigits: 1 });
   if (n >= 1) return n.toFixed(2);
   return n.toPrecision(4);
+}
+
+function mmss(s: number): string {
+  const m = Math.floor(s / 60);
+  return `${m}:${String(Math.max(0, Math.round(s - m * 60))).padStart(2, "0")}`;
 }
