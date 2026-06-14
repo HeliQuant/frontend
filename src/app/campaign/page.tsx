@@ -27,6 +27,12 @@ function fmtPrice(n: number | null | undefined): string {
     : n >= 1 ? n.toFixed(2) : n.toFixed(4);
 }
 
+function mmss(s: number): string {
+  const m = Math.floor(s / 60);
+  const sec = Math.max(0, Math.round(s - m * 60));
+  return m + ":" + (sec < 10 ? "0" + sec : "" + sec);
+}
+
 function Lane({ p }: { p: OpenPosition }) {
   const frac = laneFrac(p);
   const up = (p.upnl_pct ?? 0) >= 0;
@@ -43,6 +49,11 @@ function Lane({ p }: { p: OpenPosition }) {
           <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-steel">
             {p.tier} · net {p.votes > 0 ? "+" : ""}{p.votes}
           </span>
+          {p.horizon_h != null && (
+            <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-bone/45">
+              · ⏱ {(p.held_h ?? 0).toFixed(1)}/{p.horizon_h}h
+            </span>
+          )}
         </span>
         <span className="font-mono text-[12px] tracking-wide" style={{ color: carColor }}>
           {up ? "+" : ""}{(p.upnl_pct ?? 0).toFixed(2)}%
@@ -77,6 +88,13 @@ function Lane({ p }: { p: OpenPosition }) {
         <span className="absolute -bottom-0.5 left-1/2 translate-y-full -translate-x-1/2 font-mono text-[8px] uppercase tracking-[0.12em] text-steel">@ {fmtPrice(p.entry)}</span>
         <span className="absolute -bottom-0.5 right-1 translate-y-full font-mono text-[8px] uppercase tracking-[0.12em] text-chartreuse/80">TP {fmtPrice(p.tp)}</span>
       </div>
+      {/* near-TP lock — price entered the >=80% band, banking the near-win if it stalls */}
+      {p.near_tp && (
+        <p className="mt-2.5 inline-block border border-chartreuse/50 bg-chartreuse/5 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-[0.12em] text-chartreuse">
+          🏁 near TP{p.tp_progress_pct != null ? " " + p.tp_progress_pct.toFixed(0) + "%" : ""} ·{" "}
+          {p.near_tp_lock_in_s != null ? "lock in " + mmss(p.near_tp_lock_in_s) : "banking near-win"}
+        </p>
+      )}
       {/* desk reasons — the justification for THIS car being on the grid */}
       {p.reasons && p.reasons.length > 0 && (
         <p className="mt-3.5 font-mono text-[9px] uppercase tracking-[0.12em] text-steel">
@@ -205,7 +223,7 @@ export default function CampaignPage() {
               <div className="flex flex-wrap gap-2">
                 {data.recent_closes.slice().reverse().map((c) => {
                   const win = (c.pnl_usd ?? 0) > 0;
-                  const icon = c.exit_reason === "TP" ? "🎯" : c.exit_reason === "SL" ? "🛑" : c.exit_reason === "TRAIL" ? "🪤" : "⏱";
+                  const icon = c.exit_reason === "TP" ? "🎯" : c.exit_reason === "SL" ? "🛑" : c.exit_reason === "TRAIL" ? "🪤" : c.exit_reason === "NEARTP" ? "🏁" : c.exit_reason === "STALL" ? "✂" : "⏱";
                   return (
                     <span key={c.id} className="flex items-center gap-1.5 border-2 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em]"
                       style={{ borderColor: win ? "rgba(201,242,75,0.5)" : "rgba(255,90,31,0.5)", color: win ? "var(--color-chartreuse)" : "var(--color-signal2)" }}>
