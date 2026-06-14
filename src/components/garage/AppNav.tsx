@@ -16,6 +16,7 @@ import { useState } from "react";
 const LINKS = [
   { href: "/app", label: "The floor" },
   { href: "/campaign", label: "The grid" },
+  { href: "/carry", label: "The edge" },
   { href: "/learning", label: "Tuning bay" },
   { href: "/agents", label: "The crew" },
   { href: "/ledger", label: "Ledger" },

@@ -190,6 +190,25 @@ export async function fetchPerformance(): Promise<PerfStats | null> {
   }
 }
 
+// ── THE EDGE: delta-neutral funding-carry (/carry) — the one validated positive, non-directional edge ──
+// Live carry rate per asset from real Bybit funding + the dated crash-robustness verdict. Honest: the firm
+// HARVESTS only when carry is rich (>risk-free) AND crash-robust; otherwise it skips (funding thin = wait).
+export type CarryRead = {
+  carry_ann_pct: number | null;
+  crash_class: string | null; // robust | lumpy | moderate | tame | untested
+  verdict: string | null;
+  source?: string;
+};
+export type CarryStatus = { carry: Record<string, CarryRead>; best_harvestable: string };
+export async function fetchCarry(): Promise<CarryStatus | null> {
+  try {
+    const r = await fetch(`${AGENT_URL}/carry?cb=${Date.now()}`, { cache: "no-store" });
+    return r.ok ? ((await r.json()) as CarryStatus) : null;
+  } catch {
+    return null;
+  }
+}
+
 // ── the on-chain agent roster (ERC-8004) ──
 export type Agent = {
   name: string;
