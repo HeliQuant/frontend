@@ -19,6 +19,7 @@ const LINKS = [
   { href: "/learning", label: "Tuning bay" },
   { href: "/agents", label: "The crew" },
   { href: "/ledger", label: "Ledger" },
+  { href: "/performance", label: "Track record" },
   { href: "/whales", label: "Telemetry" },
   { href: "/assets", label: "Dyno bays" },
   { href: "/hire", label: "Hire" },

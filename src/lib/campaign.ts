@@ -152,6 +152,44 @@ export async function fetchTrades(): Promise<TradeLog | null> {
   }
 }
 
+// ── THE DYNO: rigorous performance analytics on the real ledger (/performance) ──
+// quantstats-grade metrics, computed numpy-only from resolved trades. Annualized figures are
+// suppressed until the sample is meaningful (>=30d & >=30 trades) — the firm refuses to extrapolate
+// a fantasy CAGR off a 3-day window, so those fields go null and `annualized` is false.
+export type PerfStats = {
+  n: number;
+  note?: string;
+  win_rate?: number;
+  total_return_pct?: number;
+  mean_trade_pct?: number;
+  vol_trade_pct?: number;
+  sharpe_per_trade?: number;
+  sortino_per_trade?: number;
+  sharpe_annualized?: number | null;
+  sortino_annualized?: number | null;
+  max_drawdown_pct?: number;
+  calmar?: number | null;
+  cagr_pct?: number | null;
+  profit_factor?: number | null;
+  avg_win_pct?: number | null;
+  avg_loss_pct?: number | null;
+  best_pct?: number;
+  worst_pct?: number;
+  span_days?: number | null;
+  trades_per_year?: number | null;
+  annualized?: boolean;
+  equity_curve?: number[];
+  sample_warning?: string | null;
+};
+export async function fetchPerformance(): Promise<PerfStats | null> {
+  try {
+    const r = await fetch(`${AGENT_URL}/performance?cb=${Date.now()}`, { cache: "no-store" });
+    return r.ok ? ((await r.json()) as PerfStats) : null;
+  } catch {
+    return null;
+  }
+}
+
 // ── the on-chain agent roster (ERC-8004) ──
 export type Agent = {
   name: string;
