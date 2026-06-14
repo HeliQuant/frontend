@@ -38,7 +38,7 @@ export default function AppNav() {
 
   return (
     <header className="sticky top-0 z-50 border-b-2 border-bone/15 bg-pitch/85 backdrop-blur-md">
-      <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-3 sm:px-10 xl:px-4">
+      <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-6 px-6 py-3 sm:px-10 xl:px-8">
         {/* brand mark → exit back to the landing site */}
         <Link href="/" className="flex items-center gap-3" aria-label="HeliQuant — back to site">
           <span className="gr-shadow-bone grid h-10 w-10 place-items-center border-2 border-pitch bg-bone p-1">
@@ -50,7 +50,7 @@ export default function AppNav() {
         </Link>
 
         {/* functional bays — active bay reads chartreuse */}
-        <nav className="hidden items-center gap-7 md:flex">
+        <nav className="hidden items-center gap-x-5 xl:flex 2xl:gap-x-7">
           {LINKS.map((l) => {
             const active = isActive(pathname, l.href);
             return (
@@ -58,7 +58,7 @@ export default function AppNav() {
                 key={l.href}
                 href={l.href}
                 aria-current={active ? "page" : undefined}
-                className={`font-mono text-[11px] uppercase tracking-[0.22em] transition-colors ${
+                className={`whitespace-nowrap font-mono text-[11px] uppercase tracking-[0.16em] transition-colors ${
                   active ? "text-chartreuse" : "text-bone/65 hover:text-chartreuse"
                 }`}
               >
@@ -72,7 +72,7 @@ export default function AppNav() {
         <div className="flex items-center gap-3">
           <Link
             href="/"
-            className="gr-press hidden border-2 border-bone/40 bg-transparent px-4 py-2 font-display text-sm font-bold uppercase tracking-wide text-bone md:inline-block"
+            className="gr-press hidden border-2 border-bone/40 bg-transparent px-4 py-2 font-display text-sm font-bold uppercase tracking-wide text-bone xl:inline-block"
           >
             View site
           </Link>
@@ -81,7 +81,7 @@ export default function AppNav() {
             aria-label="Toggle navigation"
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
-            className="grid h-10 w-10 place-items-center border-2 border-bone/40 text-bone md:hidden"
+            className="grid h-10 w-10 place-items-center border-2 border-bone/40 text-bone xl:hidden"
           >
             <span className="font-mono text-lg leading-none">{open ? "✕" : "≡"}</span>
           </button>
@@ -90,7 +90,7 @@ export default function AppNav() {
 
       {/* mobile drawer — every bay reachable without typing a route */}
       {open && (
-        <nav className="border-t-2 border-bone/15 bg-pitch/95 px-6 py-4 md:hidden">
+        <nav className="border-t-2 border-bone/15 bg-pitch/95 px-6 py-4 xl:hidden">
           <ul className="flex flex-col gap-1">
             {LINKS.map((l) => {
               const active = isActive(pathname, l.href);
