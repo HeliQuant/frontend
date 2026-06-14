@@ -12,7 +12,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { fetchCampaign, type CampaignStatus, type OpenPosition } from "@/lib/campaign";
+import { fetchCampaign, venueBadge, type CampaignStatus, type OpenPosition } from "@/lib/campaign";
 import { fetchStatus, fetchDecisions, fetchCandles, type OrgStatus, type Decision, type Candle } from "@/lib/live";
 import MiniCandles from "./MiniCandles";
 
@@ -215,6 +215,9 @@ function PositionRow({ p, candles }: { p: OpenPosition; candles: Candle[] }) {
           <span className={`border px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em] ${p.dir === "SHORT" ? "border-signal2/60 text-signal2" : "border-chartreuse/60 text-chartreuse"}`}>
             {p.dir}
           </span>
+          {(() => { const v = venueBadge(p.venue); return (
+            <span className={`border px-2 py-0.5 font-mono text-[9px] uppercase tracking-wide ${v.cls}`}>{v.label}</span>
+          ); })()}
           <span className="border border-bone/30 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-bone/60">{p.tier}</span>
           {p.horizon_h != null && (
             <span className="border border-bone/20 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-bone/55">

@@ -28,6 +28,7 @@ export type OpenPosition = {
   tp_progress_pct?: number;  // 0..100 — how far price has travelled toward TP
   near_tp?: boolean;         // in the near-TP band (>=80% to TP, not broken through)
   near_tp_lock_in_s?: number; // seconds until the near-TP lock fires (banks the near-win)
+  venue?: string | null;     // "bybit-testnet-spot" | "bybit-testnet-perp" | null/absent = paper
 };
 
 export type ClosedPosition = {
@@ -134,6 +135,7 @@ export type Trade = {
   utc_open: string;
   utc_close: string | null;
   anchor_tx: string | null; // Mantle Sepolia tx that sealed this trade's outcome (null = pending)
+  venue?: string | null;    // "bybit-testnet-spot" | "bybit-testnet-perp" | null/absent = paper
 };
 export type TradeLog = {
   count: number;
@@ -267,4 +269,13 @@ export function laneFrac(p: OpenPosition): number | null {
   if (p.now == null || p.sl == null || p.tp == null || p.tp === p.sl) return null;
   const f = (p.now - p.sl) / (p.tp - p.sl);
   return Math.max(0, Math.min(1, f));
+}
+
+/** Trade-venue badge content. A real Bybit-testnet fill reads ⚡ BYBIT TESTNET (chartreuse);
+ *  anything else (null/absent = paper at live prices) reads 📄 PAPER (steel). Returns the label
+ *  plus the border/text Tailwind classes — the caller adds its own sibling-chip sizing. */
+export function venueBadge(venue?: string | null): { label: string; cls: string } {
+  return venue && venue.startsWith("bybit-testnet")
+    ? { label: "⚡ BYBIT TESTNET", cls: "border-chartreuse/50 text-chartreuse" }
+    : { label: "📄 PAPER", cls: "border-bone/25 text-steel" };
 }

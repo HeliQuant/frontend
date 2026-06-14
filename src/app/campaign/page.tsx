@@ -17,7 +17,7 @@ import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 
 import AppNav from "@/components/garage/AppNav";
-import { fetchCampaign, laneFrac, type CampaignStatus, type OpenPosition } from "@/lib/campaign";
+import { fetchCampaign, laneFrac, venueBadge, type CampaignStatus, type OpenPosition } from "@/lib/campaign";
 
 const POLL_MS = 20000;
 
@@ -46,6 +46,9 @@ function Lane({ p }: { p: OpenPosition }) {
           <span className={`border px-1.5 py-px font-mono text-[9px] font-bold tracking-[0.14em] ${p.dir === "LONG" ? "border-chartreuse text-chartreuse" : "border-bone/45 text-bone/70"}`}>
             {p.dir}
           </span>
+          {(() => { const v = venueBadge(p.venue); return (
+            <span className={`border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wide ${v.cls}`}>{v.label}</span>
+          ); })()}
           <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-steel">
             {p.tier} · net {p.votes > 0 ? "+" : ""}{p.votes}
           </span>
