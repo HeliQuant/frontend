@@ -91,8 +91,8 @@ function Lane({ p }: { p: OpenPosition }) {
       {/* near-TP lock — price entered the >=80% band, banking the near-win if it stalls */}
       {p.near_tp && (
         <p className="mt-2.5 inline-block border border-chartreuse/50 bg-chartreuse/5 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-[0.12em] text-chartreuse">
-          🏁 near TP{p.tp_progress_pct != null ? " " + p.tp_progress_pct.toFixed(0) + "%" : ""} ·{" "}
-          {p.near_tp_lock_in_s != null ? "lock in " + mmss(p.near_tp_lock_in_s) : "banking near-win"}
+          🏁 {(p.tp_progress_pct ?? 0) >= 100 ? "at TP" : "near TP " + (p.tp_progress_pct ?? 0).toFixed(0) + "%"} ·{" "}
+          {p.near_tp_lock_in_s != null ? "banking in " + mmss(p.near_tp_lock_in_s) : "banking near-win"}
         </p>
       )}
       {/* desk reasons — the justification for THIS car being on the grid */}
