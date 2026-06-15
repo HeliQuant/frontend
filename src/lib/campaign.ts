@@ -99,7 +99,11 @@ export type EdgeRec = {
   confirmations?: number;
   note?: string;
 };
-export type EdgeRegistry = { validated: Record<string, EdgeRec>; candidate: Record<string, EdgeRec> };
+export type EdgeRegistry = {
+  validated: Record<string, EdgeRec>;
+  candidate: Record<string, EdgeRec>;
+  last_run?: string | null; // ISO of the last edge-lab sweep — proves the lab is still running
+};
 
 export async function fetchDesks(): Promise<DeskWeights | null> {
   try {
@@ -201,7 +205,11 @@ export type CarryRead = {
   verdict: string | null;
   source?: string;
 };
-export type CarryStatus = { carry: Record<string, CarryRead>; best_harvestable: string };
+export type CarryStatus = {
+  carry: Record<string, CarryRead>;
+  best_harvestable: string;
+  asof?: string | null; // ISO of the last funding read — null = feed never/stale
+};
 export async function fetchCarry(): Promise<CarryStatus | null> {
   try {
     const r = await fetch(`${AGENT_URL}/carry?cb=${Date.now()}`, { cache: "no-store" });
@@ -258,6 +266,37 @@ export async function fetchOnchain(wallet?: string): Promise<OnchainLedger | nul
     const q = wallet ? `&wallet=${encodeURIComponent(wallet)}` : "";
     const r = await fetch(`${AGENT_URL}/onchain?cb=${Date.now()}${q}`, { cache: "no-store" });
     return r.ok ? ((await r.json()) as OnchainLedger) : null;
+  } catch {
+    return null;
+  }
+}
+
+// ── THE TIMING TOWER: live per-asset Hyperliquid smart-money (/whales) ──
+// The REAL per-asset grid the firm acts on: the Hyperliquid top-PnL leaderboard, read live per
+// traded asset (BTC/ETH/SOL/HYPE/SUI — MNT is NOT on Hyperliquid). Honest by construction: when
+// none of the tracked top traders hold an asset, whales_in_position is 0 and the row says so.
+export type WhaleAsset = {
+  asset: string;
+  whales_in_position: number; // how many of the tracked top-PnL traders currently hold it
+  long: number;               // count on the long side
+  short: number;              // count on the short side
+  long_usd: number;           // notional held long
+  short_usd: number;          // notional held short
+  net_usd: number;            // long_usd − short_usd (net conviction)
+  avg_roe_pct: number | null; // mean ROE across holders (null = no read)
+  stance: "LONG" | "SHORT" | "NEUTRAL";
+  n_tracked: number;          // size of the tracked leaderboard for this asset
+  brief: string;              // one-line read
+};
+export type WhalesResponse = {
+  asof: string;
+  source: string;
+  assets: WhaleAsset[];
+};
+export async function fetchWhales(): Promise<WhalesResponse | null> {
+  try {
+    const r = await fetch(`${AGENT_URL}/whales?cb=${Date.now()}`, { cache: "no-store" });
+    return r.ok ? ((await r.json()) as WhalesResponse) : null;
   } catch {
     return null;
   }
