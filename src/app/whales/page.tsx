@@ -1,20 +1,20 @@
 /**
  * /whales — "THE TIMING TOWER" (Night Garage §6.7)
  *
- * Smart-money wallets on Mantle DEX rendered as an F1 timing tower: position by composite
- * rank score, gap-to-leader, net-volume interval bars, bias as a tire-compound chip,
- * buy/sell sector counts, last pit stop. Geometry encodes the data (doctrine Law 2) — the
- * row IS the telemetry, no cards.
+ * PRIMARY (live): the Hyperliquid top-PnL whale grid, per traded asset — the REAL per-asset
+ * smart-money the firm acts on (BTC/ETH/SOL/HYPE/SUI). Rendered by <HlWhaleTower/> (client,
+ * polls /whales every 20s). Geometry encodes the data (doctrine Law 2) — rows, not cards.
  *
- * HONESTY PLATE: this watchlist is pit-wall CONTEXT, not alpha — investigation showed these
- * are churners/arb bots, not patient holders. The live firm tracks a different grid: the
- * Hyperliquid top-PnL leaderboard, per traded asset, in the cloud.
+ * SECONDARY (context, not live): a Mantle DEX flow SNAPSHOT (May-29 capture). Investigation
+ * showed these wallets are churners/arb bots, not patient holders — so it's context for the
+ * desks, NOT alpha, and NOT live. Kept, but clearly demoted below the live grid.
  */
 
 import { promises as fs } from "fs";
 import path from "path";
 
 import AppNav from "@/components/garage/AppNav";
+import HlWhaleTower from "@/components/garage/HlWhaleTower";
 
 interface WhaleProfile {
   address: string;
@@ -34,7 +34,7 @@ interface WhaleProfile {
   direction_bias: "accumulating" | "distributing" | "neutral";
 }
 
-async function getWhales(): Promise<WhaleProfile[]> {
+async function getMantleSnapshot(): Promise<WhaleProfile[]> {
   const filePath = path.join(process.cwd(), "public/data/whale_watchlist.json");
   try {
     const raw = await fs.readFile(filePath, "utf-8");
@@ -65,9 +65,9 @@ function compound(bias: WhaleProfile["direction_bias"]) {
 export const dynamic = "force-dynamic";
 
 export default async function WhalesPage() {
-  const whales = (await getWhales()).sort((a, b) => b.rank_score - a.rank_score).slice(0, 16);
-  const leader = whales[0];
-  const maxAbsNet = Math.max(1, ...whales.map((w) => Math.abs(w.net_volume_usd)));
+  const snapshot = (await getMantleSnapshot()).sort((a, b) => b.rank_score - a.rank_score).slice(0, 12);
+  const leader = snapshot[0];
+  const maxAbsNet = Math.max(1, ...snapshot.map((w) => Math.abs(w.net_volume_usd)));
 
   return (
     <>
@@ -77,7 +77,7 @@ export default async function WhalesPage() {
 
         <section className="relative z-10 mx-auto max-w-[1280px] px-6 pt-16 sm:px-10 xl:px-4">
           <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-steel">
-            <span className="text-chartreuse">▮</span> TELEMETRY · MANTLE DEX · SMART-MONEY GRID
+            <span className="inline-block h-2 w-2 animate-pulse bg-chartreuse align-middle" /> TELEMETRY · LIVE SMART-MONEY GRID · PER TRADED ASSET
           </p>
           <h1
             className="mt-4 font-display font-extrabold uppercase leading-[0.9] text-bone"
@@ -86,27 +86,63 @@ export default async function WhalesPage() {
             The timing <span className="text-chartreuse">tower</span>
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-bone/65">
-            Every driver on the Mantle DEX track, ranked by composite score — volume, activity,
-            realized PnL. Watch their lines; don&apos;t copy them blind.
+            Track the other drivers on the track. The firm reads the{" "}
+            <span className="text-bone">Hyperliquid top-PnL leaderboard per traded asset</span> — live —
+            and watches who&apos;s long, who&apos;s short, and where the conviction sits. Watch their lines;
+            don&apos;t copy them blind.
           </p>
 
-          {/* honesty plate — what this grid IS and is not */}
+          {/* honesty plate — PRIMARY (live HL) vs SECONDARY (Mantle DEX snapshot) */}
           <div className="mt-6 inline-block border-2 border-bone/30 bg-carbon px-4 py-2.5">
             <p className="font-mono text-[10px] uppercase leading-relaxed tracking-[0.16em] text-steel">
-              pit-wall <span className="text-bone">context, not alpha</span> — investigation showed this grid is
-              churners &amp; bots, not holders.
+              <span className="text-chartreuse">primary · live</span> — Hyperliquid top-PnL whales per traded asset
+              (the real per-asset smart-money the firm acts on).
               <br />
-              the live firm follows a different grid:{" "}
-              <span className="text-chartreuse">Hyperliquid top-PnL whales, per asset, in the cloud.</span>
+              <span className="text-bone/70">secondary · snapshot</span> — Mantle DEX flow, a dated capture
+              (context / churners, <span className="text-bone">not alpha, not live</span>).
             </p>
           </div>
 
-          {/* ── THE TOWER ── */}
-          <div className="mt-10 max-w-4xl">
-            {/* column legend — large, geometry is primary content */}
+          {/* ═══════════ PRIMARY · LIVE HYPERLIQUID GRID ═══════════ */}
+          <div className="mt-12 max-w-4xl">
+            <HlWhaleTower />
+          </div>
+        </section>
+
+        {/* hazard seam → secondary, demoted Mantle DEX snapshot */}
+        <div aria-hidden className="gr-hazard mt-16 h-[12px] opacity-80" />
+
+        <section className="relative z-10 mx-auto max-w-[1280px] px-6 pt-12 sm:px-10 xl:px-4">
+          <div className="max-w-4xl">
+            <div className="mb-5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 border-b-2 border-bone/15 pb-3">
+              <div className="flex items-baseline gap-4">
+                <span className="font-display text-4xl font-extrabold leading-none text-bone/15">02</span>
+                <div>
+                  <h2 className="font-display text-xl font-extrabold uppercase tracking-wide text-bone/80">
+                    Mantle DEX flow · snapshot
+                  </h2>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-steel">
+                    context, not live — a dated capture of Mantle DEX swap flow
+                  </p>
+                </div>
+              </div>
+              <span className="inline-flex items-center gap-2 border border-bone/20 bg-pitch px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-steel">
+                <span aria-hidden className="inline-block h-2 w-2 rounded-full bg-steel" /> SNAPSHOT · NOT LIVE
+              </span>
+            </div>
+
+            <div className="mb-5 inline-block border-l-2 border-bone/30 bg-carbon px-4 py-2.5">
+              <p className="font-mono text-[10px] uppercase leading-relaxed tracking-[0.16em] text-steel">
+                pit-wall <span className="text-bone">context, not alpha</span> — investigation showed this grid is
+                churners &amp; bots, not holders. MNT isn&apos;t on Hyperliquid, so this is the only Mantle-native
+                flow read — kept as <span className="text-bone">desk context</span> only.
+              </p>
+            </div>
+
+            {/* column legend */}
             <div className="grid grid-cols-[44px_1fr_64px] items-end gap-3 border-b-2 border-bone/25 pb-2 sm:grid-cols-[44px_150px_1fr_92px_64px_56px]">
               <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-steel">pos</span>
-              <span className="hidden font-mono text-[9px] uppercase tracking-[0.2em] text-steel sm:block">driver</span>
+              <span className="hidden font-mono text-[9px] uppercase tracking-[0.2em] text-steel sm:block">wallet</span>
               <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-steel">
                 net flow ← sell · buy → <span className="text-bone/60">(bar = net DEX volume)</span>
               </span>
@@ -119,13 +155,13 @@ export default async function WhalesPage() {
               <span className="text-right font-mono text-[9px] uppercase tracking-[0.2em] text-steel">pit</span>
             </div>
 
-            {whales.length === 0 && (
+            {snapshot.length === 0 && (
               <p className="mt-8 font-mono text-sm uppercase tracking-[0.2em] text-steel">
-                grid empty — watchlist file not found
+                snapshot empty — watchlist file not found
               </p>
             )}
 
-            {whales.map((w, i) => {
+            {snapshot.map((w, i) => {
               const chip = compound(w.direction_bias);
               const gap = leader ? (leader.rank_score - w.rank_score).toFixed(1) : "0.0";
               const frac = Math.abs(w.net_volume_usd) / maxAbsNet;
@@ -133,21 +169,21 @@ export default async function WhalesPage() {
               return (
                 <div
                   key={w.address}
-                  className="gr-rise grid grid-cols-[44px_1fr_64px] items-center gap-3 border-b border-bone/10 py-3 transition-colors hover:bg-carbon sm:grid-cols-[44px_150px_1fr_92px_64px_56px]"
+                  className="gr-rise grid grid-cols-[44px_1fr_64px] items-center gap-3 border-b border-bone/10 py-3 opacity-80 transition-colors hover:bg-carbon hover:opacity-100 sm:grid-cols-[44px_150px_1fr_92px_64px_56px]"
                   style={{ animationDelay: `${i * 0.05}s` }}
                 >
-                  {/* position box — leader gets the chartreuse plate */}
+                  {/* position box — leader gets the bone plate (muted: this is context, not the live leader) */}
                   <span
                     className={
                       i === 0
-                        ? "gr-shadow-bone grid h-9 w-9 place-items-center border-2 border-bone bg-chartreuse font-display text-lg font-extrabold text-pitch"
+                        ? "gr-shadow-bone grid h-9 w-9 place-items-center border-2 border-bone bg-bone/90 font-display text-lg font-extrabold text-pitch"
                         : "grid h-9 w-9 place-items-center border-2 border-bone/25 font-display text-lg font-bold text-bone/70"
                     }
                   >
                     {i + 1}
                   </span>
 
-                  {/* driver: addr + compound chip + gap-to-leader */}
+                  {/* wallet: addr + compound chip + gap-to-leader */}
                   <span className="hidden flex-col gap-1 sm:flex">
                     <a
                       href={`https://mantlescan.xyz/address/${w.address}`}
@@ -209,12 +245,12 @@ export default async function WhalesPage() {
                 </div>
               );
             })}
-          </div>
 
-          <p className="mt-6 max-w-4xl font-mono text-[10px] uppercase leading-relaxed tracking-[0.16em] text-steel">
-            pnl counts single-pool round-trips only (cross-pool figures were artifacts — we dropped them) ·
-            source: Mantle DEX swap events, top pools · refreshed by the local telemetry rig
-          </p>
+            <p className="mt-6 font-mono text-[10px] uppercase leading-relaxed tracking-[0.16em] text-steel">
+              snapshot · not live · pnl counts single-pool round-trips only (cross-pool figures were artifacts — we
+              dropped them) · source: Mantle DEX swap events, top pools · captured by the local telemetry rig
+            </p>
+          </div>
         </section>
       </main>
 
@@ -222,7 +258,7 @@ export default async function WhalesPage() {
         <div aria-hidden className="gr-hazard h-[14px] opacity-90" />
         <div className="mx-auto max-w-[1280px] px-6 py-8 sm:px-10 xl:px-4">
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-steel">
-            HELIQUANT · THE TIMING TOWER · context feeds the desks — the dyno decides
+            HELIQUANT · THE TIMING TOWER · live Hyperliquid grid up top — Mantle DEX is dated context below
           </p>
         </div>
       </footer>
