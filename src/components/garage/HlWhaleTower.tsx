@@ -259,6 +259,34 @@ export default function HlWhaleTower() {
                     </span>
                   )}
                 </p>
+                {held && w.whales && w.whales.length > 0 && (
+                  <div className="border-l-2 border-bone/25 bg-carbon px-4 pb-3">
+                    <p className="mb-1.5 font-mono text-[9px] uppercase tracking-[0.18em] text-steel">
+                      the actual wallets · top-PnL HL traders holding {w.asset} · tap to verify ↗
+                    </p>
+                    <div className="flex flex-col gap-1">
+                      {w.whales.map((h) => (
+                        <a
+                          key={h.address}
+                          href={`https://hypurrscan.io/address/${h.address}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 border border-bone/10 px-2 py-1 font-mono text-[10px] transition-colors hover:border-chartreuse/50 hover:bg-pitch"
+                        >
+                          <span className="truncate text-bone/70">
+                            {h.address.slice(0, 6)}…{h.address.slice(-4)}
+                          </span>
+                          <span className={h.side === "LONG" ? "text-chartreuse" : "text-signal2"}>{h.side}</span>
+                          <span className="text-bone/55">{fmtUsd(h.notional_usd)}</span>
+                          <span className={h.roe_pct >= 0 ? "text-chartreuse" : "text-signal2"}>
+                            {h.roe_pct >= 0 ? "+" : ""}
+                            {h.roe_pct.toFixed(0)}%
+                          </span>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </motion.div>
             )}
           </div>

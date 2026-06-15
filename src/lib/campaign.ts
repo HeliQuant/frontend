@@ -275,6 +275,14 @@ export async function fetchOnchain(wallet?: string): Promise<OnchainLedger | nul
 // The REAL per-asset grid the firm acts on: the Hyperliquid top-PnL leaderboard, read live per
 // traded asset (BTC/ETH/SOL/HYPE/SUI — MNT is NOT on Hyperliquid). Honest by construction: when
 // none of the tracked top traders hold an asset, whales_in_position is 0 and the row says so.
+// one individual top-PnL HL trader holding the asset — the clickable wallet rows on /whales
+export type WhaleEntry = {
+  address: string;
+  side: "LONG" | "SHORT";
+  notional_usd: number;
+  roe_pct: number;
+  upnl_usd: number;
+};
 export type WhaleAsset = {
   asset: string;
   whales_in_position: number; // how many of the tracked top-PnL traders currently hold it
@@ -287,6 +295,7 @@ export type WhaleAsset = {
   stance: "LONG" | "SHORT" | "NEUTRAL";
   n_tracked: number;          // size of the tracked leaderboard for this asset
   brief: string;              // one-line read
+  whales?: WhaleEntry[];      // the individual wallets holding it (top by notional)
 };
 export type WhalesResponse = {
   asof: string;
