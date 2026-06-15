@@ -23,8 +23,15 @@ import {
   type EdgeRegistry,
   type EdgeRec,
 } from "@/lib/campaign";
+import LiveBadge from "@/components/garage/LiveBadge";
 
 const POLL_MS = 20000;
+
+function runDate(iso: string | null | undefined): string | null {
+  if (!iso) return null;
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10);
+}
 
 /* ───────────────────────── helpers ───────────────────────── */
 type Cell = { key: string; asset: string; signal: string; regime: string; n: number; wins: number; pnl: number; status: "faded" | "trusted" | "watching"; mult: number };
@@ -72,6 +79,7 @@ export default function LearningBay() {
   const [desks, setDesks] = useState<DeskWeights | null>(null);
   const [edges, setEdges] = useState<EdgeRegistry | null>(null);
   const [reached, setReached] = useState<boolean | null>(null);
+  const [lastGood, setLastGood] = useState<Date | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -82,6 +90,7 @@ export default function LearningBay() {
       if (c) setCamp(c);
       if (d) setDesks(d);
       if (e) setEdges(e);
+      if (c || d || e) setLastGood(new Date());
     };
     pull();
     const id = setInterval(pull, POLL_MS);
@@ -98,6 +107,7 @@ export default function LearningBay() {
 
   const candidates = useMemo<EdgeRec[]>(() => Object.values(edges?.candidate ?? {}), [edges]);
   const validatedN = Object.keys(edges?.validated ?? {}).length;
+  const lastRun = runDate(edges?.last_run);
   const [lo, hi] = desks?.bounds ?? [0.6, 1.4];
   const deskRows = useMemo(
     () => (desks?.desks ?? []).map((name) => {
@@ -118,11 +128,17 @@ export default function LearningBay() {
 
   return (
     <div className="space-y-16">
+      {/* proof-of-life */}
+      <div className="flex items-center justify-between">
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-steel">self-learning console · /edges · /desks · /campaign</p>
+        <LiveBadge at={lastGood} />
+      </div>
+
       {/* ── headline stat strip ── */}
       <div className="grid grid-cols-2 gap-px bg-bone/10 lg:grid-cols-4">
         {[
-          { k: "validated edges", v: `${validatedN}`, c: validatedN ? "text-chartreuse" : "text-bone" },
-          { k: "edges on probation", v: `${candidates.length}`, c: "text-chartreuse" },
+          { k: "validated edges · traded", v: `${validatedN}`, c: validatedN ? "text-chartreuse" : "text-bone" },
+          { k: "tested · on probation · not traded", v: `${candidates.length}`, c: "text-bone/70" },
           { k: "desks earning trust", v: `${desks?.desks?.length ?? 9}`, c: "text-bone" },
           { k: "conditions learned", v: `${camp?.learned?.tracked ?? 0}`, c: "text-bone" },
         ].map((s) => (
@@ -135,19 +151,29 @@ export default function LearningBay() {
 
       {/* ════ LAYER 1 · EDGE DISCOVERY ════ */}
       <section>
-        <LayerHead n={1} title="Edge discovery" sub="earn the edge · cost-aware OOS + walk-forward + FDR → registry gates aggression" />
+        <LayerHead n={1} title="Edge discovery" sub="earn the edge · cost-aware OOS + walk-forward + FDR → ONLY validated edges trade" />
         {/* validated banner — honest */}
         <div className={`border-2 px-5 py-4 ${validatedN ? "border-chartreuse/60 bg-chartreuse/5" : "border-signal2/50 bg-carbon"}`}>
           <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-bone/80">
             {validatedN ? (
-              <><span className="text-chartreuse">{validatedN} VALIDATED EDGE(S)</span> — cleared to earn real aggression.</>
+              <><span className="text-chartreuse">{validatedN} VALIDATED EDGE(S)</span> — cleared to trade. Only validated edges ever touch capital.</>
             ) : (
-              <><span className="text-signal2">0 VALIDATED EDGES.</span> The firm hunts but won&apos;t fake one — real capital stays gated. Discipline over a fabricated number.</>
+              <><span className="text-signal2">0 VALIDATED EDGES → NOTHING TRADES.</span> The lab keeps testing, but only a validated edge touches capital. The candidates below are <span className="text-bone">tested, NOT traded</span>. Discipline over a fabricated number.</>
             )}
           </p>
         </div>
-        {/* candidate cards */}
-        <p className="mb-3 mt-6 font-mono text-[10px] uppercase tracking-[0.2em] text-steel">on probation · passed OOS, awaiting fresh-data confirmation before graduating</p>
+        {/* candidate cards — TESTED, on probation, NOT TRADED */}
+        <div className="mb-3 mt-6 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-steel">
+            tested by the edge lab · <span className="text-bone/70">not traded</span> · awaiting validation
+            <span className="text-bone/40"> — passed an OOS replay, but only graduate (and trade) after fresh-data confirmation</span>
+          </p>
+          {lastRun && (
+            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-steel">
+              last edge-lab run: <span className="text-bone/70">{lastRun}</span>
+            </p>
+          )}
+        </div>
         <div className="grid gap-px bg-bone/10 sm:grid-cols-2 lg:grid-cols-3">
           {candidates.length === 0 ? (
             <div className="bg-carbon px-5 py-8 font-mono text-[11px] uppercase tracking-[0.16em] text-steel">no candidates in registry</div>
@@ -158,11 +184,14 @@ export default function LearningBay() {
                 <div key={`${e.asset}-${e.edge}`} className="bg-carbon p-5">
                   <div className="flex items-center justify-between">
                     <span className="font-display text-3xl font-extrabold uppercase text-bone">{e.asset}</span>
-                    <span className={`border px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] ${grad ? "border-chartreuse/60 text-chartreuse" : "border-bone/30 text-steel"}`}>
-                      {grad ? `${e.confirmations}× confirmed` : "probation"}
+                    <span className="border border-bone/30 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] text-bone/60">
+                      tested · not traded
                     </span>
                   </div>
-                  <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.12em] text-chartreuse">{e.edge}{e.horizon_h ? ` · ${e.horizon_h}h` : ""}</p>
+                  <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.12em] text-bone/70">
+                    {e.edge}{e.horizon_h ? ` · ${e.horizon_h}h` : ""}
+                    {grad && <span className="text-steel"> · {e.confirmations}× confirmed (still gated)</span>}
+                  </p>
                   <div className="mt-4 grid grid-cols-2 gap-2 font-mono text-[11px]">
                     <Metric k="OOS ROI" v={e.oos_roi_pct != null ? `${e.oos_roi_pct >= 0 ? "+" : ""}${e.oos_roi_pct.toFixed(0)}%` : "—"} good={(e.oos_roi_pct ?? 0) > 0} />
                     <Metric k="payoff" v={e.payoff_b != null ? `${e.payoff_b.toFixed(2)}×` : "—"} good={(e.payoff_b ?? 0) > 1} />
