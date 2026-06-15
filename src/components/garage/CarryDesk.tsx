@@ -15,8 +15,18 @@ import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 
 import { fetchCarry, type CarryStatus } from "@/lib/campaign";
+import LiveBadge from "@/components/garage/LiveBadge";
 
 const POLL_MS = 30000;
+
+// "updated HH:MM UTC" from the feed's own asof; honest fallbacks when the feed is missing/dead
+function asofLabel(asof: string | null | undefined): string {
+  if (asof === undefined) return "live";
+  if (asof === null) return "feed: never / stale";
+  const d = new Date(asof);
+  if (Number.isNaN(d.getTime())) return "feed: stale";
+  return `updated ${d.toLocaleTimeString("en-GB", { hour12: false, timeZone: "UTC" }).slice(0, 5)} UTC`;
+}
 const RISK_FREE = 5.0; // ~stablecoin yield benchmark — carry must clear this to be worth the legs
 
 // Validated WALK-FORWARD carry (scripts/79, 2026-06-07 — net of funding + 4-leg costs, 90d hold, dated):
@@ -40,6 +50,7 @@ const CRASH_COLOR: Record<string, string> = {
 export default function CarryDesk() {
   const [c, setC] = useState<CarryStatus | null>(null);
   const [reached, setReached] = useState<boolean | null>(null);
+  const [lastGood, setLastGood] = useState<Date | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -47,7 +58,10 @@ export default function CarryDesk() {
       const r = await fetchCarry();
       if (!alive) return;
       setReached(Boolean(r));
-      if (r) setC(r);
+      if (r) {
+        setC(r);
+        setLastGood(new Date());
+      }
     };
     pull();
     const id = setInterval(pull, POLL_MS);
@@ -60,6 +74,12 @@ export default function CarryDesk() {
 
   return (
     <div className="space-y-12">
+      {/* proof-of-life */}
+      <div className="flex items-center justify-between">
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-steel">delta-neutral funding-carry desk</p>
+        <LiveBadge at={lastGood} />
+      </div>
+
       {/* headline strip */}
       <div className="grid grid-cols-2 gap-px bg-bone/10 lg:grid-cols-4">
         <div className="bg-carbon px-5 py-4">
@@ -139,7 +159,7 @@ export default function CarryDesk() {
           <span className="font-display text-4xl font-extrabold leading-none text-bone/15">02</span>
           <div>
             <h2 className="font-display text-xl font-extrabold uppercase tracking-wide text-bone">Live carry — right now</h2>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-steel">read from real Bybit funding · {reached === false ? "desk unreachable, retrying" : "live"}</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-steel">read from real Bybit funding · {reached === false ? "desk unreachable, retrying" : asofLabel(c?.asof)}</p>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-px bg-bone/10 lg:grid-cols-3">
