@@ -78,10 +78,10 @@ export default function HeroEngineBay() {
               Register your engine
             </a>
             <a
-              href="/app"
+              href="/campaign"
               className="gr-press border-2 border-bone bg-bone px-7 py-3.5 font-display text-lg font-bold uppercase tracking-wide text-pitch"
             >
-              Open the console
+              Watch the owner&apos;s floor
             </a>
             <a
               href="#dyno"

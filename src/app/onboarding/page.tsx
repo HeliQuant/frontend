@@ -20,15 +20,13 @@ type Cred = {
   key: string;
   label: string;
   why: string;
-  group: "memory" | "guards" | "fuel";
+  group: "guards" | "fuel";
   secret: boolean;
   placeholder: string;
   defaultValue?: string;
 };
 
 const CREDS: Cred[] = [
-  { key: "SUPABASE_URL", label: "Supabase URL", why: "state that survives redeploys — swap for your own project", group: "memory", secret: false, placeholder: "https://xxxx.supabase.co", defaultValue: "https://dreexbadvlxufkrvvwrq.supabase.co" },
-  { key: "SUPABASE_KEY", label: "Supabase service-role key", why: "server-side writes to hq_state + decisions_hq — lives only on your engine", group: "memory", secret: true, placeholder: "sb_secret_…" },
   { key: "ASSETS", label: "Assets", why: "what the floor analyzes, comma-separated, one rotated per cycle", group: "guards", secret: false, placeholder: "MNT,BTC,ETH,SOL,HYPE,SUI", defaultValue: "MNT,BTC,ETH,SOL,HYPE,SUI" },
   { key: "INTERVAL_MIN", label: "Cycle interval (min)", why: "minutes between org cycles — 30+ keeps a free Groq tier comfortable", group: "guards", secret: false, placeholder: "30", defaultValue: "30" },
   { key: "REFRESH_DATA", label: "Self-refresh data (0/1)", why: "1 = the engine re-fetches fresh market data each cycle", group: "guards", secret: false, placeholder: "1", defaultValue: "1" },
@@ -48,7 +46,6 @@ const CREDS: Cred[] = [
 ];
 
 const GROUPS: Array<{ id: Cred["group"]; title: string; sub: string }> = [
-  { id: "memory", title: "MEMORY", sub: "survives redeploys" },
   { id: "guards", title: "GUARDS", sub: "how it runs" },
   { id: "fuel", title: "FUEL LINES", sub: "execution + optional power-ups" },
 ];
@@ -169,6 +166,30 @@ export default function OnboardingPage() {
             </p>
           </div>
 
+          {/* tour guide — what to do, step by step */}
+          <div className="mt-8 border-2 border-bone/25 bg-carbon p-5">
+            <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-chartreuse">▸ how it works · 4 steps</p>
+            <ol className="mt-4 grid gap-3 sm:grid-cols-2">
+              {[
+                ["1", "Run your engine", "Clone agents-localReady and start it (docker compose up). It auto-creates a local SQLite for your keys."],
+                ["2", "Tunnel + token", "Expose it with ngrok and set HQ_SETUP_TOKEN. Paste the URL + token in 01 below."],
+                ["3", "Paste your keys", "Ten Groq keys (free) + any execution / optional keys. They go straight to YOUR engine — never us."],
+                ["4", "Register → launch", "Hit Register. Your keys land in your engine SQLite and the dashboard switches to YOUR firm."],
+              ].map(([n, t, d]) => (
+                <li key={n} className="flex gap-3">
+                  <span className="grid h-8 w-9 shrink-0 place-items-center border-2 border-chartreuse font-display text-sm font-extrabold text-chartreuse">{n}</span>
+                  <div>
+                    <p className="font-mono text-[11px] font-bold uppercase tracking-[0.12em] text-bone">{t}</p>
+                    <p className="mt-0.5 text-[11px] leading-relaxed text-bone/50">{d}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+            <p className="mt-4 border-t-2 border-bone/10 pt-3 font-mono text-[10px] uppercase leading-relaxed tracking-[0.12em] text-steel">
+              ▸ the <span className="text-bone">navbar</span> has the full HeliQuant story — architecture, the desks, the findings — plus the <span className="text-chartreuse">owner&apos;s own live campaign</span> (The grid), running 24/7.
+            </p>
+          </div>
+
           {/* ── 1 · connect to your engine ── */}
           <div className="mt-10 border-2 border-bone/25 bg-carbon">
             <div className="flex items-baseline justify-between border-b-2 border-bone/15 px-5 py-3">
@@ -214,7 +235,7 @@ export default function OnboardingPage() {
 
           {/* ── 3 · the rest of the credentials ── */}
           <div className="mt-7 flex items-center justify-between">
-            <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-steel">03 · MEMORY · GUARDS · FUEL — {credCount} set</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-steel">03 · GUARDS · FUEL — {credCount} set</p>
             <button onClick={() => setReveal((r) => !r)} className="border border-bone/30 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.16em] text-bone/70 hover:border-chartreuse hover:text-chartreuse">{reveal ? "mask" : "reveal"}</button>
           </div>
           <div className="mt-3 space-y-6">

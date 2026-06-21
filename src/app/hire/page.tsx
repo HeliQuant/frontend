@@ -1019,8 +1019,17 @@ export default function AppPage() {
   return (
     <>
       <AppNav />
+      {/* view-only — the on-chain hire / deposit flow (ERC-8183) is still in development */}
+      <div aria-hidden className="pointer-events-none fixed inset-x-0 top-20 z-[60] flex justify-center px-4">
+        <span
+          className="border-2 border-signal2 bg-pitch/92 px-6 py-3 font-display text-base font-extrabold uppercase tracking-[0.18em] text-signal2 sm:text-xl"
+          style={{ boxShadow: "6px 6px 0 rgba(255,90,31,0.4)" }}
+        >
+          🚧 Still in development · view only
+        </span>
+      </div>
       <main
-        className="relative isolate min-h-screen w-full overflow-hidden px-5 pb-24 pt-16 sm:px-8 md:pt-20 lg:px-12"
+        className="pointer-events-none relative isolate min-h-screen w-full overflow-hidden px-5 pb-24 pt-16 sm:px-8 md:pt-20 lg:px-12"
         style={{ backgroundColor: MIDNIGHT, color: ICE }}
       >
         {/* atmosphere — carbon dots + faint overhead chartreuse lamp (the garage standard) */}
