@@ -25,7 +25,7 @@ const LINKS = [
   { href: "/assets", label: "Dyno bays" },
   { href: "/hire", label: "Hire" },
   { href: "/firms/heliquant", label: "License" },
-  { href: "/setup", label: "Ignition" },
+  { href: "/onboarding", label: "Register" },
 ];
 
 function isActive(pathname: string, href: string): boolean {

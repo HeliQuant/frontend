@@ -72,8 +72,14 @@ export default function HeroEngineBay() {
 
           <div className="gr-rise mt-9 flex flex-wrap items-center gap-4" style={{ animationDelay: "0.34s" }}>
             <a
+              href="/onboarding"
+              className="gr-shadow-chart gr-press border-2 border-pitch bg-chartreuse px-7 py-3.5 font-display text-lg font-bold uppercase tracking-wide text-pitch"
+            >
+              Register your engine
+            </a>
+            <a
               href="/app"
-              className="gr-shadow-chart gr-press border-2 border-bone bg-bone px-7 py-3.5 font-display text-lg font-bold uppercase tracking-wide text-pitch"
+              className="gr-press border-2 border-bone bg-bone px-7 py-3.5 font-display text-lg font-bold uppercase tracking-wide text-pitch"
             >
               Open the console
             </a>
