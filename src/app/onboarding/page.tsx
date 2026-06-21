@@ -230,6 +230,9 @@ export default function OnboardingPage() {
             <p className="mt-4 border-t-2 border-bone/10 pt-3 font-mono text-[10px] uppercase leading-relaxed tracking-[0.12em] text-steel">
               ▸ the <span className="text-bone">navbar</span> has the full HeliQuant story — architecture, the desks, the findings — plus the <span className="text-chartreuse">owner&apos;s own live campaign</span> (The grid), running 24/7.
             </p>
+            <p className="mt-2 font-mono text-[10px] uppercase leading-relaxed tracking-[0.12em] text-steel">
+              ▸ prefer cloud over local? you can host the engine on <span className="text-bone">Railway</span> instead of local + ngrok — deploy the <a href="https://github.com/HeliQuant/agents" target="_blank" rel="noreferrer" className="text-chartreuse hover:underline">agents repo</a>, set <span className="text-bone">HQ_SETUP_TOKEN</span>, and use that URL above. Local is the recommended path.
+            </p>
           </div>
 
           {/* ── 1 · connect to your engine ── */}

@@ -63,7 +63,7 @@ export default function HeroEngineBay() {
             className="gr-rise mt-7 max-w-xl text-pretty text-base leading-relaxed text-bone/70 sm:text-lg"
             style={{ animationDelay: "0.22s" }}
           >
-            Nine desks feed the manifold. The debate compresses. The PM fires{" "}
+            A dozen voices feed the manifold. The debate compresses. The PM fires{" "}
             <span className="font-mono text-chartreuse">ENTER</span> only on a validated edge —
             today the registry is empty, so the gearbox holds{" "}
             <span className="font-mono text-bone">N</span>. Every decision, including the
@@ -89,6 +89,12 @@ export default function HeroEngineBay() {
               style={{ boxShadow: "4px 4px 0 rgba(242,239,230,0.25)" }}
             >
               See the dyno
+            </a>
+            <a
+              href="/onboarding"
+              className="self-center font-mono text-[12px] uppercase tracking-[0.16em] text-steel underline-offset-4 hover:text-chartreuse hover:underline"
+            >
+              already have an engine? log in →
             </a>
           </div>
 
