@@ -11,7 +11,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import { isOwnerEngine } from "@/lib/engine";
 
 const LINKS = [
   { href: "/app", label: "The floor" },
@@ -38,6 +40,15 @@ function isActive(pathname: string, href: string): boolean {
 export default function AppNav() {
   const pathname = usePathname() || "";
   const [open, setOpen] = useState(false);
+  // connected = the user pointed the dApp at THEIR own engine (registered + connected). Default false
+  // (owner showcase) matches SSR → no hydration drift; updated after mount + on route change.
+  const [connected, setConnected] = useState(false);
+  useEffect(() => setConnected(!isOwnerEngine()), [pathname]);
+
+  // /campaign = owner showcase (only when NOT connected); /trade + /profile = your engine (only when connected)
+  const visible = LINKS.filter((l) =>
+    l.href === "/campaign" ? !connected : l.href === "/trade" || l.href === "/profile" ? connected : true,
+  );
 
   return (
     <header className="sticky top-0 z-50 border-b-2 border-bone/15 bg-pitch/85 backdrop-blur-md">
@@ -54,7 +65,7 @@ export default function AppNav() {
 
         {/* functional bays — active bay reads chartreuse */}
         <nav className="hidden items-center gap-x-5 xl:flex 2xl:gap-x-7">
-          {LINKS.map((l) => {
+          {visible.map((l) => {
             const active = isActive(pathname, l.href);
             return (
               <Link
@@ -96,7 +107,7 @@ export default function AppNav() {
       {open && (
         <nav className="border-t-2 border-bone/15 bg-pitch/95 px-6 py-4 xl:hidden">
           <ul className="flex flex-col gap-1">
-            {LINKS.map((l) => {
+            {visible.map((l) => {
               const active = isActive(pathname, l.href);
               return (
                 <li key={l.href}>
