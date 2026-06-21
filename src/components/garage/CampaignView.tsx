@@ -149,48 +149,65 @@ export default function CampaignView({ base, mode }: { base?: string; mode: "own
             </p>
           </div>
 
-          {/* ── BANKROLL · capital + profit + saldo (the "fuel cell") ── */}
+          {/* ── CAPITAL · paper accounting vs Bitget testnet (clearly separated) ── */}
           {data?.capital && (() => {
             const c = data.capital;
             const eqUp = c.equity_usd >= c.starting_capital_usd;
             const roiUp = c.roi_pct >= 0;
+            const bg = c.bitget_saldo;
+            const usd = (n: number) => "$" + n.toLocaleString("en-US", { maximumFractionDigits: 0 });
             return (
-              <div className="mt-8 border-2 border-bone/25 bg-carbon">
-                <div aria-hidden className="gr-hazard h-[6px] opacity-70" />
-                <div className="grid gap-px bg-bone/10 sm:grid-cols-2 lg:grid-cols-4">
-                  <div className="bg-carbon p-5">
-                    <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-steel">equity · paper bankroll</p>
-                    <p className="mt-1 font-display text-4xl font-extrabold leading-none" style={{ color: eqUp ? "var(--color-chartreuse)" : "var(--color-signal2)" }}>
-                      ${c.equity_usd.toLocaleString("en-US", { maximumFractionDigits: 2 })}
-                    </p>
-                    <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-steel">from ${c.starting_capital_usd.toLocaleString("en-US")}</p>
+              <div className="mt-8 grid gap-4 lg:grid-cols-2">
+                {/* 📄 PAPER ACCOUNTING — the source of truth */}
+                <div className="border-2 border-bone/25 bg-carbon">
+                  <div className="flex items-center justify-between border-b-2 border-bone/15 px-5 py-2.5">
+                    <p className="font-display text-sm font-bold uppercase tracking-wide text-bone">📄 Paper accounting</p>
+                    <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-steel">bankroll at live prices · source of truth</p>
                   </div>
-                  <div className="bg-carbon p-5">
-                    <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-steel">return on capital</p>
-                    <p className="mt-1 font-display text-4xl font-extrabold leading-none" style={{ color: roiUp ? "var(--color-chartreuse)" : "var(--color-signal2)" }}>
-                      {roiUp ? "+" : ""}{c.roi_pct.toFixed(2)}%
-                    </p>
-                    <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-steel">realized + unrealized</p>
+                  <div className="grid grid-cols-3 gap-px bg-bone/10">
+                    <div className="bg-carbon p-4">
+                      <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-steel">equity</p>
+                      <p className="mt-1 font-display text-3xl font-extrabold leading-none" style={{ color: eqUp ? "var(--color-chartreuse)" : "var(--color-signal2)" }}>{usd(c.equity_usd)}</p>
+                      <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.12em] text-steel">from {usd(c.starting_capital_usd)}</p>
+                    </div>
+                    <div className="bg-carbon p-4">
+                      <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-steel">ROI</p>
+                      <p className="mt-1 font-display text-3xl font-extrabold leading-none" style={{ color: roiUp ? "var(--color-chartreuse)" : "var(--color-signal2)" }}>{roiUp ? "+" : ""}{c.roi_pct.toFixed(2)}%</p>
+                      <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.12em] text-steel">real + unreal</p>
+                    </div>
+                    <div className="bg-carbon p-4">
+                      <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-steel">P&amp;L</p>
+                      <p className="mt-1.5 font-mono text-[13px] text-bone/85">{c.realized_pnl_usd >= 0 ? "+" : "−"}${Math.abs(c.realized_pnl_usd).toFixed(2)} <span className="text-[9px] text-steel">real</span></p>
+                      <p className="mt-1 font-mono text-[13px] text-bone/85">{c.unrealized_pnl_usd >= 0 ? "+" : "−"}${Math.abs(c.unrealized_pnl_usd).toFixed(2)} <span className="text-[9px] text-steel">unreal</span></p>
+                    </div>
                   </div>
-                  <div className="bg-carbon p-5">
-                    <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-steel">P&amp;L split</p>
-                    <p className="mt-2 font-mono text-sm text-bone/85"><span className="text-steel">realized </span>{c.realized_pnl_usd >= 0 ? "+" : "−"}${Math.abs(c.realized_pnl_usd).toFixed(2)}</p>
-                    <p className="mt-1 font-mono text-sm text-bone/85"><span className="text-steel">unrealized </span>{c.unrealized_pnl_usd >= 0 ? "+" : "−"}${Math.abs(c.unrealized_pnl_usd).toFixed(2)}</p>
+                </div>
+
+                {/* ⚡ BITGET TESTNET — real demo fills, no real funds */}
+                <div className={`border-2 ${bg ? "border-chartreuse/55" : "border-bone/20"} bg-carbon`}>
+                  <div className="flex items-center justify-between border-b-2 border-bone/15 px-5 py-2.5">
+                    <p className="font-display text-sm font-bold uppercase tracking-wide" style={{ color: bg ? "var(--color-chartreuse)" : "rgba(242,239,230,0.4)" }}>⚡ Bitget testnet</p>
+                    <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-steel">real demo fills · no real funds</p>
                   </div>
-                  <div className="bg-carbon p-5">
-                    <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-steel">exchange saldo</p>
-                    {c.bitget_saldo ? (
-                      <>
-                        <p className="mt-1 font-display text-3xl font-extrabold leading-none text-bone">${c.bitget_saldo.equity_usd.toLocaleString("en-US", { maximumFractionDigits: 2 })}</p>
-                        <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-steel">bitget {c.bitget_saldo.demo ? "testnet" : "mainnet"} · avail ${c.bitget_saldo.available_usd.toFixed(0)}</p>
-                      </>
-                    ) : (
-                      <>
-                        <p className="mt-1 font-display text-2xl font-extrabold leading-none text-bone/40">— paper —</p>
-                        <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-steel/70">arm execution to show real saldo</p>
-                      </>
-                    )}
-                  </div>
+                  {bg ? (
+                    <div className="grid grid-cols-2 gap-px bg-bone/10">
+                      <div className="bg-carbon p-4">
+                        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-steel">balance</p>
+                        <p className="mt-1 font-display text-3xl font-extrabold leading-none text-chartreuse">{usd(bg.equity_usd)}</p>
+                        <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.12em] text-steel">SUSDT demo equity</p>
+                      </div>
+                      <div className="bg-carbon p-4">
+                        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-steel">available</p>
+                        <p className="mt-1 font-display text-3xl font-extrabold leading-none text-bone">{usd(bg.available_usd)}</p>
+                        <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.12em] text-steel">BTC / ETH / XRP</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="px-5 py-7">
+                      <p className="font-display text-2xl font-extrabold uppercase leading-none text-bone/40">not armed</p>
+                      <p className="mt-2 font-mono text-[10px] uppercase leading-relaxed tracking-[0.12em] text-steel/80">set BITGET_EXECUTE=1 + keys on the engine to trade Bitget testnet — the real demo saldo shows here.</p>
+                    </div>
+                  )}
                 </div>
               </div>
             );
