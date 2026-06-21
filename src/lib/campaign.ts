@@ -5,8 +5,10 @@
  * edge — this is the disciplined hunt, made visible.
  */
 
-export const AGENT_URL =
-  process.env.NEXT_PUBLIC_AGENT_URL || "https://agents-production-5a3d.up.railway.app";
+import { getEngineUrl, OWNER_ENGINE_URL } from "./engine";
+
+/** Back-compat re-export of the Owner-showcase URL. Live fetches use getEngineUrl() (runtime-switchable). */
+export const AGENT_URL = OWNER_ENGINE_URL;
 
 export type OpenPosition = {
   id: number;
@@ -80,7 +82,7 @@ export type Capital = {
 
 export async function fetchCampaign(): Promise<CampaignStatus | null> {
   try {
-    const r = await fetch(`${AGENT_URL}/campaign?cb=${Date.now()}`, { cache: "no-store" });
+    const r = await fetch(`${getEngineUrl()}/campaign?cb=${Date.now()}`, { cache: "no-store" });
     if (!r.ok) return null;
     return (await r.json()) as CampaignStatus;
   } catch {
@@ -118,7 +120,7 @@ export type EdgeRegistry = {
 
 export async function fetchDesks(): Promise<DeskWeights | null> {
   try {
-    const r = await fetch(`${AGENT_URL}/desks?cb=${Date.now()}`, { cache: "no-store" });
+    const r = await fetch(`${getEngineUrl()}/desks?cb=${Date.now()}`, { cache: "no-store" });
     return r.ok ? ((await r.json()) as DeskWeights) : null;
   } catch {
     return null;
@@ -126,7 +128,7 @@ export async function fetchDesks(): Promise<DeskWeights | null> {
 }
 export async function fetchEdges(): Promise<EdgeRegistry | null> {
   try {
-    const r = await fetch(`${AGENT_URL}/edges?cb=${Date.now()}`, { cache: "no-store" });
+    const r = await fetch(`${getEngineUrl()}/edges?cb=${Date.now()}`, { cache: "no-store" });
     return r.ok ? ((await r.json()) as EdgeRegistry) : null;
   } catch {
     return null;
@@ -162,7 +164,7 @@ export type TradeLog = {
 };
 export async function fetchTrades(): Promise<TradeLog | null> {
   try {
-    const r = await fetch(`${AGENT_URL}/trades?cb=${Date.now()}`, { cache: "no-store" });
+    const r = await fetch(`${getEngineUrl()}/trades?cb=${Date.now()}`, { cache: "no-store" });
     return r.ok ? ((await r.json()) as TradeLog) : null;
   } catch {
     return null;
@@ -200,7 +202,7 @@ export type PerfStats = {
 };
 export async function fetchPerformance(): Promise<PerfStats | null> {
   try {
-    const r = await fetch(`${AGENT_URL}/performance?cb=${Date.now()}`, { cache: "no-store" });
+    const r = await fetch(`${getEngineUrl()}/performance?cb=${Date.now()}`, { cache: "no-store" });
     return r.ok ? ((await r.json()) as PerfStats) : null;
   } catch {
     return null;
@@ -223,7 +225,7 @@ export type CarryStatus = {
 };
 export async function fetchCarry(): Promise<CarryStatus | null> {
   try {
-    const r = await fetch(`${AGENT_URL}/carry?cb=${Date.now()}`, { cache: "no-store" });
+    const r = await fetch(`${getEngineUrl()}/carry?cb=${Date.now()}`, { cache: "no-store" });
     return r.ok ? ((await r.json()) as CarryStatus) : null;
   } catch {
     return null;
@@ -243,7 +245,7 @@ export type Agent = {
 export type AgentRoster = { agents: Agent[]; identity?: string; explorer?: string; error?: string };
 export async function fetchAgents(): Promise<AgentRoster | null> {
   try {
-    const r = await fetch(`${AGENT_URL}/agents?cb=${Date.now()}`, { cache: "no-store" });
+    const r = await fetch(`${getEngineUrl()}/agents?cb=${Date.now()}`, { cache: "no-store" });
     return r.ok ? ((await r.json()) as AgentRoster) : null;
   } catch {
     return null;
@@ -275,7 +277,7 @@ export type OnchainLedger = {
 export async function fetchOnchain(wallet?: string): Promise<OnchainLedger | null> {
   try {
     const q = wallet ? `&wallet=${encodeURIComponent(wallet)}` : "";
-    const r = await fetch(`${AGENT_URL}/onchain?cb=${Date.now()}${q}`, { cache: "no-store" });
+    const r = await fetch(`${getEngineUrl()}/onchain?cb=${Date.now()}${q}`, { cache: "no-store" });
     return r.ok ? ((await r.json()) as OnchainLedger) : null;
   } catch {
     return null;
@@ -315,7 +317,7 @@ export type WhalesResponse = {
 };
 export async function fetchWhales(): Promise<WhalesResponse | null> {
   try {
-    const r = await fetch(`${AGENT_URL}/whales?cb=${Date.now()}`, { cache: "no-store" });
+    const r = await fetch(`${getEngineUrl()}/whales?cb=${Date.now()}`, { cache: "no-store" });
     return r.ok ? ((await r.json()) as WhalesResponse) : null;
   } catch {
     return null;

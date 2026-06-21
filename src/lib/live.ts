@@ -4,7 +4,7 @@
  * the PM decision feed, and OHLC candles for the position charts.
  */
 
-import { AGENT_URL } from "./campaign";
+import { getEngineUrl } from "./engine";
 
 export type OrgStatus = {
   started_utc?: string;
@@ -28,7 +28,7 @@ export type Candle = { t: number; o: number; h: number; l: number; c: number };
 
 async function getJSON<T>(path: string): Promise<T | null> {
   try {
-    const r = await fetch(`${AGENT_URL}${path}${path.includes("?") ? "&" : "?"}cb=${Date.now()}`, {
+    const r = await fetch(`${getEngineUrl()}${path}${path.includes("?") ? "&" : "?"}cb=${Date.now()}`, {
       cache: "no-store",
     });
     if (!r.ok) return null;

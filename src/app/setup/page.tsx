@@ -16,9 +16,10 @@
  * Every variable name below is real — read from the agents codebase, not invented.
  */
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import AppNav from "@/components/garage/AppNav";
+import { OWNER_ENGINE_URL, clearEngineUrl, getEngineUrl, isOwnerEngine, pingEngine, setEngineUrl } from "@/lib/engine";
 
 type Cred = {
   key: string;
@@ -141,6 +142,60 @@ const CREDS: Cred[] = [
     placeholder: "1 (if using Bybit)",
   },
   {
+    key: "BITGET_API_KEY",
+    label: "Bitget API key",
+    why: "Bitget futures execution (long + short) — bitget.com → API management. Demo SUSDT-FUTURES needs no real funds",
+    group: "fuel",
+    required: false,
+    secret: true,
+    placeholder: "optional",
+  },
+  {
+    key: "BITGET_API_SECRET",
+    label: "Bitget API secret",
+    why: "pairs with the Bitget key",
+    group: "fuel",
+    required: false,
+    secret: true,
+    placeholder: "optional",
+  },
+  {
+    key: "BITGET_PASSPHRASE",
+    label: "Bitget passphrase",
+    why: "the passphrase you set when creating the Bitget API key",
+    group: "fuel",
+    required: false,
+    secret: true,
+    placeholder: "optional",
+  },
+  {
+    key: "BITGET_DEMO",
+    label: "Bitget demo (0/1)",
+    why: "1 = demo SUSDT-FUTURES (no real funds, safe). 0 = mainnet — only with eyes open",
+    group: "fuel",
+    required: false,
+    secret: false,
+    placeholder: "1",
+  },
+  {
+    key: "BITGET_EXECUTE",
+    label: "Bitget execute (0/1)",
+    why: "1 = the floor places real Bitget orders with the keys above. 0 = paper",
+    group: "fuel",
+    required: false,
+    secret: false,
+    placeholder: "0",
+  },
+  {
+    key: "HQ_DUAL_VENUE",
+    label: "Dual venue (0/1)",
+    why: "1 = a LONG opens on BOTH Bybit testnet + Bitget; a SHORT on Bitget; anything else = paper-for-learning",
+    group: "fuel",
+    required: false,
+    secret: false,
+    placeholder: "0",
+  },
+  {
     key: "DEPLOYER_PRIVATE_KEY",
     label: "Mantle wallet private key",
     why: "anchors decisions on-chain (testnet wallet with faucet MNT — never your main wallet)",
@@ -213,6 +268,34 @@ export default function SetupPage() {
   );
   const [reveal, setReveal] = useState(false);
 
+  // ── multi-user: connect THIS dashboard to your own local engine ──
+  const [engineInput, setEngineInput] = useState("");
+  const [pingState, setPingState] = useState<"idle" | "checking" | "ok" | "fail">("idle");
+  const [current, setCurrent] = useState(OWNER_ENGINE_URL);
+  const [onOwner, setOnOwner] = useState(true);
+  useEffect(() => {
+    setCurrent(getEngineUrl());
+    setOnOwner(isOwnerEngine());
+    if (!isOwnerEngine()) setEngineInput(getEngineUrl());
+  }, []);
+  const onConnect = async () => {
+    const url = engineInput.trim();
+    if (!url) return;
+    setPingState("checking");
+    const ok = await pingEngine(url);
+    if (ok) {
+      setEngineUrl(url);
+      setPingState("ok");
+      setTimeout(() => window.location.reload(), 700);
+    } else {
+      setPingState("fail");
+    }
+  };
+  const onDisconnect = () => {
+    clearEngineUrl();
+    window.location.reload();
+  };
+
   const set = (k: string, v: string) => setValues((s) => ({ ...s, [k]: v }));
 
   const requiredList = CREDS.filter((c) => c.required);
@@ -280,11 +363,60 @@ export default function SetupPage() {
           {/* security plate — the contract of this page */}
           <div className="mt-6 inline-block border-2 border-chartreuse bg-carbon px-4 py-2.5" style={{ boxShadow: "5px 5px 0 rgba(201,242,75,0.45)" }}>
             <p className="font-mono text-[10px] uppercase leading-relaxed tracking-[0.16em] text-bone/85">
-              <span className="text-chartreuse">⚿ keys never leave this page</span> — nothing you type is sent
-              anywhere: no storage, no request carries your values, state dies with the tab.
+              <span className="text-chartreuse">⚿ your keys never leave this page</span> — the .env you build is
+              never sent or stored: it lives in tab memory and dies with the tab.
               <br />
-              you paste the .env into <span className="text-bone">your own Railway project</span>; we never see it.
+              you paste the .env into <span className="text-bone">your own machine / Railway</span>; we never see it.
+              <span className="text-steel"> (only your non-secret engine URL is saved locally, to remember the connection.)</span>
             </p>
+          </div>
+
+          {/* ── 00 · CONNECT THIS DASHBOARD TO YOUR ENGINE (multi-user) ── */}
+          <div className="mt-8 border-2 border-bone/25 bg-carbon">
+            <div className="flex items-baseline justify-between border-b-2 border-bone/15 px-5 py-3">
+              <p className="font-display text-xl font-bold uppercase tracking-wide text-bone">00 · CONNECT YOUR ENGINE</p>
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-steel">run local → tunnel → point the dApp here</p>
+            </div>
+            <div className="grid gap-4 px-5 py-5 sm:grid-cols-[1fr_auto] sm:items-end">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-steel">your engine URL (ngrok / cloud)</p>
+                <input
+                  value={engineInput}
+                  onChange={(e) => setEngineInput(e.target.value)}
+                  placeholder="https://xxxx.ngrok-free.app"
+                  spellCheck={false}
+                  autoComplete="off"
+                  className="mt-1.5 w-full border-2 border-bone/25 bg-pitch px-3 py-2 font-mono text-[12px] text-bone placeholder:text-steel/60 focus:border-chartreuse focus:outline-none"
+                />
+                <p className="mt-1.5 text-[11px] leading-relaxed text-bone/45">
+                  Run <span className="font-mono text-bone">agents-localReady</span> on your machine, expose{" "}
+                  <span className="font-mono text-bone">/run-cycle</span> via ngrok, paste the URL. The whole dashboard then
+                  reads <span className="text-chartreuse">YOUR</span> firm — keys stay on your machine, never ours.
+                </p>
+              </div>
+              <button
+                onClick={onConnect}
+                disabled={pingState === "checking"}
+                className="gr-press border-2 border-bone bg-chartreuse px-4 py-2 font-display text-sm font-bold uppercase tracking-wide text-pitch disabled:opacity-50"
+                style={{ boxShadow: "3px 3px 0 rgba(242,239,230,0.9)" }}
+              >
+                {pingState === "checking" ? "testing…" : "Test & connect"}
+              </button>
+            </div>
+            <div className="flex flex-wrap items-center gap-3 border-t-2 border-bone/10 px-5 py-3">
+              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-steel">viewing:</span>
+              <span className={`border-2 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] ${onOwner ? "border-bone/40 text-bone/70" : "border-chartreuse text-chartreuse"}`}>
+                {onOwner ? "🏠 OWNER ENGINE · showcase" : "🛰 YOUR LOCAL ENGINE"}
+              </span>
+              <span className="max-w-[280px] truncate font-mono text-[10px] text-bone/45">{current}</span>
+              {pingState === "ok" && <span className="font-mono text-[10px] text-chartreuse">✓ connected — reloading…</span>}
+              {pingState === "fail" && <span className="font-mono text-[10px] text-signal2">✕ no /health — is it running + tunnelled?</span>}
+              {!onOwner && (
+                <button onClick={onDisconnect} className="ml-auto border border-bone/30 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.16em] text-bone/70 hover:border-signal2 hover:text-signal2">
+                  disconnect → showcase
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="mt-12 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
