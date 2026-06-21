@@ -65,6 +65,17 @@ export type CampaignStatus = {
   open_positions: OpenPosition[];
   recent_closes: ClosedPosition[];
   principle: string;
+  capital?: Capital;
+};
+
+export type Capital = {
+  starting_capital_usd: number;
+  realized_pnl_usd: number;
+  unrealized_pnl_usd: number;
+  equity_usd: number;
+  roi_pct: number;
+  basis: string;
+  bitget_saldo?: { available_usd: number; equity_usd: number; demo: boolean };
 };
 
 export async function fetchCampaign(): Promise<CampaignStatus | null> {
@@ -323,7 +334,12 @@ export function laneFrac(p: OpenPosition): number | null {
  *  anything else (null/absent = paper at live prices) reads 📄 PAPER (steel). Returns the label
  *  plus the border/text Tailwind classes — the caller adds its own sibling-chip sizing. */
 export function venueBadge(venue?: string | null): { label: string; cls: string } {
-  return venue && venue.startsWith("bybit-testnet")
-    ? { label: "⚡ BYBIT TESTNET", cls: "border-chartreuse/50 text-chartreuse" }
-    : { label: "📄 PAPER", cls: "border-bone/25 text-steel" };
+  const v = venue || "";
+  const bg = v.includes("bitget");
+  const bb = v.includes("bybit-testnet");
+  if (bg && bb) return { label: "⚡ DUAL · BYBIT+BITGET", cls: "border-chartreuse text-chartreuse" };
+  if (bg) return { label: "⚡ BITGET DEMO", cls: "border-chartreuse/50 text-chartreuse" };
+  if (bb) return { label: "⚡ BYBIT TESTNET", cls: "border-chartreuse/50 text-chartreuse" };
+  if (v.startsWith("paper (learning")) return { label: "📄 PAPER · LEARNING", cls: "border-bone/30 text-steel" };
+  return { label: "📄 PAPER", cls: "border-bone/25 text-steel" };
 }

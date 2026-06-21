@@ -154,6 +154,53 @@ export default function CampaignPage() {
             </p>
           </div>
 
+          {/* ── BANKROLL · capital + profit + saldo (the "fuel cell") ── */}
+          {data?.capital && (() => {
+            const c = data.capital;
+            const eqUp = c.equity_usd >= c.starting_capital_usd;
+            const roiUp = c.roi_pct >= 0;
+            return (
+              <div className="mt-8 border-2 border-bone/25 bg-carbon">
+                <div aria-hidden className="gr-hazard h-[6px] opacity-70" />
+                <div className="grid gap-px bg-bone/10 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="bg-carbon p-5">
+                    <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-steel">equity · paper bankroll</p>
+                    <p className="mt-1 font-display text-4xl font-extrabold leading-none" style={{ color: eqUp ? "var(--color-chartreuse)" : "var(--color-signal2)" }}>
+                      ${c.equity_usd.toLocaleString("en-US", { maximumFractionDigits: 2 })}
+                    </p>
+                    <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-steel">from ${c.starting_capital_usd.toLocaleString("en-US")}</p>
+                  </div>
+                  <div className="bg-carbon p-5">
+                    <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-steel">return on capital</p>
+                    <p className="mt-1 font-display text-4xl font-extrabold leading-none" style={{ color: roiUp ? "var(--color-chartreuse)" : "var(--color-signal2)" }}>
+                      {roiUp ? "+" : ""}{c.roi_pct.toFixed(2)}%
+                    </p>
+                    <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-steel">realized + unrealized</p>
+                  </div>
+                  <div className="bg-carbon p-5">
+                    <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-steel">P&amp;L split</p>
+                    <p className="mt-2 font-mono text-sm text-bone/85"><span className="text-steel">realized </span>{c.realized_pnl_usd >= 0 ? "+" : "−"}${Math.abs(c.realized_pnl_usd).toFixed(2)}</p>
+                    <p className="mt-1 font-mono text-sm text-bone/85"><span className="text-steel">unrealized </span>{c.unrealized_pnl_usd >= 0 ? "+" : "−"}${Math.abs(c.unrealized_pnl_usd).toFixed(2)}</p>
+                  </div>
+                  <div className="bg-carbon p-5">
+                    <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-steel">exchange saldo</p>
+                    {c.bitget_saldo ? (
+                      <>
+                        <p className="mt-1 font-display text-3xl font-extrabold leading-none text-bone">${c.bitget_saldo.equity_usd.toLocaleString("en-US", { maximumFractionDigits: 2 })}</p>
+                        <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-steel">bitget {c.bitget_saldo.demo ? "demo" : "live"} · avail ${c.bitget_saldo.available_usd.toFixed(0)}</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="mt-1 font-display text-2xl font-extrabold leading-none text-bone/40">— paper —</p>
+                        <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-steel/70">arm execution to show real saldo</p>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
           {/* ── lap board ── */}
           {data && (
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
