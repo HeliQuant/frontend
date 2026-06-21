@@ -2,7 +2,7 @@
  * Runtime engine URL — the multi-user switch.
  *
  * The dApp defaults to the OWNER showcase (the founder's always-on Railway firm). A visitor can
- * point the whole dashboard at THEIR OWN local engine (run `agents-localReady`, expose it via a
+ * point the whole dashboard at THEIR OWN local engine (run `agents-LocalReady`, expose it via a
  * tunnel like ngrok, paste the URL on /setup). Every live fetch reads getEngineUrl(), so the moment
  * a user connects, all panels re-point to their firm. Stored in localStorage — keys never touch us.
  */

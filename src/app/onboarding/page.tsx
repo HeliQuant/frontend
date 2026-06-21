@@ -3,7 +3,7 @@
 /**
  * /onboarding — "REGISTER YOUR ENGINE" (Night Garage)
  *
- * NO-CUSTODY register. You run `agents-localReady` on your own machine, expose it via a tunnel
+ * NO-CUSTODY register. You run `agents-LocalReady` on your own machine, expose it via a tunnel
  * (ngrok), and this form POSTs your keys STRAIGHT to YOUR engine's /register — they're stored in its
  * local SQLite and never touch our server. After register, the dashboard connects to your engine.
  *
@@ -124,7 +124,7 @@ export default function OnboardingPage() {
     setMsg("checking your engine…");
     if (!(await pingEngine(url))) {
       setStatus("fail");
-      setMsg("engine unreachable — is agents-localReady running + tunnelled?");
+      setMsg("engine unreachable — is agents-LocalReady running + tunnelled?");
       return;
     }
     try {
@@ -184,7 +184,7 @@ export default function OnboardingPage() {
             Register your <span className="text-chartreuse">engine</span>
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-bone/65">
-            Run <span className="font-mono text-bone">agents-localReady</span> on your machine, tunnel it, then submit your keys
+            Run <span className="font-mono text-bone">agents-LocalReady</span> on your machine, tunnel it, then submit your keys
             below. They POST <span className="text-chartreuse">straight to your engine</span> — stored in its local SQLite,
             never on our servers.
           </p>
@@ -205,7 +205,7 @@ export default function OnboardingPage() {
             </div>
             <ol className="mt-4 grid gap-3 sm:grid-cols-2">
               {[
-                ["1", "Run your engine", "Clone agents-localReady and start it (docker compose up). It auto-creates a local SQLite for your keys."],
+                ["1", "Run your engine", "Clone agents-LocalReady and start it (docker compose up). It auto-creates a local SQLite for your keys."],
                 ["2", "Tunnel + token", "Expose it with ngrok and set HQ_SETUP_TOKEN. Paste the URL + token in 01 below."],
                 ["3", "Paste your keys", "Ten Groq keys (free) + any execution / optional keys. They go straight to YOUR engine — never us."],
                 ["4", "Register → launch", "Hit Register. Your keys land in your engine SQLite and the dashboard switches to YOUR firm."],
