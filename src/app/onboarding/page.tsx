@@ -70,6 +70,7 @@ const TOUR: TourStep[] = [
   { sel: '[data-tour="/assets"]', title: "Navbar · Dyno bays", body: "Per-asset character — which assets are predictable vs efficient, driving the desk tilt." },
   { sel: '[data-tour="/hire"]', title: "Navbar · Hire", body: "The on-chain 'hire the firm' deposit product (ERC-8183) — still in development." },
   { sel: '[data-tour="/firms/heliquant"]', title: "Navbar · License", body: "The firm's on-chain identity — the transferable strategy-brain NFT." },
+  { sel: '[data-tour="/profile"]', title: "Navbar · Your pit", body: "Your engine status, wallet, and the credentials on file (names only) — your corner of the dApp." },
   { sel: '[data-tour="/onboarding"]', title: "Navbar · Register", body: "You're here — register your own engine to run your own firm. Replay this tour anytime from the guide." },
 ];
 

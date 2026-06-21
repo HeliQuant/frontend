@@ -26,6 +26,7 @@ const LINKS = [
   { href: "/assets", label: "Dyno bays" },
   { href: "/hire", label: "Hire" },
   { href: "/firms/heliquant", label: "License" },
+  { href: "/profile", label: "Your pit" },
   { href: "/onboarding", label: "Register" },
 ];
 
