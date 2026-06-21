@@ -11,9 +11,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-
-import { isOwnerEngine } from "@/lib/engine";
+import { useState } from "react";
 
 const LINKS = [
   { href: "/app", label: "The floor" },
@@ -38,8 +36,6 @@ function isActive(pathname: string, href: string): boolean {
 export default function AppNav() {
   const pathname = usePathname() || "";
   const [open, setOpen] = useState(false);
-  const [ownerEngine, setOwnerEngine] = useState(true); // default matches SSR (owner showcase) — avoids hydration mismatch
-  useEffect(() => { setOwnerEngine(isOwnerEngine()); }, [pathname]);
 
   return (
     <header className="sticky top-0 z-50 border-b-2 border-bone/15 bg-pitch/85 backdrop-blur-md">
@@ -75,15 +71,6 @@ export default function AppNav() {
 
         {/* right: exit to the public site (desktop) · hamburger (mobile) */}
         <div className="flex items-center gap-3">
-          <Link
-            href="/setup"
-            title="Which engine this dashboard reads — connect your own on Ignition"
-            className={`hidden items-center gap-1.5 border-2 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] xl:inline-flex ${
-              ownerEngine ? "border-bone/30 text-bone/60 hover:border-bone/60" : "border-chartreuse text-chartreuse"
-            }`}
-          >
-            {ownerEngine ? "🏠 owner engine" : "🛰 your engine"}
-          </Link>
           <Link
             href="/"
             className="gr-press hidden border-2 border-bone/40 bg-transparent px-4 py-2 font-display text-sm font-bold uppercase tracking-wide text-bone xl:inline-block"
