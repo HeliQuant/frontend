@@ -80,9 +80,9 @@ export type Capital = {
   bitget_saldo?: { available_usd: number; equity_usd: number; demo: boolean };
 };
 
-export async function fetchCampaign(): Promise<CampaignStatus | null> {
+export async function fetchCampaign(base?: string): Promise<CampaignStatus | null> {
   try {
-    const r = await fetch(`${getEngineUrl()}/campaign?cb=${Date.now()}`, { cache: "no-store" });
+    const r = await fetch(`${base || getEngineUrl()}/campaign?cb=${Date.now()}`, { cache: "no-store" });
     if (!r.ok) return null;
     return (await r.json()) as CampaignStatus;
   } catch {

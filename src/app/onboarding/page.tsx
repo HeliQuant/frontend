@@ -60,6 +60,7 @@ const TOUR: TourStep[] = [
   { sel: '[data-tour="ob-register"]', title: "Register", body: "Hit Register — your keys POST straight to YOUR engine's SQLite (never us), and the dashboard switches to your firm." },
   { sel: '[data-tour="/app"]', title: "Navbar · The floor", body: "The firm's live decision floor — desks → debate → PM, the autonomous loop at work." },
   { sel: '[data-tour="/campaign"]', title: "Navbar · The grid", body: "The live trading campaign — each open position as a race from its stop to its target. The owner's runs 24/7 here." },
+  { sel: '[data-tour="/trade"]', title: "Navbar · Your floor", body: "Your OWN firm's live grid — reads YOUR connected local engine (vs The grid, which is the owner's showcase)." },
   { sel: '[data-tour="/carry"]', title: "Navbar · The edge", body: "The validated delta-neutral funding-carry strategy — the firm's market-neutral yield engine." },
   { sel: '[data-tour="/learning"]', title: "Navbar · Tuning bay", body: "Self-learning — desk reliability weights + the edge lab that retires decayed edges." },
   { sel: '[data-tour="/agents"]', title: "Navbar · The crew", body: "The 12 desks as on-chain ERC-8004 agents — identity, reputation, sealed outputs, all verifiable." },
@@ -202,6 +203,12 @@ export default function OnboardingPage() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-chartreuse">▸ how it works · 4 steps</p>
               <button onClick={() => setShowTour(true)} className="gr-press border-2 border-chartreuse px-3 py-1.5 font-display text-xs font-bold uppercase tracking-wide text-chartreuse hover:bg-chartreuse hover:text-pitch">▸ take the guided tour</button>
+            </div>
+            <div className="mt-4 flex flex-wrap items-center gap-3 border-2 border-chartreuse/40 bg-pitch p-3">
+              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-steel">get the engine:</span>
+              <a href="https://github.com/HeliQuant/agents-LocalReady/archive/refs/heads/main.zip" className="gr-press border-2 border-bone bg-chartreuse px-3.5 py-1.5 font-display text-xs font-bold uppercase tracking-wide text-pitch">⬇ download .zip</a>
+              <code className="border border-bone/20 bg-carbon px-2 py-1 font-mono text-[10px] text-bone/70">git clone https://github.com/HeliQuant/agents-LocalReady</code>
+              <a href="https://github.com/HeliQuant/agents-LocalReady" target="_blank" rel="noreferrer" className="font-mono text-[10px] uppercase tracking-[0.14em] text-steel hover:text-chartreuse">repo ↗</a>
             </div>
             <ol className="mt-4 grid gap-3 sm:grid-cols-2">
               {[
