@@ -182,7 +182,7 @@ export default function CampaignView({ base, mode }: { base?: string; mode: "own
                     {c.bitget_saldo ? (
                       <>
                         <p className="mt-1 font-display text-3xl font-extrabold leading-none text-bone">${c.bitget_saldo.equity_usd.toLocaleString("en-US", { maximumFractionDigits: 2 })}</p>
-                        <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-steel">bitget {c.bitget_saldo.demo ? "demo" : "live"} · avail ${c.bitget_saldo.available_usd.toFixed(0)}</p>
+                        <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-steel">bitget {c.bitget_saldo.demo ? "testnet" : "mainnet"} · avail ${c.bitget_saldo.available_usd.toFixed(0)}</p>
                       </>
                     ) : (
                       <>

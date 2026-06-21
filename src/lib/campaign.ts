@@ -340,7 +340,7 @@ export function venueBadge(venue?: string | null): { label: string; cls: string 
   const bg = v.includes("bitget");
   const bb = v.includes("bybit-testnet");
   if (bg && bb) return { label: "⚡ DUAL · BYBIT+BITGET", cls: "border-chartreuse text-chartreuse" };
-  if (bg) return { label: "⚡ BITGET DEMO", cls: "border-chartreuse/50 text-chartreuse" };
+  if (bg) return { label: "⚡ BITGET TESTNET", cls: "border-chartreuse/50 text-chartreuse" };
   if (bb) return { label: "⚡ BYBIT TESTNET", cls: "border-chartreuse/50 text-chartreuse" };
   if (v.startsWith("paper (learning")) return { label: "📄 PAPER · LEARNING", cls: "border-bone/30 text-steel" };
   return { label: "📄 PAPER", cls: "border-bone/25 text-steel" };
