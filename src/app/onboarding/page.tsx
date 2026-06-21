@@ -11,9 +11,10 @@
  */
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import AppNav from "@/components/garage/AppNav";
+import Tour, { type TourStep } from "@/components/garage/Tour";
 import { pingEngine, setEngineUrl } from "@/lib/engine";
 
 type Cred = {
@@ -52,6 +53,25 @@ const GROUPS: Array<{ id: Cred["group"]; title: string; sub: string }> = [
 
 const GROQ_SLOTS = 10;
 
+const TOUR: TourStep[] = [
+  { sel: '[data-tour="ob-engine"]', title: "Your engine", body: "Paste your local engine's tunnel URL + the HQ_SETUP_TOKEN you set on it. This is the engine the dashboard will read." },
+  { sel: '[data-tour="ob-groq"]', title: "Groq keys", body: "Ten free Groq keys — the desks rotate across them to dodge rate limits. Joined into one string on submit." },
+  { sel: '[data-tour="ob-creds"]', title: "Execution + power-ups", body: "Bitget keys to trade, a testnet wallet to anchor on-chain, and optional desk APIs (Allora / Nansen / Elfa). All optional." },
+  { sel: '[data-tour="ob-register"]', title: "Register", body: "Hit Register — your keys POST straight to YOUR engine's SQLite (never us), and the dashboard switches to your firm." },
+  { sel: '[data-tour="/app"]', title: "Navbar · The floor", body: "The firm's live decision floor — desks → debate → PM, the autonomous loop at work." },
+  { sel: '[data-tour="/campaign"]', title: "Navbar · The grid", body: "The live trading campaign — each open position as a race from its stop to its target. The owner's runs 24/7 here." },
+  { sel: '[data-tour="/carry"]', title: "Navbar · The edge", body: "The validated delta-neutral funding-carry strategy — the firm's market-neutral yield engine." },
+  { sel: '[data-tour="/learning"]', title: "Navbar · Tuning bay", body: "Self-learning — desk reliability weights + the edge lab that retires decayed edges." },
+  { sel: '[data-tour="/agents"]', title: "Navbar · The crew", body: "The 12 desks as on-chain ERC-8004 agents — identity, reputation, sealed outputs, all verifiable." },
+  { sel: '[data-tour="/ledger"]', title: "Navbar · Ledger", body: "Every decision + trade outcome, hashed and anchored on Mantle — the tamper-proof audit trail." },
+  { sel: '[data-tour="/performance"]', title: "Navbar · Track record", body: "Rigorous stats on the real ledger — Sharpe / Sortino / drawdown, no fantasy CAGR." },
+  { sel: '[data-tour="/whales"]', title: "Navbar · Telemetry", body: "Live Hyperliquid whale positions the firm watches — and fades when they crowd a trade." },
+  { sel: '[data-tour="/assets"]', title: "Navbar · Dyno bays", body: "Per-asset character — which assets are predictable vs efficient, driving the desk tilt." },
+  { sel: '[data-tour="/hire"]', title: "Navbar · Hire", body: "The on-chain 'hire the firm' deposit product (ERC-8183) — still in development." },
+  { sel: '[data-tour="/firms/heliquant"]', title: "Navbar · License", body: "The firm's on-chain identity — the transferable strategy-brain NFT." },
+  { sel: '[data-tour="/onboarding"]', title: "Navbar · Register", body: "You're here — register your own engine to run your own firm. Replay this tour anytime from the guide." },
+];
+
 export default function OnboardingPage() {
   const router = useRouter();
   const [engineUrl, setEngineUrlInput] = useState("");
@@ -63,6 +83,17 @@ export default function OnboardingPage() {
   const [reveal, setReveal] = useState(false);
   const [status, setStatus] = useState<"idle" | "registering" | "ok" | "fail">("idle");
   const [msg, setMsg] = useState("");
+  const [showTour, setShowTour] = useState(false);
+  useEffect(() => {
+    try {
+      if (!localStorage.getItem("hq_tour_seen")) {
+        setShowTour(true);
+        localStorage.setItem("hq_tour_seen", "1");
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   const setGroqAt = (i: number, v: string) => setGroq((g) => g.map((x, j) => (j === i ? v : x)));
   const setVal = (k: string, v: string) => setValues((s) => ({ ...s, [k]: v }));
@@ -168,7 +199,10 @@ export default function OnboardingPage() {
 
           {/* tour guide — what to do, step by step */}
           <div className="mt-8 border-2 border-bone/25 bg-carbon p-5">
-            <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-chartreuse">▸ how it works · 4 steps</p>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-chartreuse">▸ how it works · 4 steps</p>
+              <button onClick={() => setShowTour(true)} className="gr-press border-2 border-chartreuse px-3 py-1.5 font-display text-xs font-bold uppercase tracking-wide text-chartreuse hover:bg-chartreuse hover:text-pitch">▸ take the guided tour</button>
+            </div>
             <ol className="mt-4 grid gap-3 sm:grid-cols-2">
               {[
                 ["1", "Run your engine", "Clone agents-localReady and start it (docker compose up). It auto-creates a local SQLite for your keys."],
@@ -191,7 +225,7 @@ export default function OnboardingPage() {
           </div>
 
           {/* ── 1 · connect to your engine ── */}
-          <div className="mt-10 border-2 border-bone/25 bg-carbon">
+          <div data-tour="ob-engine" className="mt-10 border-2 border-bone/25 bg-carbon">
             <div className="flex items-baseline justify-between border-b-2 border-bone/15 px-5 py-3">
               <p className="font-display text-xl font-bold uppercase tracking-wide text-bone">01 · YOUR ENGINE</p>
               <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-steel">tunnel URL + setup token</p>
@@ -211,7 +245,7 @@ export default function OnboardingPage() {
           </div>
 
           {/* ── 2 · Groq keys (ten slots → one comma-string) ── */}
-          <div className="mt-7 border-2 border-bone/25 bg-carbon">
+          <div data-tour="ob-groq" className="mt-7 border-2 border-bone/25 bg-carbon">
             <div className="flex items-baseline justify-between border-b-2 border-bone/15 px-5 py-3">
               <p className="font-display text-xl font-bold uppercase tracking-wide text-bone">02 · THE BRAIN · GROQ KEYS</p>
               <p className={`font-mono text-[10px] uppercase tracking-[0.18em] ${groqFilled >= GROQ_SLOTS ? "text-chartreuse" : "text-steel"}`}>{groqFilled}/{GROQ_SLOTS} filled · min 10</p>
@@ -238,7 +272,7 @@ export default function OnboardingPage() {
             <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-steel">03 · GUARDS · FUEL — {credCount} set</p>
             <button onClick={() => setReveal((r) => !r)} className="border border-bone/30 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.16em] text-bone/70 hover:border-chartreuse hover:text-chartreuse">{reveal ? "mask" : "reveal"}</button>
           </div>
-          <div className="mt-3 space-y-6">
+          <div data-tour="ob-creds" className="mt-3 space-y-6">
             {GROUPS.map((grp) => (
               <div key={grp.id} className="border-2 border-bone/25 bg-carbon">
                 <div className="flex items-baseline justify-between border-b-2 border-bone/15 px-5 py-2.5">
@@ -268,7 +302,7 @@ export default function OnboardingPage() {
           </div>
 
           {/* ── launch row ── */}
-          <div className="mt-8 flex flex-col gap-4 border-2 border-chartreuse bg-carbon p-5 sm:flex-row sm:items-center sm:justify-between" style={{ boxShadow: "6px 6px 0 rgba(201,242,75,0.4)" }}>
+          <div data-tour="ob-register" className="mt-8 flex flex-col gap-4 border-2 border-chartreuse bg-carbon p-5 sm:flex-row sm:items-center sm:justify-between" style={{ boxShadow: "6px 6px 0 rgba(201,242,75,0.4)" }}>
             <div>
               <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-steel">{groqFilled >= GROQ_SLOTS && connectReady ? "ready to register" : `need: ${connectReady ? "" : "engine + token · "}${groqFilled >= GROQ_SLOTS ? "" : "10 groq keys"}`}</p>
               {msg && <p className={`mt-1 font-mono text-[12px] ${status === "ok" ? "text-chartreuse" : status === "fail" ? "text-signal2" : "text-bone/70"}`}>{msg}</p>}
@@ -291,6 +325,7 @@ export default function OnboardingPage() {
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-steel">HELIQUANT · REGISTER YOUR ENGINE · your keys, your machine, no custody</p>
         </div>
       </footer>
+      {showTour && <Tour steps={TOUR} onClose={() => setShowTour(false)} />}
     </>
   );
 }

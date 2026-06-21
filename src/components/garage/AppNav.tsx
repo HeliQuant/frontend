@@ -58,6 +58,7 @@ export default function AppNav() {
               <Link
                 key={l.href}
                 href={l.href}
+                data-tour={l.href}
                 aria-current={active ? "page" : undefined}
                 className={`whitespace-nowrap font-mono text-[11px] uppercase tracking-[0.16em] transition-colors ${
                   active ? "text-chartreuse" : "text-bone/65 hover:text-chartreuse"
