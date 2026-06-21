@@ -1,8 +1,6 @@
 # frontend
 
 > Next.js dApp for **[HeliQuant](https://github.com/HeliQuant)** trading firm marketplace on Mantle.
->
-> Submitted to **Mantle Turing Test Hackathon 2026** — Track 1: AI Trading & Strategy.
 
 ## Live demo
 

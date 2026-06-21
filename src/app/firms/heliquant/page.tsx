@@ -87,7 +87,7 @@ export default function HeliQuantFirmPage() {
                     <span className="text-steel">CLASS ▸</span> AUTONOMOUS TRADING FIRM · 9 DESKS · 1 PM
                   </p>
                   <p>
-                    <span className="text-steel">SERIES ▸</span> MANTLE TURING TEST 2026 · AI TRADING &amp; STRATEGY
+                    <span className="text-steel">SERIES ▸</span> AI TRADING &amp; STRATEGY
                   </p>
                   <p>
                     <span className="text-steel">IDENTITY ▸</span> ERC-8004 REGISTRY (on-chain, verifiable)

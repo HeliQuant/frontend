@@ -153,7 +153,7 @@ ENCODING:    tag size = subsystem weight; chartreuse edge = live now (Railway cl
 COPY:        part numbers as repo names; "RUNS WHILE YOU SLEEP" line
 ```
 
-Footer: license-plate plaque "HELIQUANT · MANTLE TURING TEST 2026" on a hazard seam.
+Footer: license-plate plaque "HELIQUANT · THE DISCIPLINED TRADING ENGINE" on a hazard seam.
 
 ### 6.7 /whales — "THE TIMING TOWER" (F1 pit wall)
 ```
