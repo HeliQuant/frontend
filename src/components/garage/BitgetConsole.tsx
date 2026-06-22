@@ -52,7 +52,7 @@ export default function BitgetConsole({ data }: { data: CampaignStatus | null })
           <Cell label="balance" value={usd0(bg!.equity_usd)} sub="demo equity" accent />
           <Cell label="available" value={usd0(bg!.available_usd)} sub="margin free" />
           <Cell label="testnet fills" value={String(fills)} sub="real orders placed" accent />
-          <Cell label="venue perps" value="BTC · ETH · XRP" sub="on the demo" small />
+          <Cell label="venue perps (demo)" value="SBTC · SETH · SXRP" sub="SUSDT-FUTURES" small />
         </div>
       ) : (
         <div className="px-5 py-6">

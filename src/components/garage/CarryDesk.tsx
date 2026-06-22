@@ -131,7 +131,7 @@ export default function CarryDesk() {
             return (
               <div key={v.asset} className="grid items-center gap-4 bg-carbon px-5 py-4 lg:grid-cols-[210px_1fr_300px]">
                 <div className="flex items-center gap-3">
-                  <span className="font-display text-2xl font-extrabold uppercase text-bone">{v.asset}</span>
+                  <span className="font-display text-2xl font-extrabold uppercase text-bone">{v.asset}USDT</span>
                   <span className={`border px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] ${CRASH_COLOR[v.crash] ?? CRASH_COLOR["—"]}`}>{v.crash}</span>
                   {v.tier === "PRIMARY" ? <span className="border border-chartreuse/60 bg-chartreuse/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] text-chartreuse">harvest</span> : null}
                 </div>
@@ -170,7 +170,7 @@ export default function CarryDesk() {
             return (
               <div key={v.asset} className="bg-carbon px-5 py-4">
                 <div className="flex items-baseline justify-between">
-                  <span className="font-display text-xl font-extrabold uppercase text-bone">{v.asset}</span>
+                  <span className="font-display text-xl font-extrabold uppercase text-bone">{v.asset}USDT</span>
                   <span className={`font-display text-2xl font-extrabold ${rate == null ? "text-steel" : harvest ? "text-chartreuse" : "text-bone/70"}`}>
                     {rate == null ? "—" : `${rate >= 0 ? "+" : ""}${rate}%`}
                   </span>

@@ -10,7 +10,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 
-import { fetchTrades, type Trade, type TradeLog } from "@/lib/campaign";
+import { fetchTrades, venueLabel, type Trade, type TradeLog } from "@/lib/campaign";
 
 const POLL_MS = 20000;
 
@@ -122,7 +122,7 @@ function TradeRow({ t, delay }: { t: Trade; delay: number }) {
     >
       {/* asset + side + venue (paper vs real Bitget testnet fill) */}
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span className="font-display text-xl font-extrabold uppercase text-bone">{t.asset}</span>
+        <span className="font-display text-base font-extrabold uppercase text-bone">{venueLabel(t.asset, t.venue)}</span>
         <span className={`font-mono text-[10px] font-bold uppercase ${long ? "text-chartreuse" : "text-signal2"}`}>
           {long ? "↑L" : "↓S"}
         </span>

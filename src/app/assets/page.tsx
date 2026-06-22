@@ -168,7 +168,9 @@ export default function AssetsPage() {
                 {/* stand plate */}
                 <div className="flex items-start gap-4 lg:flex-col lg:gap-2">
                   <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-steel">{b.no}</p>
-                  <p className="font-display text-5xl font-extrabold leading-none text-bone">{b.ticker}</p>
+                  <p className="font-display text-5xl font-extrabold leading-none text-bone">
+                    {b.ticker}{b.ticker !== "mETH" && <span className="text-2xl text-steel">USDT</span>}
+                  </p>
                   <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-steel">{b.name}</p>
                 </div>
 

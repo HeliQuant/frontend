@@ -12,7 +12,7 @@ import { motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { fetchCampaign, laneFrac, venueBadge, type CampaignStatus, type OpenPosition } from "@/lib/campaign";
+import { fetchCampaign, laneFrac, pairLabel, venueBadge, venueLabel, type CampaignStatus, type OpenPosition } from "@/lib/campaign";
 import AppNav from "@/components/garage/AppNav";
 import BitgetConsole from "@/components/garage/BitgetConsole";
 
@@ -38,7 +38,7 @@ function Lane({ p }: { p: OpenPosition }) {
     <div className="border-b border-bone/10 py-3.5">
       <div className="mb-2 flex items-baseline justify-between gap-3">
         <span className="flex items-center gap-2.5">
-          <span className="font-display text-lg font-extrabold uppercase tracking-wide text-bone">{p.asset}</span>
+          <span className="font-display text-lg font-extrabold uppercase tracking-wide text-bone">{venueLabel(p.asset, p.venue)}</span>
           <span className={`border px-1.5 py-px font-mono text-[9px] font-bold tracking-[0.14em] ${p.dir === "LONG" ? "border-chartreuse text-chartreuse" : "border-bone/45 text-bone/70"}`}>
             {p.dir}
           </span>
@@ -308,7 +308,7 @@ export default function CampaignView({ base, mode }: { base?: string; mode: "own
                   return (
                     <span key={c.id} className="flex items-center gap-1.5 border-2 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em]"
                       style={{ borderColor: win ? "rgba(201,242,75,0.5)" : "rgba(255,90,31,0.5)", color: win ? "var(--color-chartreuse)" : "var(--color-signal2)" }}>
-                      {icon} {c.asset} {c.dir} {(c.net_pct ?? 0) >= 0 ? "+" : ""}{(c.net_pct ?? 0).toFixed(2)}%
+                      {icon} {pairLabel(c.asset)} {c.dir} {(c.net_pct ?? 0) >= 0 ? "+" : ""}{(c.net_pct ?? 0).toFixed(2)}%
                     </span>
                   );
                 })}

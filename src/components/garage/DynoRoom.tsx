@@ -52,7 +52,7 @@ export default function DynoRoom() {
           <div className="gr-shadow-ink relative border-2 border-bone/25 bg-pitch p-6">
             <div className="flex items-center justify-between border-b-2 border-bone/15 pb-3">
               <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-steel">
-                dyno run · OI-CONTRARIAN · MNT · out-of-sample
+                dyno run · OI-CONTRARIAN · MNTUSDT · out-of-sample
               </p>
               <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-chartreuse">
                 $1,000 → $1,289
@@ -85,7 +85,7 @@ export default function DynoRoom() {
                   transition={{ duration: 1.6, ease: [0.3, 0.9, 0.3, 1] }}
                 />
                 <text x="14" y="166" className="fill-signal2 font-mono" style={{ fontSize: 10 }}>
-                  MNT −39% same window
+                  MNTUSDT −39% same window
                 </text>
                 <text x="350" y="56" className="fill-chartreuse font-mono" style={{ fontSize: 12 }}>
                   +28.9% OOS

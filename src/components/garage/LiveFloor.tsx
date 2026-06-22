@@ -12,7 +12,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { fetchCampaign, venueBadge, type CampaignStatus, type OpenPosition } from "@/lib/campaign";
+import { fetchCampaign, venueBadge, venueLabel, type CampaignStatus, type OpenPosition } from "@/lib/campaign";
 import { fetchStatus, fetchDecisions, fetchCandles, type OrgStatus, type Decision, type Candle } from "@/lib/live";
 import MiniCandles from "./MiniCandles";
 
@@ -211,7 +211,7 @@ function PositionRow({ p, candles }: { p: OpenPosition; candles: Candle[] }) {
       {/* thesis */}
       <div>
         <div className="flex flex-wrap items-center gap-3">
-          <span className="font-display text-2xl font-extrabold uppercase text-bone">{p.asset}</span>
+          <span className="font-display text-2xl font-extrabold uppercase text-bone">{venueLabel(p.asset, p.venue)}</span>
           <span className={`border px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em] ${p.dir === "SHORT" ? "border-signal2/60 text-signal2" : "border-chartreuse/60 text-chartreuse"}`}>
             {p.dir}
           </span>

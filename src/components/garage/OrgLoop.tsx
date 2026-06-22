@@ -149,7 +149,7 @@ export default function OrgLoop() {
         <div className="mt-6 inline-flex items-center gap-2 border-2 px-3 py-1.5" style={{ borderColor: entering ? C.chart : "rgba(242,239,230,0.25)" }}>
           <span className="h-2 w-2 rounded-full" style={{ background: entering ? C.chart : C.steel }} />
           <span className="font-mono text-[11px] uppercase tracking-[0.16em]" style={{ color: entering ? C.chart : C.steel }}>
-            analyzing {sc.asset} → {entering ? `ENTER ${sc.dir}` : "ABSTAIN"}
+            analyzing {sc.asset}USDT → {entering ? `ENTER ${sc.dir}` : "ABSTAIN"}
           </span>
         </div>
 

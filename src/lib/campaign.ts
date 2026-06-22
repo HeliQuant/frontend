@@ -349,3 +349,11 @@ export function venueBadge(venue?: string | null): { label: string; cls: string 
   if (v.startsWith("paper (learning")) return { label: "📄 PAPER · LEARNING", cls: "border-bone/30 text-steel" };
   return { label: "📄 PAPER", cls: "border-bone/25 text-steel" };
 }
+
+// Bitget instrument labels. Mainnet perps are USDT-margined (BTCUSDT…); the demo is S-prefixed +
+// settled in Simulated USDT (SBTCSUSDT…). pairLabel = the mainnet pair; venueLabel = demo symbol when
+// the fill was on the Bitget testnet, else the mainnet pair.
+const DEMO_SYMBOL: Record<string, string> = { BTC: "SBTCSUSDT", ETH: "SETHSUSDT", XRP: "SXRPSUSDT" };
+export const pairLabel = (asset: string): string => `${asset.toUpperCase()}USDT`;
+export const venueLabel = (asset: string, venue?: string | null): string =>
+  (venue ?? "").includes("bitget") ? (DEMO_SYMBOL[asset.toUpperCase()] ?? pairLabel(asset)) : pairLabel(asset);

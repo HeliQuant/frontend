@@ -85,7 +85,7 @@ export default function BlackBox() {
               </p>
               <p className="mt-5 font-mono text-sm tracking-wide text-bone/75">{ANCHOR.tx}</p>
               <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-steel">
-                MNT · ABSTAIN · sealed on Mantle
+                MNTUSDT · ABSTAIN · sealed on Mantle
               </p>
             </div>
             <a
@@ -118,7 +118,7 @@ export default function BlackBox() {
                     {String(r.ts).slice(0, 10)}
                   </span>
                   <span className="font-mono text-[12px] uppercase tracking-[0.18em] text-bone/80">
-                    {r.ticker}
+                    {r.ticker}USDT
                   </span>
                   <span className={`font-display text-base font-bold uppercase tracking-wide ${stanceColor(String(r.decision))}`}>
                     {r.decision}

@@ -183,7 +183,7 @@ export default function LearningBay() {
               return (
                 <div key={`${e.asset}-${e.edge}`} className="bg-carbon p-5">
                   <div className="flex items-center justify-between">
-                    <span className="font-display text-3xl font-extrabold uppercase text-bone">{e.asset}</span>
+                    <span className="font-display text-3xl font-extrabold uppercase text-bone">{e.asset}USDT</span>
                     <span className="border border-bone/30 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] text-bone/60">
                       tested · not traded
                     </span>
@@ -260,7 +260,7 @@ export default function LearningBay() {
               return (
                 <div key={c.key} className="grid items-center gap-4 bg-carbon px-5 py-4 lg:grid-cols-[260px_1fr_200px]">
                   <div className="flex items-center gap-3">
-                    <span className="font-display text-2xl font-extrabold uppercase text-bone">{c.asset}</span>
+                    <span className="font-display text-2xl font-extrabold uppercase text-bone">{c.asset}USDT</span>
                     <span className={`border px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] ${REGIME_COLOR[c.regime] ?? REGIME_COLOR.flat}`}>{c.regime}</span>
                     <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-bone/50">{c.signal}</span>
                   </div>
@@ -302,7 +302,7 @@ export default function LearningBay() {
                 <div className="divide-y divide-bone/10">
                   {skips.slice().reverse().map((s, i) => (
                     <div key={`${s.utc}-${i}`} className="flex items-center gap-3 px-5 py-2.5 font-mono text-[11px]">
-                      <span className="w-12 font-display text-base font-bold uppercase text-bone">{s.asset}</span>
+                      <span className="w-16 font-display text-base font-bold uppercase text-bone">{s.asset}USDT</span>
                       <span className="text-signal2">⊘ {s.dir}</span>
                       <span className="text-bone/45">vs regime {s.regime}</span>
                       <span className="ml-auto text-steel">{ago(s.utc)} ago</span>
