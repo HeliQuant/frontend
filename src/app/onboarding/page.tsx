@@ -82,6 +82,7 @@ export default function OnboardingPage() {
     Object.fromEntries(CREDS.filter((c) => c.defaultValue).map((c) => [c.key, c.defaultValue!])),
   );
   const [reveal, setReveal] = useState(false);
+  const [connected, setConnected] = useState(false); // engine verified reachable → unlocks the key fields
   const [status, setStatus] = useState<"idle" | "registering" | "ok" | "fail">("idle");
   const [msg, setMsg] = useState("");
   const [showTour, setShowTour] = useState(false);
@@ -114,8 +115,35 @@ export default function OnboardingPage() {
     return creds;
   }
 
+  async function onConnect() {
+    // step 1 — verify the engine is reachable, then UNLOCK the key fields. Points the dashboard at it now.
+    const url = engineUrl.trim().replace(/\/+$/, "");
+    if (!url) {
+      setStatus("fail");
+      setMsg("enter your engine URL first (run agents-LocalReady + tunnel it)");
+      return;
+    }
+    setStatus("registering");
+    setMsg("connecting to your engine…");
+    if (!(await pingEngine(url))) {
+      setStatus("fail");
+      setConnected(false);
+      setMsg("engine unreachable — is agents-LocalReady running + tunnelled?");
+      return;
+    }
+    setEngineUrl(url); // dashboard now reads YOUR engine
+    setConnected(true);
+    setStatus("ok");
+    setMsg("✓ connected — your key fields are unlocked below. Already set up? Skip straight to your dashboard.");
+  }
+
   async function onRegister() {
     const url = engineUrl.trim().replace(/\/+$/, "");
+    if (!connected) {
+      setStatus("fail");
+      setMsg("connect to your engine first (step 01) to unlock the key fields");
+      return;
+    }
     if (!connectReady) {
       setStatus("fail");
       setMsg("engine URL + setup token required (set HQ_SETUP_TOKEN on your engine)");
@@ -214,8 +242,8 @@ export default function OnboardingPage() {
               {[
                 ["1", "Run your engine", "Clone agents-LocalReady and start it (docker compose up). It auto-creates a local SQLite for your keys."],
                 ["2", "Tunnel + token", "Expose it with ngrok and set HQ_SETUP_TOKEN. Paste the URL + token in 01 below."],
-                ["3", "Paste your keys", "Ten Groq keys (free) + any execution / optional keys. They go straight to YOUR engine — never us."],
-                ["4", "Register → launch", "Hit Register. Your keys land in your engine SQLite and the dashboard switches to YOUR firm."],
+                ["3", "Connect", "Hit Connect — the dashboard verifies your engine is reachable and UNLOCKS the key fields below."],
+                ["4", "Add keys → register", "Fill Groq + execution keys (now unlocked) and Register. They save to your engine's SQLite once, then load every restart — no re-entering."],
               ].map(([n, t, d]) => (
                 <li key={n} className="flex gap-3">
                   <span className="grid h-8 w-9 shrink-0 place-items-center border-2 border-chartreuse font-display text-sm font-extrabold text-chartreuse">{n}</span>
@@ -243,7 +271,7 @@ export default function OnboardingPage() {
             <div className="grid gap-4 px-5 py-5 sm:grid-cols-2">
               <div>
                 <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-steel">engine URL (ngrok / cloud)</p>
-                <input value={engineUrl} onChange={(e) => setEngineUrlInput(e.target.value)} placeholder="https://xxxx.ngrok-free.app" spellCheck={false} autoComplete="off"
+                <input value={engineUrl} onChange={(e) => { setEngineUrlInput(e.target.value); setConnected(false); }} placeholder="https://xxxx.ngrok-free.app" spellCheck={false} autoComplete="off"
                   className="mt-1.5 w-full border-2 border-bone/25 bg-pitch px-3 py-2 font-mono text-[12px] text-bone placeholder:text-steel/60 focus:border-chartreuse focus:outline-none" />
               </div>
               <div>
@@ -252,15 +280,23 @@ export default function OnboardingPage() {
                   className="mt-1.5 w-full border-2 border-bone/25 bg-pitch px-3 py-2 font-mono text-[12px] text-bone placeholder:text-steel/60 focus:border-chartreuse focus:outline-none" />
               </div>
             </div>
+            <div className="flex flex-wrap items-center gap-3 border-t-2 border-bone/15 px-5 py-3.5">
+              <button onClick={onConnect} disabled={status === "registering"} className={`gr-press border-2 px-5 py-2 font-display text-sm font-bold uppercase tracking-wide disabled:opacity-50 ${connected ? "border-chartreuse text-chartreuse" : "border-bone bg-chartreuse text-pitch"}`}>
+                {connected ? "✓ connected — reconnect" : "Connect to your engine →"}
+              </button>
+              <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-steel">
+                {connected ? "engine verified · key fields unlocked below" : "verify your engine is reachable to unlock the key fields"}
+              </p>
+            </div>
           </div>
 
           {/* ── 2 · Groq keys (ten slots → one comma-string) ── */}
           <div data-tour="ob-groq" className="mt-7 border-2 border-bone/25 bg-carbon">
             <div className="flex items-baseline justify-between border-b-2 border-bone/15 px-5 py-3">
               <p className="font-display text-xl font-bold uppercase tracking-wide text-bone">02 · THE BRAIN · GROQ KEYS</p>
-              <p className={`font-mono text-[10px] uppercase tracking-[0.18em] ${groqFilled >= GROQ_SLOTS ? "text-chartreuse" : "text-steel"}`}>{groqFilled}/{GROQ_SLOTS} filled · min 10</p>
+              <p className={`font-mono text-[10px] uppercase tracking-[0.18em] ${!connected ? "text-steel/70" : groqFilled >= GROQ_SLOTS ? "text-chartreuse" : "text-steel"}`}>{connected ? `${groqFilled}/${GROQ_SLOTS} filled · min 10` : "🔒 connect engine first"}</p>
             </div>
-            <div className="px-5 py-4">
+            <div className={`px-5 py-4 ${connected ? "" : "pointer-events-none select-none opacity-40"}`}>
               <p className="mb-3 text-[11px] leading-relaxed text-bone/45">
                 The desks rotate across many free Groq keys to dodge rate limits — paste <span className="text-bone">ten</span>{" "}
                 (<span className="font-mono text-bone">console.groq.com</span>, free). They're joined into one comma-separated string on submit.
@@ -279,10 +315,10 @@ export default function OnboardingPage() {
 
           {/* ── 3 · the rest of the credentials ── */}
           <div className="mt-7 flex items-center justify-between">
-            <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-steel">03 · GUARDS · FUEL — {credCount} set</p>
-            <button onClick={() => setReveal((r) => !r)} className="border border-bone/30 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.16em] text-bone/70 hover:border-chartreuse hover:text-chartreuse">{reveal ? "mask" : "reveal"}</button>
+            <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-steel">03 · GUARDS · FUEL — {connected ? `${credCount} set` : "🔒 connect engine first"}</p>
+            <button onClick={() => setReveal((r) => !r)} disabled={!connected} className="border border-bone/30 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.16em] text-bone/70 hover:border-chartreuse hover:text-chartreuse disabled:opacity-40">{reveal ? "mask" : "reveal"}</button>
           </div>
-          <div data-tour="ob-creds" className="mt-3 space-y-6">
+          <div data-tour="ob-creds" className={`mt-3 space-y-6 ${connected ? "" : "pointer-events-none select-none opacity-40"}`}>
             {GROUPS.map((grp) => (
               <div key={grp.id} className="border-2 border-bone/25 bg-carbon">
                 <div className="flex items-baseline justify-between border-b-2 border-bone/15 px-5 py-2.5">
@@ -314,14 +350,14 @@ export default function OnboardingPage() {
           {/* ── launch row ── */}
           <div data-tour="ob-register" className="mt-8 flex flex-col gap-4 border-2 border-chartreuse bg-carbon p-5 sm:flex-row sm:items-center sm:justify-between" style={{ boxShadow: "6px 6px 0 rgba(201,242,75,0.4)" }}>
             <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-steel">{groqFilled >= GROQ_SLOTS && connectReady ? "ready to register" : `need: ${connectReady ? "" : "engine + token · "}${groqFilled >= GROQ_SLOTS ? "" : "10 groq keys"}`}</p>
+              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-steel">{!connected ? "connect your engine first (step 01) to unlock" : groqFilled >= GROQ_SLOTS ? "ready to register" : `need: 10 groq keys (${groqFilled} so far)`}</p>
               {msg && <p className={`mt-1 font-mono text-[12px] ${status === "ok" ? "text-chartreuse" : status === "fail" ? "text-signal2" : "text-bone/70"}`}>{msg}</p>}
             </div>
             <div className="flex items-center gap-3">
-              <button onClick={onLogin} disabled={status === "registering"} className="gr-press border-2 border-bone/60 px-4 py-2.5 font-display text-sm font-semibold uppercase tracking-wide text-bone/85 hover:border-chartreuse hover:text-chartreuse disabled:opacity-50">
-                Already set up → connect
+              <button onClick={onLogin} disabled={status === "registering" || !connected} title="keys already saved in your engine's SQLite — just open the dashboard" className="gr-press border-2 border-bone/60 px-4 py-2.5 font-display text-sm font-semibold uppercase tracking-wide text-bone/85 hover:border-chartreuse hover:text-chartreuse disabled:opacity-50">
+                Already configured → dashboard
               </button>
-              <button onClick={onRegister} disabled={status === "registering" || groqFilled < GROQ_SLOTS || !connectReady} className="gr-press border-2 border-bone bg-chartreuse px-6 py-2.5 font-display text-base font-bold uppercase tracking-wide text-pitch disabled:opacity-40" style={{ boxShadow: "3px 3px 0 rgba(242,239,230,0.9)" }}>
+              <button onClick={onRegister} disabled={status === "registering" || !connected || groqFilled < GROQ_SLOTS || !connectReady} className="gr-press border-2 border-bone bg-chartreuse px-6 py-2.5 font-display text-base font-bold uppercase tracking-wide text-pitch disabled:opacity-40" style={{ boxShadow: "3px 3px 0 rgba(242,239,230,0.9)" }}>
                 {status === "registering" ? "registering…" : "Register your engine"}
               </button>
             </div>
