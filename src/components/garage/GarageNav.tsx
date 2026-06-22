@@ -7,7 +7,6 @@
 import Image from "next/image";
 
 const LINKS = [
-  { href: "/#engine", label: "Engine" },
   { href: "/campaign", label: "The grid" },
   { href: "/#dyno", label: "Dyno" },
   { href: "/#report", label: "Findings" },
