@@ -7,6 +7,7 @@
 
 import GarageNav from "@/components/garage/GarageNav";
 import HeroEngineBay from "@/components/garage/HeroEngineBay";
+import CommandConsole from "@/components/garage/CommandConsole";
 import TheCore from "@/components/garage/TheCore";
 import EngineCycle from "@/components/garage/EngineCycle";
 import DynoRoom from "@/components/garage/DynoRoom";
@@ -23,7 +24,10 @@ export default function HomePage() {
         {/* 1 — THE ENGINE BAY · tach + turbine + gearbox holding N */}
         <HeroEngineBay />
 
-        {/* 2 — THE CORE · the literal V8, fully exploded, orbitable (live WebGL) */}
+        {/* 2 — THE TERMINAL · watch the firm decide — 12 desks → one verdict (mostly ABSTAIN) */}
+        <CommandConsole />
+
+        {/* 3 — THE CORE · the literal V8, fully exploded, orbitable (live WebGL) */}
         <TheCore />
 
         {/* 3 — THE ENGINE CYCLE · the org loop as a 4-stroke engine */}

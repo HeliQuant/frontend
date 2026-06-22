@@ -65,9 +65,10 @@ export default function AppNav() {
           </Link>
           <span
             title="HeliQuant executes its trades on the Bitget testnet"
-            className="hidden items-center gap-1 border border-bitget/45 px-2 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-bitget xl:inline-flex"
+            className="hidden items-center gap-1.5 border border-bitget/45 py-0.5 pl-0.5 pr-2 xl:inline-flex"
           >
-            ⚡ on Bitget
+            <Image src="/brand/bitget.jpg" alt="Bitget" width={18} height={18} />
+            <span className="font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-bitget">on Bitget</span>
           </span>
         </div>
 
