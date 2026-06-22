@@ -132,7 +132,7 @@ function TradeRow({ t, delay }: { t: Trade; delay: number }) {
             <span
               title={bitget ? "real fill on Bitget testnet (demo)" : "paper trade at the live price"}
               className={`border px-1 py-0.5 font-mono text-[8px] font-bold uppercase tracking-[0.08em] ${
-                bitget ? "border-chartreuse/50 text-chartreuse" : "border-bone/25 text-steel"
+                bitget ? "border-bitget/50 text-bitget" : "border-bone/25 text-steel"
               }`}
             >
               {bitget ? "⚡ Bitget testnet" : "📄 paper"}

@@ -178,6 +178,7 @@
   --color-chartreuse: #c9f24b;  /* THE accent — livery, spark, validated, CTA */
   --color-steel: #8b8b80;       /* muted text */
   --color-signal2: #ff5a1f;     /* rare alert: rejected / crash / risk only */
+  --color-bitget: #1ce5cf;      /* the EXECUTION VENUE accent — Bitget teal, used ONLY on Bitget-venue UI */
 }
 
 /* Hazard stripe seam — the signature motif (45° chartreuse/pitch tape between sections) */

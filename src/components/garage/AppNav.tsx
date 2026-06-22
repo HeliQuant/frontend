@@ -53,15 +53,23 @@ export default function AppNav() {
   return (
     <header className="sticky top-0 z-50 border-b-2 border-bone/15 bg-pitch/85 backdrop-blur-md">
       <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-6 px-6 py-3 sm:px-10 xl:px-8">
-        {/* brand mark → exit back to the landing site */}
-        <Link href="/" className="flex items-center gap-3" aria-label="HeliQuant — back to site">
-          <span className="gr-shadow-bone grid h-10 w-10 place-items-center border-2 border-pitch bg-bone p-1">
-            <Image src="/brand/logo.png" alt="HeliQuant rotor mark" width={32} height={33} priority />
+        {/* brand mark → exit back to the landing site · + the execution-venue mark */}
+        <div className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-3" aria-label="HeliQuant — back to site">
+            <span className="gr-shadow-bone grid h-10 w-10 place-items-center border-2 border-pitch bg-bone p-1">
+              <Image src="/brand/logo.png" alt="HeliQuant rotor mark" width={32} height={33} priority />
+            </span>
+            <span className="font-display text-2xl font-extrabold uppercase tracking-wide text-bone">
+              Heli<span className="text-chartreuse">Quant</span>
+            </span>
+          </Link>
+          <span
+            title="HeliQuant executes its trades on the Bitget testnet"
+            className="hidden items-center gap-1 border border-bitget/45 px-2 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-bitget xl:inline-flex"
+          >
+            ⚡ on Bitget
           </span>
-          <span className="font-display text-2xl font-extrabold uppercase tracking-wide text-bone">
-            Heli<span className="text-chartreuse">Quant</span>
-          </span>
-        </Link>
+        </div>
 
         {/* functional bays — active bay reads chartreuse */}
         <nav className="hidden items-center gap-x-5 xl:flex 2xl:gap-x-7">

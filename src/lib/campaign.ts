@@ -345,7 +345,7 @@ export function laneFrac(p: OpenPosition): number | null {
  *  plus the border/text Tailwind classes — the caller adds its own sibling-chip sizing. */
 export function venueBadge(venue?: string | null): { label: string; cls: string } {
   const v = venue || "";
-  if (v.includes("bitget")) return { label: "⚡ BITGET TESTNET", cls: "border-chartreuse/50 text-chartreuse" };
+  if (v.includes("bitget")) return { label: "⚡ BITGET TESTNET", cls: "border-bitget/50 text-bitget" };
   if (v.startsWith("paper (learning")) return { label: "📄 PAPER · LEARNING", cls: "border-bone/30 text-steel" };
   return { label: "📄 PAPER", cls: "border-bone/25 text-steel" };
 }

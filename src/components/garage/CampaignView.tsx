@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 
 import { fetchCampaign, laneFrac, venueBadge, type CampaignStatus, type OpenPosition } from "@/lib/campaign";
 import AppNav from "@/components/garage/AppNav";
+import BitgetConsole from "@/components/garage/BitgetConsole";
 
 const POLL_MS = 20000;
 
@@ -149,6 +150,9 @@ export default function CampaignView({ base, mode }: { base?: string; mode: "own
             </p>
           </div>
 
+          {/* ⚡ BITGET EXECUTION CONSOLE — the venue made unmissable (teal = Bitget integration) */}
+          <BitgetConsole data={data} />
+
           {/* ── CAPITAL · paper accounting vs Bitget testnet (clearly separated) ── */}
           {data?.capital && (() => {
             const c = data.capital;
@@ -184,9 +188,9 @@ export default function CampaignView({ base, mode }: { base?: string; mode: "own
                 </div>
 
                 {/* ⚡ BITGET TESTNET — real demo fills, no real funds */}
-                <div className={`border-2 ${bg ? "border-chartreuse/55" : "border-bone/20"} bg-carbon`}>
+                <div className={`border-2 ${bg ? "border-bitget/55" : "border-bone/20"} bg-carbon`}>
                   <div className="flex items-center justify-between border-b-2 border-bone/15 px-5 py-2.5">
-                    <p className="font-display text-sm font-bold uppercase tracking-wide" style={{ color: bg ? "var(--color-chartreuse)" : "rgba(242,239,230,0.4)" }}>⚡ Bitget testnet</p>
+                    <p className="font-display text-sm font-bold uppercase tracking-wide" style={{ color: bg ? "var(--color-bitget)" : "rgba(242,239,230,0.4)" }}>⚡ Bitget testnet</p>
                     <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-steel">real demo fills · no real funds</p>
                   </div>
                   {bg ? (() => {
@@ -198,14 +202,14 @@ export default function CampaignView({ base, mode }: { base?: string; mode: "own
                     <div className="grid grid-cols-3 gap-px bg-bone/10">
                       <div className="bg-carbon p-4">
                         <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-steel">balance</p>
-                        <p className="mt-1 font-display text-3xl font-extrabold leading-none text-chartreuse">{usd(bg.equity_usd)}</p>
+                        <p className="mt-1 font-display text-3xl font-extrabold leading-none text-bitget">{usd(bg.equity_usd)}</p>
                         <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.12em] text-steel">
                           avail {usd(bg.available_usd)}{bg.baseline_usd ? ` · base ${usd(bg.baseline_usd)}` : ""}
                         </p>
                       </div>
                       <div className="bg-carbon p-4">
                         <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-steel">ROI</p>
-                        <p className="mt-1 font-display text-3xl font-extrabold leading-none" style={{ color: bRoiUp ? "var(--color-chartreuse)" : "var(--color-signal2)" }}>{bRoiUp ? "+" : ""}{bRoi.toFixed(2)}%</p>
+                        <p className="mt-1 font-display text-3xl font-extrabold leading-none" style={{ color: bRoiUp ? "var(--color-bitget)" : "var(--color-signal2)" }}>{bRoiUp ? "+" : ""}{bRoi.toFixed(2)}%</p>
                         <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.12em] text-steel">since baseline</p>
                       </div>
                       <div className="bg-carbon p-4">
