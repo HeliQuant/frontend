@@ -8,7 +8,6 @@
 import GarageNav from "@/components/garage/GarageNav";
 import HeroEngineBay from "@/components/garage/HeroEngineBay";
 import OrgLoop from "@/components/garage/OrgLoop";
-import TheCore from "@/components/garage/TheCore";
 import EngineCycle from "@/components/garage/EngineCycle";
 import DynoRoom from "@/components/garage/DynoRoom";
 import CrashTest from "@/components/garage/CrashTest";
@@ -27,8 +26,7 @@ export default function HomePage() {
         {/* 2 — THE LOOP · the autonomous org cycle as a closed node graph (end feeds start, never stops) */}
         <OrgLoop />
 
-        {/* 3 — THE CORE · the literal V8, fully exploded, orbitable (live WebGL) */}
-        <TheCore />
+        {/* (the live WebGL V8 — "The Core" — now lives on /app, not the landing) */}
 
         {/* 3 — THE ENGINE CYCLE · the org loop as a 4-stroke engine */}
         <EngineCycle />
