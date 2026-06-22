@@ -85,7 +85,7 @@ export default function TradeLedger() {
         <div className="space-y-px bg-bone/10">
           {/* header row */}
           <div className="hidden grid-cols-[100px_1fr_80px_80px_95px_150px] gap-3 bg-pitch px-5 py-2 font-mono text-[9px] uppercase tracking-[0.16em] text-steel lg:grid">
-            <span>asset · side</span>
+            <span>asset · side · venue</span>
             <span>entry → exit</span>
             <span className="text-right">net %</span>
             <span className="text-right">P&amp;L $</span>
@@ -120,12 +120,25 @@ function TradeRow({ t, delay }: { t: Trade; delay: number }) {
       transition={{ duration: 0.3, delay }}
       className="grid grid-cols-2 items-center gap-3 bg-carbon px-5 py-3 lg:grid-cols-[100px_1fr_80px_80px_95px_150px]"
     >
-      {/* asset + side */}
-      <div className="flex items-center gap-2">
+      {/* asset + side + venue (paper vs real Bitget testnet fill) */}
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
         <span className="font-display text-xl font-extrabold uppercase text-bone">{t.asset}</span>
         <span className={`font-mono text-[10px] font-bold uppercase ${long ? "text-chartreuse" : "text-signal2"}`}>
           {long ? "↑L" : "↓S"}
         </span>
+        {(() => {
+          const bitget = (t.venue ?? "").includes("bitget");
+          return (
+            <span
+              title={bitget ? "real fill on Bitget testnet (demo)" : "paper trade at the live price"}
+              className={`border px-1 py-0.5 font-mono text-[8px] font-bold uppercase tracking-[0.08em] ${
+                bitget ? "border-chartreuse/50 text-chartreuse" : "border-bone/25 text-steel"
+              }`}
+            >
+              {bitget ? "⚡ Bitget testnet" : "📄 paper"}
+            </span>
+          );
+        })()}
         <span className="hidden font-mono text-[8px] uppercase tracking-wide text-steel sm:inline">{t.tier}</span>
       </div>
       {/* entry -> exit */}

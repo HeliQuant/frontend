@@ -28,7 +28,7 @@ type Cred = {
 };
 
 const CREDS: Cred[] = [
-  { key: "ASSETS", label: "Assets", why: "what the floor analyzes, comma-separated, one rotated per cycle", group: "guards", secret: false, placeholder: "MNT,BTC,ETH,SOL,HYPE,SUI", defaultValue: "MNT,BTC,ETH,SOL,HYPE,SUI" },
+  { key: "ASSETS", label: "Assets", why: "what the floor analyzes, comma-separated, one rotated per cycle", group: "guards", secret: false, placeholder: "BTC,ETH,SOL,HYPE,SUI,XRP", defaultValue: "BTC,ETH,SOL,HYPE,SUI,XRP" },
   { key: "INTERVAL_MIN", label: "Cycle interval (min)", why: "minutes between org cycles — 30+ keeps a free Groq tier comfortable", group: "guards", secret: false, placeholder: "30", defaultValue: "30" },
   { key: "REFRESH_DATA", label: "Self-refresh data (0/1)", why: "1 = the engine re-fetches fresh market data each cycle", group: "guards", secret: false, placeholder: "1", defaultValue: "1" },
   // ── Bitget (execution) ──
