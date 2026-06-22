@@ -53,15 +53,20 @@ export default function TradeLedger() {
     };
   }, []);
 
-  const net = log?.net_usd ?? 0;
+  // the live Bitget basket — old MNT (and any non-basket) trades are dropped from the ledger + its stats
+  const BASKET = new Set(["BTC", "ETH", "SOL", "HYPE", "SUI", "XRP"]);
+  const trades = (log?.trades ?? []).filter((t) => BASKET.has((t.asset || "").toUpperCase()));
+  const wins = trades.filter((t) => (t.pnl_usd ?? 0) > 0).length;
+  const winPct = trades.length ? Math.round((wins / trades.length) * 1000) / 10 : 0;
+  const net = trades.reduce((s, t) => s + (t.pnl_usd ?? 0), 0);
 
   return (
     <div className="space-y-8">
       {/* summary blotter */}
       <div className="grid grid-cols-2 gap-px bg-bone/10 lg:grid-cols-4">
         {[
-          { k: "trades resolved", v: `${log?.count ?? 0}`, c: "text-bone" },
-          { k: "win rate", v: `${log?.win_pct ?? 0}%`, c: "text-bone" },
+          { k: "trades resolved", v: `${trades.length}`, c: "text-bone" },
+          { k: "win rate", v: `${winPct}%`, c: "text-bone" },
           { k: "net P&L (paper)", v: `${net >= 0 ? "+" : ""}$${net.toFixed(2)}`, c: net >= 0 ? "text-chartreuse" : "text-signal2" },
           { k: "open now", v: `${log?.open_now ?? 0}`, c: "text-bone" },
         ].map((s) => (
@@ -77,7 +82,7 @@ export default function TradeLedger() {
         <div className="border-2 border-bone/20 bg-carbon px-6 py-12 text-center font-mono text-xs uppercase tracking-[0.2em] text-steel">
           ledger unreachable — the firm runs on Railway; retrying every 20s
         </div>
-      ) : (log?.trades?.length ?? 0) === 0 ? (
+      ) : trades.length === 0 ? (
         <div className="border-2 border-bone/15 bg-carbon px-6 py-12 text-center font-mono text-xs uppercase tracking-[0.2em] text-steel">
           no resolved trades yet — the floor is still working its first positions
         </div>
@@ -92,7 +97,7 @@ export default function TradeLedger() {
             <span>exit · regime</span>
             <span>on-chain · age</span>
           </div>
-          {log!.trades.map((t, i) => (
+          {trades.map((t, i) => (
             <TradeRow key={t.id} t={t} delay={Math.min(i * 0.012, 0.3)} />
           ))}
         </div>
