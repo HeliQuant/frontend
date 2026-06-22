@@ -1,14 +1,14 @@
 "use client";
 
 /**
- * OrgLoop — "THE LOOP". HeliQuant's autonomous org cycle as a node manifold whose END feeds back into
- * its START. Telemetry fans to ALL 12 desks → they converge into the PM → the PM rules → on ENTER it
- * fills on Bitget + anchors on Mantle → the firm learns → the wire loops back. It self-cycles between a
- * real ABSTAIN read and a real ENTER (open-position) read, so the demo shows BOTH outcomes — the firm
- * opens trades (79 live Bitget-testnet fills) but mostly holds (no validated edge = discipline).
+ * OrgLoop — "THE LOOP". HeliQuant's full autonomous org cycle as a node graph whose END feeds back into
+ * its START through a real learning loop. STEWARD orchestrates → INGEST pulls telemetry → it fans to ALL
+ * 12 desks → they converge into the PM → RISK GATE sizes → VERDICT → (ENTER) EXECUTE on Bitget → ANCHOR
+ * on Mantle → EDGE-LAB learns + re-tunes → MEMORY stores → back to the STEWARD. Every connector carries a
+ * flowing data dot; the cycle self-alternates between a real ABSTAIN read and a real ENTER (open-position).
  *
- * Honest: 12 real desks, qualitative reads (no fabricated numbers); ENTER is an exploration/aligned
- * trade (real on the Bitget testnet), ABSTAIN is the default (registry empty by design).
+ * Honest: real components + 12 real desks; reads are qualitative (no fabricated numbers); ENTER is an
+ * aligned/exploration trade (real on the Bitget testnet), ABSTAIN is the default (registry empty by design).
  */
 
 import { useEffect, useState } from "react";
@@ -23,57 +23,76 @@ const C = {
 };
 
 type Vote = "abstain" | "skip" | "fade" | "neutral" | "long" | "confirm" | "lean";
-const voteColor = (v: Vote) =>
-  v === "long" || v === "confirm" || v === "lean" ? C.chart : v === "fade" ? C.signal2 : v === "neutral" ? C.bone : C.steel;
+const isUp = (v: Vote) => v === "long" || v === "confirm" || v === "lean";
+const voteColor = (v: Vote) => (isUp(v) ? C.chart : v === "fade" ? C.signal2 : v === "neutral" ? C.bone : C.steel);
 
 const DESK_NAMES = ["REGIME", "OI-CONTRARIAN", "SMART-MONEY", "ON-CHAIN", "MACRO · ALLORA", "SENTIMENT", "CARRY", "MANTLE-FUND", "TIMESFM · VOL", "MULTI-TF", "FLOW-INTEL", "WHALE"];
 
-// Two real outcomes the loop cycles through. reads[i] = [read, vote] for DESK_NAMES[i].
 const SCEN = [
   {
-    asset: "BTC", verdict: "ABSTAIN", dir: "", exec: false, pmSub: "no edge · holds",
+    asset: "BTC", verdict: "ABSTAIN", dir: "", exec: false, pmSub: "no edge · holds", riskSub: "no size",
     reads: [["choppy / no trend", "neutral"], ["no extreme", "abstain"], ["whales split", "abstain"], ["flows quiet", "abstain"],
       ["no signal", "abstain"], ["mixed", "abstain"], ["funding thin", "skip"], ["no catalyst", "abstain"],
       ["forecast flat", "abstain"], ["1h vs 1D opposed", "fade"], ["no FDR edge", "abstain"], ["no conviction", "abstain"]] as [string, Vote][],
   },
   {
-    asset: "HYPE", verdict: "ENTER", dir: "LONG", exec: true, pmSub: "trend + multi-TF · sized",
+    asset: "HYPE", verdict: "ENTER", dir: "LONG", exec: true, pmSub: "trend + multi-TF", riskSub: "¼-Kelly · 1.7×",
     reads: [["clean uptrend", "long"], ["no extreme", "abstain"], ["whales long", "long"], ["inflows", "lean"],
       ["bullish", "long"], ["positive", "lean"], ["funding ok", "skip"], ["n/a", "abstain"],
       ["vol expanding", "long"], ["1h·4h·1D aligned", "confirm"], ["no FDR edge", "abstain"], ["accumulating", "long"]] as [string, Vote][],
   },
 ];
 
-// ── geometry (viewBox 1280 × 760) ──
-const DW = 176, DH = 46;
-const COL_X = [360, 596];
-const ROW_Y = [70, 188, 306, 424, 542, 660];
-const deskPos = (i: number) => ({ cx: COL_X[i % 2], cy: ROW_Y[Math.floor(i / 2)] });
+// ── geometry (viewBox 1320 × 880) ──
+const DW = 176, DH = 42;
+const COL_X = [360, 600];
+const ROW_Y = [70, 168, 266, 364, 462, 560];
+const dpos = (i: number) => ({ cx: COL_X[i % 2], cy: ROW_Y[Math.floor(i / 2)] });
 
-const INGEST = { cx: 104, cy: 365, w: 116, h: 58 };
-const PM = { cx: 884, cy: 365, w: 132, h: 66 };
-const VERDICT = { cx: 1146, cy: 175, w: 118, h: 54 };
-const EXECUTE = { cx: 1146, cy: 365, w: 118, h: 54 };
-const ANCHOR = { cx: 1146, cy: 555, w: 118, h: 54 };
+const INGEST = { cx: 96, cy: 380, w: 128, h: 54, tag: "↯", label: "INGEST", sub: "live telemetry", color: C.bone };
+const PM = { cx: 884, cy: 330, w: 132, h: 64, tag: "⚖", label: "PM", color: C.chart };
+const VERDICT = { cx: 1146, cy: 120, w: 120, h: 52 };
+const RISK = { cx: 1146, cy: 272, w: 120, h: 52, tag: "⛨", label: "RISK GATE", color: C.bone };
+const EXECUTE = { cx: 1146, cy: 424, w: 120, h: 52 };
+const ANCHOR = { cx: 1146, cy: 576, w: 120, h: 52 };
+const LEARN = { cx: 884, cy: 808, w: 176, h: 56, tag: "↻", label: "EDGE-LAB", sub: "learn · re-tune registry", color: C.chart };
+const MEMORY = { cx: 470, cy: 808, w: 150, h: 56, tag: "❒", label: "MEMORY", sub: "recall · store", color: C.bone };
+// STEWARD sits on the bottom-left return lane (well below the desks), so the learning loop never crosses them.
+const STEWARD = { cx: 96, cy: 770, w: 128, h: 54, tag: "❖", label: "STEWARD", sub: "wakes the firm", color: C.bone };
 
-const curve = (x1: number, y1: number, x2: number, y2: number) => {
-  const mx = (x1 + x2) / 2;
-  return `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`;
-};
+const cH = (x1: number, y1: number, x2: number, y2: number) => { const m = (x1 + x2) / 2; return `M ${x1} ${y1} C ${m} ${y1}, ${m} ${y2}, ${x2} ${y2}`; };
+const cV = (x1: number, y1: number, x2: number, y2: number) => { const m = (y1 + y2) / 2; return `M ${x1} ${y1} C ${x1} ${m}, ${x2} ${m}, ${x2} ${y2}`; };
 
-const fanIn = DESK_NAMES.map((_, i) => { const p = deskPos(i); return curve(INGEST.cx + INGEST.w / 2, INGEST.cy, p.cx - DW / 2, p.cy); });
-const fanOut = DESK_NAMES.map((_, i) => { const p = deskPos(i); return curve(p.cx + DW / 2, p.cy, PM.cx - PM.w / 2, PM.cy); });
-const wPV = curve(PM.cx + PM.w / 2, PM.cy, VERDICT.cx, VERDICT.cy + VERDICT.h / 2);
-const wVE = `M ${VERDICT.cx} ${VERDICT.cy + VERDICT.h / 2} L ${EXECUTE.cx} ${EXECUTE.cy - EXECUTE.h / 2}`;
-const wEA = `M ${EXECUTE.cx} ${EXECUTE.cy + EXECUTE.h / 2} L ${ANCHOR.cx} ${ANCHOR.cy - ANCHOR.h / 2}`;
-const wReturn = `M ${ANCHOR.cx} ${ANCHOR.cy + ANCHOR.h / 2} C ${ANCHOR.cx} 720, ${INGEST.cx} 720, ${INGEST.cx} ${INGEST.cy + INGEST.h / 2}`;
+// edge set — EVERY connector gets a flowing dot
+const fanIn = DESK_NAMES.map((_, i) => cH(INGEST.cx + INGEST.w / 2, INGEST.cy, dpos(i).cx - DW / 2, dpos(i).cy));
+const fanOut = DESK_NAMES.map((_, i) => cH(dpos(i).cx + DW / 2, dpos(i).cy, PM.cx - PM.w / 2, PM.cy));
+const eSI = `M ${STEWARD.cx} ${STEWARD.cy - STEWARD.h / 2} L ${INGEST.cx} ${INGEST.cy + INGEST.h / 2}`;
+const ePV = cH(PM.cx + PM.w / 2, PM.cy, VERDICT.cx - VERDICT.w / 2, VERDICT.cy);
+const eVR = `M ${VERDICT.cx} ${VERDICT.cy + VERDICT.h / 2} L ${RISK.cx} ${RISK.cy - RISK.h / 2}`;
+const eRE = `M ${RISK.cx} ${RISK.cy + RISK.h / 2} L ${EXECUTE.cx} ${EXECUTE.cy - EXECUTE.h / 2}`;
+const eEA = `M ${EXECUTE.cx} ${EXECUTE.cy + EXECUTE.h / 2} L ${ANCHOR.cx} ${ANCHOR.cy - ANCHOR.h / 2}`;
+const eAL = cV(ANCHOR.cx, ANCHOR.cy + ANCHOR.h / 2, LEARN.cx + LEARN.w / 2, LEARN.cy);
+const eLM = `M ${LEARN.cx - LEARN.w / 2} ${LEARN.cy} L ${MEMORY.cx + MEMORY.w / 2} ${MEMORY.cy}`;
+const eMS = cH(MEMORY.cx - MEMORY.w / 2, MEMORY.cy, STEWARD.cx + STEWARD.w / 2, STEWARD.cy);
 
-function Dot({ path, color, dur, begin, r = 3 }: { path: string; color: string; dur: number; begin: number; r?: number }) {
+function Dot({ d, color, dur, begin, r = 3 }: { d: string; color: string; dur: number; begin: number; r?: number }) {
   return (
     <circle r={r} fill={color} opacity={0}>
-      <animateMotion dur={`${dur}s`} repeatCount="indefinite" path={path} begin={`${begin}s`} />
-      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.85;1" dur={`${dur}s`} repeatCount="indefinite" begin={`${begin}s`} />
+      <animateMotion dur={`${dur}s`} repeatCount="indefinite" path={d} begin={`${begin}s`} />
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.88;1" dur={`${dur}s`} repeatCount="indefinite" begin={`${begin}s`} />
     </circle>
+  );
+}
+
+function Box({ n, label, sub, tag, color, dim }: { n: { cx: number; cy: number; w: number; h: number }; label: string; sub: string; tag: string; color: string; dim?: boolean }) {
+  return (
+    <g opacity={dim ? 0.55 : 1}>
+      <rect x={n.cx - n.w / 2} y={n.cy - n.h / 2} width={n.w} height={n.h} rx={9} fill={C.carbon} stroke={color} strokeWidth={2} />
+      <circle cx={n.cx + n.w / 2 - 11} cy={n.cy - n.h / 2 + 11} r={3} fill={color}><animate attributeName="opacity" values="1;0.3;1" dur="1.7s" repeatCount="indefinite" /></circle>
+      <text x={n.cx - n.w / 2 + 13} y={n.cy + 1} fontSize={17} fill={color} style={{ fontFamily: "var(--font-mono, monospace)" }}>{tag}</text>
+      <text x={n.cx + 10} y={n.cy - 2} textAnchor="middle" fontSize={12} fontWeight={800} fill={C.bone} style={{ fontFamily: "var(--font-display, sans-serif)" }}>{label}</text>
+      <text x={n.cx + 10} y={n.cy + 13} textAnchor="middle" fontSize={8.5} fill={C.steel} style={{ fontFamily: "var(--font-mono, monospace)" }}>{sub}</text>
+    </g>
   );
 }
 
@@ -86,7 +105,6 @@ export default function OrgLoop() {
   const sc = SCEN[si];
   const entering = sc.verdict === "ENTER";
   const vColor = entering ? C.chart : C.bone;
-  const eColor = sc.exec ? C.bitget : C.steel;
 
   return (
     <section className="relative bg-pitch">
@@ -96,16 +114,15 @@ export default function OrgLoop() {
           <span className="text-bitget">▮</span> THE LOOP · IT RUNS ITSELF · 24/7
         </p>
         <h2 className="mt-4 font-display font-extrabold uppercase leading-[0.9] text-bone" style={{ fontSize: "clamp(2.2rem, 5vw, 3.8rem)" }}>
-          Twelve desks, one closed <span className="text-chartreuse">cycle</span>. No off switch.
+          A whole firm on one closed <span className="text-chartreuse">cycle</span>. No off switch.
         </h2>
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-bone/60">
-          Telemetry fans out to <span className="text-bone">all twelve desks</span>; they converge into the PM.
-          Most cycles it <span className="text-bone">holds</span> — no validated edge, no trade. When the desks
-          align, it <span className="text-chartreuse">ENTERs</span>, fills on <span className="text-bitget">Bitget</span>,
-          and anchors on Mantle — then learns and loops back.
+          A steward wakes the firm, telemetry fans to <span className="text-bone">all twelve desks</span>, the PM
+          rules, the risk gate sizes, a rare ENTER fills on <span className="text-bitget">Bitget</span> and anchors
+          on Mantle — then the <span className="text-chartreuse">edge-lab learns</span>, memory stores it, and the
+          wire loops back to the steward. End feeds start.
         </p>
 
-        {/* live cycle pill */}
         <div className="mt-6 inline-flex items-center gap-2 border-2 px-3 py-1.5" style={{ borderColor: entering ? C.chart : "rgba(242,239,230,0.25)" }}>
           <span className="h-2 w-2 rounded-full" style={{ background: entering ? C.chart : C.steel }} />
           <span className="font-mono text-[11px] uppercase tracking-[0.16em]" style={{ color: entering ? C.chart : C.steel }}>
@@ -115,90 +132,66 @@ export default function OrgLoop() {
 
         <div className="mt-6 overflow-hidden border-2 border-bone/20 bg-carbon">
           <div aria-hidden className="gr-carbon-dots" style={{ padding: 8 }}>
-            <svg viewBox="0 0 1280 760" className="w-full" preserveAspectRatio="xMidYMid meet" role="img" aria-label="HeliQuant autonomous org loop">
-              {/* manifold: fan-in + fan-out (thin + faint) */}
-              <g fill="none" stroke={C.bone} strokeWidth={0.85} opacity={0.16}>
+            <svg viewBox="0 0 1320 900" className="w-full" preserveAspectRatio="xMidYMid meet" role="img" aria-label="HeliQuant autonomous org loop">
+              {/* fan wires (faint manifold) */}
+              <g fill="none" stroke={C.bone} strokeWidth={0.8} opacity={0.14}>
                 {fanIn.map((d, i) => <path key={`i${i}`} d={d} />)}
                 {fanOut.map((d, i) => <path key={`o${i}`} d={d} />)}
               </g>
+              {/* pipeline + learning-loop wires */}
+              <path d={eSI} fill="none" stroke={C.bone} strokeWidth={1.8} opacity={0.5} />
+              <path d={ePV} fill="none" stroke={C.chart} strokeWidth={2} opacity={0.5} />
+              <path d={eVR} fill="none" stroke={C.bone} strokeWidth={1.8} opacity={0.5} />
+              <path d={eRE} fill="none" stroke={C.bitget} strokeWidth={2} opacity={sc.exec ? 0.7 : 0.2} />
+              <path d={eEA} fill="none" stroke={C.bitget} strokeWidth={2} opacity={sc.exec ? 0.7 : 0.2} />
+              <path d={eAL} fill="none" stroke={C.chart} strokeWidth={1.6} strokeDasharray="7 7" opacity={0.6} />
+              <path d={eLM} fill="none" stroke={C.chart} strokeWidth={1.6} strokeDasharray="7 7" opacity={0.6} />
+              <path d={eMS} fill="none" stroke={C.chart} strokeWidth={1.6} strokeDasharray="7 7" opacity={0.6} />
 
-              {/* pipeline wires (EXECUTE/ANCHOR brighten on ENTER) */}
-              <path d={wPV} fill="none" stroke={C.chart} strokeWidth={2} opacity={0.5} />
-              <path d={wVE} fill="none" stroke={C.bitget} strokeWidth={2} opacity={sc.exec ? 0.7 : 0.18} />
-              <path d={wEA} fill="none" stroke={C.bitget} strokeWidth={2} opacity={sc.exec ? 0.7 : 0.18} />
-              <path d={wReturn} fill="none" stroke={C.chart} strokeWidth={1.5} strokeDasharray="7 7" opacity={0.65} />
-
-              {/* flowing dots */}
-              {[0, 4, 7, 11].map((i, k) => <Dot key={`di${i}`} path={fanIn[i]} color={C.steel} dur={2.4} begin={k * 0.4} r={2.5} />)}
-              {[1, 5, 9].map((i, k) => <Dot key={`do${i}`} path={fanOut[i]} color={C.bone} dur={2.4} begin={1 + k * 0.4} r={2.5} />)}
-              <Dot path={wPV} color={C.chart} dur={1.6} begin={0} />
-              {sc.exec && <Dot path={wVE} color={C.bitget} dur={1.3} begin={0.4} />}
-              {sc.exec && <Dot path={wEA} color={C.bitget} dur={1.3} begin={0.9} />}
-              <Dot path={wReturn} color={C.chart} dur={3} begin={0} r={3.5} />
-
-              <text x={640} y={714} textAnchor="middle" fontSize={12} fontWeight={700} fill={C.chart} letterSpacing="2" style={{ fontFamily: "var(--font-mono, monospace)" }}>
-                LEARN → RE-TUNE → THE LOOP NEVER STOPS
-              </text>
+              {/* flowing dots — EVERY connector */}
+              {fanIn.map((d, i) => <Dot key={`fi${i}`} d={d} color={C.steel} dur={2.6} begin={(i % 6) * 0.32} r={2.3} />)}
+              {fanOut.map((d, i) => <Dot key={`fo${i}`} d={d} color={isUp(sc.reads[i][1]) ? C.chart : C.bone} dur={2.6} begin={1.1 + (i % 6) * 0.32} r={2.3} />)}
+              <Dot d={eSI} color={C.bone} dur={1.5} begin={0} />
+              <Dot d={ePV} color={C.chart} dur={1.6} begin={0.3} />
+              <Dot d={eVR} color={C.bone} dur={1.4} begin={0.6} />
+              <Dot d={eRE} color={C.bitget} dur={1.4} begin={0.9} />
+              <Dot d={eEA} color={C.bitget} dur={1.4} begin={1.2} />
+              <Dot d={eAL} color={C.chart} dur={1.8} begin={0} r={3.4} />
+              <Dot d={eLM} color={C.chart} dur={1.6} begin={0.6} r={3.4} />
+              <Dot d={eMS} color={C.chart} dur={2.4} begin={1.2} r={3.4} />
 
               {/* 12 desk nodes */}
               {DESK_NAMES.map((name, i) => {
-                const p = deskPos(i);
+                const p = dpos(i);
                 const [read, vote] = sc.reads[i];
                 const vc = voteColor(vote);
                 return (
                   <g key={name}>
-                    <rect x={p.cx - DW / 2} y={p.cy - DH / 2} width={DW} height={DH} rx={7} fill={C.carbon} stroke={vote === "long" || vote === "confirm" || vote === "lean" ? C.chart : C.bone} strokeWidth={1.25} opacity={vote === "long" || vote === "confirm" || vote === "lean" ? 1 : 0.9} />
-                    <circle cx={p.cx - DW / 2 + 11} cy={p.cy} r={3} fill={vc}>
-                      <animate attributeName="opacity" values="1;0.25;1" dur="1.8s" repeatCount="indefinite" begin={`${(i % 6) * 0.25}s`} />
-                    </circle>
-                    <text x={p.cx - DW / 2 + 22} y={p.cy - 3} fontSize={11} fontWeight={700} fill={C.bone} style={{ fontFamily: "var(--font-mono, monospace)" }}>{name}</text>
-                    <text x={p.cx - DW / 2 + 22} y={p.cy + 12} fontSize={9} fill={C.steel} style={{ fontFamily: "var(--font-mono, monospace)" }}>{read}</text>
-                    <text x={p.cx + DW / 2 - 10} y={p.cy + 4} textAnchor="end" fontSize={8} fontWeight={700} fill={vc} style={{ fontFamily: "var(--font-mono, monospace)" }}>{vote.toUpperCase()}</text>
+                    <rect x={p.cx - DW / 2} y={p.cy - DH / 2} width={DW} height={DH} rx={7} fill={C.carbon} stroke={isUp(vote) ? C.chart : C.bone} strokeWidth={1.25} opacity={isUp(vote) ? 1 : 0.9} />
+                    <circle cx={p.cx - DW / 2 + 11} cy={p.cy} r={3} fill={vc}><animate attributeName="opacity" values="1;0.25;1" dur="1.8s" repeatCount="indefinite" begin={`${(i % 6) * 0.25}s`} /></circle>
+                    <text x={p.cx - DW / 2 + 22} y={p.cy - 3} fontSize={10.5} fontWeight={700} fill={C.bone} style={{ fontFamily: "var(--font-mono, monospace)" }}>{name}</text>
+                    <text x={p.cx - DW / 2 + 22} y={p.cy + 11} fontSize={8.5} fill={C.steel} style={{ fontFamily: "var(--font-mono, monospace)" }}>{read}</text>
+                    <text x={p.cx + DW / 2 - 9} y={p.cy + 3} textAnchor="end" fontSize={7.5} fontWeight={700} fill={vc} style={{ fontFamily: "var(--font-mono, monospace)" }}>{vote.toUpperCase()}</text>
                   </g>
                 );
               })}
 
-              {/* INGEST */}
-              <g>
-                <rect x={INGEST.cx - INGEST.w / 2} y={INGEST.cy - INGEST.h / 2} width={INGEST.w} height={INGEST.h} rx={9} fill={C.carbon} stroke={C.bone} strokeWidth={2} />
-                <text x={INGEST.cx - INGEST.w / 2 + 12} y={INGEST.cy + 1} fontSize={18} fill={C.bone} style={{ fontFamily: "var(--font-mono, monospace)" }}>↯</text>
-                <text x={INGEST.cx + 8} y={INGEST.cy - 2} textAnchor="middle" fontSize={13} fontWeight={800} fill={C.bone} style={{ fontFamily: "var(--font-display, sans-serif)" }}>INGEST</text>
-                <text x={INGEST.cx + 8} y={INGEST.cy + 14} textAnchor="middle" fontSize={9} fill={C.steel} style={{ fontFamily: "var(--font-mono, monospace)" }}>telemetry</text>
-              </g>
-              {/* PM */}
-              <g>
-                <rect x={PM.cx - PM.w / 2} y={PM.cy - PM.h / 2} width={PM.w} height={PM.h} rx={9} fill={C.carbon} stroke={C.chart} strokeWidth={2} />
-                <text x={PM.cx - PM.w / 2 + 14} y={PM.cy + 1} fontSize={18} fill={C.chart} style={{ fontFamily: "var(--font-mono, monospace)" }}>⚖</text>
-                <text x={PM.cx + 10} y={PM.cy - 2} textAnchor="middle" fontSize={13} fontWeight={800} fill={C.bone} style={{ fontFamily: "var(--font-display, sans-serif)" }}>PM</text>
-                <text x={PM.cx + 10} y={PM.cy + 14} textAnchor="middle" fontSize={9} fill={C.steel} style={{ fontFamily: "var(--font-mono, monospace)" }}>{sc.pmSub}</text>
-              </g>
-              {/* VERDICT (dynamic) */}
-              <g>
-                <rect x={VERDICT.cx - VERDICT.w / 2} y={VERDICT.cy - VERDICT.h / 2} width={VERDICT.w} height={VERDICT.h} rx={9} fill={C.carbon} stroke={vColor} strokeWidth={2} />
-                <text x={VERDICT.cx} y={VERDICT.cy - 1} textAnchor="middle" fontSize={16} fontWeight={800} fill={vColor} style={{ fontFamily: "var(--font-display, sans-serif)" }}>{sc.verdict}</text>
-                <text x={VERDICT.cx} y={VERDICT.cy + 15} textAnchor="middle" fontSize={9} fill={C.steel} style={{ fontFamily: "var(--font-mono, monospace)" }}>{entering ? sc.dir : "PM holds"}</text>
-              </g>
-              {/* EXECUTE (active on ENTER) */}
-              <g opacity={sc.exec ? 1 : 0.5}>
-                <rect x={EXECUTE.cx - EXECUTE.w / 2} y={EXECUTE.cy - EXECUTE.h / 2} width={EXECUTE.w} height={EXECUTE.h} rx={9} fill={C.carbon} stroke={eColor} strokeWidth={2} />
-                {sc.exec && <circle cx={EXECUTE.cx + EXECUTE.w / 2 - 12} cy={EXECUTE.cy - EXECUTE.h / 2 + 12} r={3.5} fill={C.bitget}><animate attributeName="opacity" values="1;0.3;1" dur="1.1s" repeatCount="indefinite" /></circle>}
-                <text x={EXECUTE.cx - EXECUTE.w / 2 + 14} y={EXECUTE.cy + 1} fontSize={18} fill={eColor} style={{ fontFamily: "var(--font-mono, monospace)" }}>⚡</text>
-                <text x={EXECUTE.cx + 10} y={EXECUTE.cy - 2} textAnchor="middle" fontSize={13} fontWeight={800} fill={C.bone} style={{ fontFamily: "var(--font-display, sans-serif)" }}>EXECUTE</text>
-                <text x={EXECUTE.cx + 10} y={EXECUTE.cy + 14} textAnchor="middle" fontSize={9} fill={C.steel} style={{ fontFamily: "var(--font-mono, monospace)" }}>{sc.exec ? "fills on Bitget" : "idle — no ENTER"}</text>
-              </g>
-              {/* ANCHOR */}
-              <g opacity={sc.exec ? 1 : 0.6}>
-                <rect x={ANCHOR.cx - ANCHOR.w / 2} y={ANCHOR.cy - ANCHOR.h / 2} width={ANCHOR.w} height={ANCHOR.h} rx={9} fill={C.carbon} stroke={C.bitget} strokeWidth={2} />
-                <text x={ANCHOR.cx - ANCHOR.w / 2 + 14} y={ANCHOR.cy + 1} fontSize={16} fill={C.bitget} style={{ fontFamily: "var(--font-mono, monospace)" }}>⛓</text>
-                <text x={ANCHOR.cx + 10} y={ANCHOR.cy - 2} textAnchor="middle" fontSize={13} fontWeight={800} fill={C.bone} style={{ fontFamily: "var(--font-display, sans-serif)" }}>ANCHOR</text>
-                <text x={ANCHOR.cx + 10} y={ANCHOR.cy + 14} textAnchor="middle" fontSize={9} fill={C.steel} style={{ fontFamily: "var(--font-mono, monospace)" }}>sealed on Mantle</text>
-              </g>
+              {/* orchestration + decision + learning nodes */}
+              <Box n={STEWARD} label={STEWARD.label} sub={STEWARD.sub} tag={STEWARD.tag} color={STEWARD.color} />
+              <Box n={INGEST} label={INGEST.label} sub={INGEST.sub} tag={INGEST.tag} color={INGEST.color} />
+              <Box n={PM} label={PM.label} sub={sc.pmSub} tag={PM.tag} color={PM.color} />
+              <Box n={{ ...VERDICT }} label={sc.verdict} sub={entering ? sc.dir : "PM holds"} tag="◆" color={vColor} />
+              <Box n={RISK} label={RISK.label} sub={sc.riskSub} tag={RISK.tag} color={RISK.color} dim={!entering} />
+              <Box n={{ ...EXECUTE }} label="EXECUTE" sub={sc.exec ? "fills on Bitget" : "idle — no ENTER"} tag="⚡" color={sc.exec ? C.bitget : C.steel} dim={!entering} />
+              <Box n={{ ...ANCHOR }} label="ANCHOR" sub="sealed on Mantle" tag="⛓" color={C.bitget} dim={!entering} />
+              <Box n={LEARN} label={LEARN.label} sub={LEARN.sub} tag={LEARN.tag} color={LEARN.color} />
+              <Box n={MEMORY} label={MEMORY.label} sub={MEMORY.sub} tag={MEMORY.tag} color={MEMORY.color} />
             </svg>
           </div>
         </div>
 
         <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.16em] text-steel/70">
-          the real 12-desk cycle, self-running · ENTER fills on the Bitget testnet (79 live) · mostly ABSTAINs — discipline, on a loop
+          the real firm, self-running · steward → 12 desks → PM → risk → Bitget → Mantle → edge-lab learns → memory → loop · mostly ABSTAINs (discipline)
         </p>
       </div>
     </section>
