@@ -77,7 +77,15 @@ export type Capital = {
   equity_usd: number;
   roi_pct: number;
   basis: string;
-  bitget_saldo?: { available_usd: number; equity_usd: number; demo: boolean };
+  bitget_saldo?: {
+    available_usd: number;
+    equity_usd: number;
+    baseline_usd?: number;
+    realized_pnl_usd?: number;
+    unrealized_pnl_usd?: number;
+    roi_pct?: number;
+    demo: boolean;
+  };
 };
 
 export async function fetchCampaign(base?: string): Promise<CampaignStatus | null> {

@@ -189,20 +189,33 @@ export default function CampaignView({ base, mode }: { base?: string; mode: "own
                     <p className="font-display text-sm font-bold uppercase tracking-wide" style={{ color: bg ? "var(--color-chartreuse)" : "rgba(242,239,230,0.4)" }}>⚡ Bitget testnet</p>
                     <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-steel">real demo fills · no real funds</p>
                   </div>
-                  {bg ? (
-                    <div className="grid grid-cols-2 gap-px bg-bone/10">
+                  {bg ? (() => {
+                    const bRoi = bg.roi_pct ?? 0;
+                    const bReal = bg.realized_pnl_usd ?? 0;
+                    const bUnreal = bg.unrealized_pnl_usd ?? 0;
+                    const bRoiUp = bRoi >= 0;
+                    return (
+                    <div className="grid grid-cols-3 gap-px bg-bone/10">
                       <div className="bg-carbon p-4">
                         <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-steel">balance</p>
                         <p className="mt-1 font-display text-3xl font-extrabold leading-none text-chartreuse">{usd(bg.equity_usd)}</p>
-                        <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.12em] text-steel">SUSDT demo equity</p>
+                        <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.12em] text-steel">
+                          avail {usd(bg.available_usd)}{bg.baseline_usd ? ` · base ${usd(bg.baseline_usd)}` : ""}
+                        </p>
                       </div>
                       <div className="bg-carbon p-4">
-                        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-steel">available</p>
-                        <p className="mt-1 font-display text-3xl font-extrabold leading-none text-bone">{usd(bg.available_usd)}</p>
-                        <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.12em] text-steel">BTC / ETH / XRP</p>
+                        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-steel">ROI</p>
+                        <p className="mt-1 font-display text-3xl font-extrabold leading-none" style={{ color: bRoiUp ? "var(--color-chartreuse)" : "var(--color-signal2)" }}>{bRoiUp ? "+" : ""}{bRoi.toFixed(2)}%</p>
+                        <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.12em] text-steel">since baseline</p>
+                      </div>
+                      <div className="bg-carbon p-4">
+                        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-steel">P&amp;L</p>
+                        <p className="mt-1.5 font-mono text-[13px] text-bone/85">{bReal >= 0 ? "+" : "−"}${Math.abs(bReal).toFixed(2)} <span className="text-[9px] text-steel">real</span></p>
+                        <p className="mt-1 font-mono text-[13px] text-bone/85">{bUnreal >= 0 ? "+" : "−"}${Math.abs(bUnreal).toFixed(2)} <span className="text-[9px] text-steel">unreal</span></p>
                       </div>
                     </div>
-                  ) : (
+                    );
+                  })() : (
                     <div className="px-5 py-7">
                       <p className="font-display text-2xl font-extrabold uppercase leading-none text-bone/40">not armed</p>
                       <p className="mt-2 font-mono text-[10px] uppercase leading-relaxed tracking-[0.12em] text-steel/80">set BITGET_EXECUTE=1 + keys on the engine to trade Bitget testnet — the real demo saldo shows here.</p>
