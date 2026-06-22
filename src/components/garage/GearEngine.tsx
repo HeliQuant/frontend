@@ -22,15 +22,15 @@ const CHART = "#c9f24b";
 // ── meshed geometry ──
 // Teeth (pitch) radius = (size/2) * (45/50)  — the r=45 teeth circle in a 100-box SVG.
 const PM_SIZE = 210; // PM pitch radius ≈ 94.5
-const DESK_SIZE = 106; // desk pitch radius ≈ 47.7
-const RING = 141; // ≈ 94.5 + 47.7 − 1 (one tooth of overlap = visibly interlocked)
+const DESK_SIZE = 64; // smaller cogs so all TWELVE mesh the PM without colliding (pitch radius ≈ 28.8)
+const RING = 122; // ≈ 94.5 + 28.8 − 1 (one tooth of overlap = visibly interlocked)
 const PM_SPEED = 44; // s/rev
-const DESK_SPEED = PM_SPEED * ((DESK_SIZE / 2) * 0.9) / ((PM_SIZE / 2) * 0.9); // real ratio ≈ 22.2
+const DESK_SPEED = PM_SPEED * ((DESK_SIZE / 2) * 0.9) / ((PM_SIZE / 2) * 0.9); // real ratio
 
-// the CURRENT nine-desk floor, evenly meshed around the PM (40° pitch, from the top)
-const DESKS = ["REGIME", "MACRO", "ON-CHAIN", "SMART-$", "RSRCH", "OI", "FLOW", "WHALE", "MANTLE"].map(
+// the CURRENT twelve-desk floor, evenly meshed around the PM (30° pitch, from the top)
+const DESKS = ["REGIME", "OI", "SMART-$", "ON-CHAIN", "ALLORA", "SENTMNT", "CARRY", "MANTLE", "TIMESFM", "MULTI-TF", "FLOW", "WHALE"].map(
   (label, i) => {
-    const a = ((-90 + i * 40) * Math.PI) / 180;
+    const a = ((-90 + i * 30) * Math.PI) / 180;
     return { label, x: Math.cos(a) * RING, y: Math.sin(a) * RING, ux: Math.cos(a), uy: Math.sin(a) };
   }
 );
@@ -170,7 +170,7 @@ export default function GearEngine() {
             meshed geometry (ring = sum of pitch radii) stays exact at every breakpoint */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 scale-[1.06] sm:scale-[1.38] lg:scale-[1.58]">
           <div className="relative" style={{ width: 560, height: 560 }}>
-            {/* center PM gear — driven by the nine desks, counter-rotating (the decider) */}
+            {/* center PM gear — driven by the twelve desks, counter-rotating (the decider) */}
             <motion.div
               className="absolute left-1/2 top-1/2"
               initial={reduced ? false : { opacity: 0, scale: 0.55 }}
@@ -181,7 +181,7 @@ export default function GearEngine() {
               <Gear label="PM" size={PM_SIZE} isCenter reverse={false} speed={PM_SPEED} />
             </motion.div>
 
-            {/* nine desk gears — teeth ON the PM's teeth, all driving the same direction */}
+            {/* twelve desk gears — teeth ON the PM's teeth, all driving the same direction */}
             {DESKS.map((d, i) => (
               <motion.div
                 key={d.label}

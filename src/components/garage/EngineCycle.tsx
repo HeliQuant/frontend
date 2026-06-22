@@ -160,7 +160,7 @@ export default function EngineCycle() {
           <div className="flex flex-wrap items-center gap-3 border-t-2 border-bone/15 px-5 py-3.5">
             <span className="gr-spark inline-block h-2.5 w-2.5 bg-chartreuse" />
             <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-bone/80">
-              latest cycle · MNT — <span className="text-bone">ABSTAIN</span> · sealed
+              latest cycle · BTC — <span className="text-bone">ABSTAIN</span> · sealed
             </span>
             <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-steel">
               (the firm holds until the dyno passes an edge)

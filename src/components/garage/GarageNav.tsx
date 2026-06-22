@@ -21,14 +21,23 @@ export default function GarageNav() {
   return (
     <header className="sticky top-0 z-50 border-b-2 border-bone/15 bg-pitch/85 backdrop-blur-md">
       <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-3 sm:px-10 xl:px-4">
-        <a href="#top" className="flex items-center gap-3">
-          <span className="gr-shadow-bone grid h-10 w-10 place-items-center border-2 border-pitch bg-bone p-1">
-            <Image src="/brand/logo.png" alt="HeliQuant rotor mark" width={32} height={33} priority />
+        <div className="flex items-center gap-3">
+          <a href="#top" className="flex items-center gap-3">
+            <span className="gr-shadow-bone grid h-10 w-10 place-items-center border-2 border-pitch bg-bone p-1">
+              <Image src="/brand/logo.png" alt="HeliQuant rotor mark" width={32} height={33} priority />
+            </span>
+            <span className="font-display text-2xl font-extrabold uppercase tracking-wide text-bone">
+              Heli<span className="text-chartreuse">Quant</span>
+            </span>
+          </a>
+          <span
+            title="HeliQuant executes its trades on the Bitget testnet"
+            className="hidden items-center gap-1.5 border border-bitget/45 py-0.5 pl-0.5 pr-2 lg:inline-flex"
+          >
+            <Image src="/brand/bitget.jpg" alt="Bitget" width={18} height={18} />
+            <span className="font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-bitget">on Bitget</span>
           </span>
-          <span className="font-display text-2xl font-extrabold uppercase tracking-wide text-bone">
-            Heli<span className="text-chartreuse">Quant</span>
-          </span>
-        </a>
+        </div>
 
         <nav className="hidden items-center gap-7 md:flex">
           {LINKS.map((l) => (

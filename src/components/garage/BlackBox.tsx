@@ -24,9 +24,9 @@ const ANCHOR = {
 
 // documented fallback rows (real, from the lab books) — used only if the live feed is empty
 const FALLBACK: Array<Pick<Decision, "ts" | "ticker" | "decision" | "direction">> = [
-  { ts: "2026-06-10", ticker: "MNT", decision: "ABSTAIN", direction: "NONE" },
+  { ts: "2026-06-10", ticker: "ETH", decision: "ABSTAIN", direction: "NONE" },
   { ts: "2026-06-09", ticker: "BTC", decision: "ABSTAIN", direction: "NONE" },
-  { ts: "2026-06-09", ticker: "MNT", decision: "ABSTAIN", direction: "NONE" },
+  { ts: "2026-06-09", ticker: "XRP", decision: "ABSTAIN", direction: "NONE" },
 ];
 
 function stanceColor(d: string) {
