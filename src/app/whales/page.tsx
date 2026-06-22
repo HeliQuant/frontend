@@ -15,6 +15,7 @@ import path from "path";
 
 import AppNav from "@/components/garage/AppNav";
 import HlWhaleTower from "@/components/garage/HlWhaleTower";
+import BitgetCrowd from "@/components/garage/BitgetCrowd";
 
 interface WhaleProfile {
   address: string;
@@ -103,10 +104,16 @@ export default async function WhalesPage() {
             </p>
           </div>
 
-          {/* ═══════════ PRIMARY · LIVE HYPERLIQUID GRID ═══════════ */}
+          {/* ═══════════ PRIMARY · LIVE HYPERLIQUID GRID (smart money) ═══════════ */}
           <div className="mt-12 max-w-4xl">
             <HlWhaleTower />
           </div>
+        </section>
+
+        {/* hazard seam → THE CROWD (live Bitget aggregate positioning) */}
+        <div aria-hidden className="gr-hazard mt-16 h-[12px] opacity-80" />
+        <section className="relative z-10 mx-auto max-w-[1280px] px-6 pt-12 sm:px-10 xl:px-4">
+          <BitgetCrowd />
         </section>
 
         {/* hazard seam → secondary, demoted Mantle DEX snapshot */}
@@ -116,7 +123,7 @@ export default async function WhalesPage() {
           <div className="max-w-4xl">
             <div className="mb-5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 border-b-2 border-bone/15 pb-3">
               <div className="flex items-baseline gap-4">
-                <span className="font-display text-4xl font-extrabold leading-none text-bone/15">02</span>
+                <span className="font-display text-4xl font-extrabold leading-none text-bone/15">03</span>
                 <div>
                   <h2 className="font-display text-xl font-extrabold uppercase tracking-wide text-bone/80">
                     Mantle DEX flow · snapshot

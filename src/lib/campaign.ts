@@ -98,6 +98,25 @@ export async function fetchCampaign(base?: string): Promise<CampaignStatus | nul
   }
 }
 
+// ── Bitget aggregate crowd positioning (the crowd, vs the Hyperliquid smart-money whales) ──
+export type BitgetCrowdAsset = {
+  asset: string; symbol: string;
+  long_acct_pct: number | null; short_acct_pct: number | null;
+  long_pos_pct: number | null; short_pos_pct: number | null;
+  open_interest: number | null;
+};
+export type BitgetCrowd = { asof: string; source: string; assets: BitgetCrowdAsset[] };
+
+export async function fetchBitgetCrowd(base?: string): Promise<BitgetCrowd | null> {
+  try {
+    const r = await fetch(`${base || getEngineUrl()}/bitget-crowd?cb=${Date.now()}`, { cache: "no-store" });
+    if (!r.ok) return null;
+    return (await r.json()) as BitgetCrowd;
+  } catch {
+    return null;
+  }
+}
+
 // ── strategic learning layers (for the Tuning Bay) ──
 export type DeskWeights = {
   desks: string[];
