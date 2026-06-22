@@ -3,7 +3,7 @@
 /**
  * TradeLedger — THE LEDGER. Every RESOLVED trade HeliQuant has made, with its full data: direction,
  * entry→exit, net%, PnL$, exit reason, the regime it opened in, and the desk-votes that justified it.
- * Reads /trades live. Honest: these are paper trades at live prices (real fills on Bybit testnet when
+ * Reads /trades live. Honest: these are paper trades at live prices (real fills on Bitget testnet when
  * armed); the DECISIONS are what get sealed on-chain (see the anchor strip below).
  */
 
@@ -100,7 +100,7 @@ export default function TradeLedger() {
 
       <p className="border-l-2 border-chartreuse bg-carbon px-5 py-3 font-mono text-[10px] uppercase leading-relaxed tracking-[0.16em] text-bone/70">
         honest scope — these are <span className="text-bone">paper trades at live prices</span> (real fills route
-        to Bybit testnet when armed). real capital still needs a validated edge. every resolved trade&apos;s
+        to Bitget testnet when armed). real capital still needs a validated edge. every resolved trade&apos;s
         outcome is <span className="text-chartreuse">sealed on Mantle</span> — tap any tx to verify on Mantlescan.
       </p>
     </div>

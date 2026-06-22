@@ -42,7 +42,7 @@ const HISTORY = [
   { date: "2026-06-02", event: `first decision anchored on Mantle — block ${FIRST_ANCHOR.block.toLocaleString("en-US")} (ABSTAIN, sealed)` },
   { date: "2026-06-02", event: "OI-contrarian edge validated +28.9% OOS — licensed to trade" },
   { date: "2026-06-02", event: "mETH/ETH +96% backtest crash-tested → REJECTED (−73 bps slippage)" },
-  { date: "2026-06-07", event: "execution proven — 100/100 live spot round-trips filled on Bybit" },
+  { date: "2026-06-07", event: "execution proven — 100/100 live spot round-trips filled on exchange testnet" },
   { date: "2026-06-07", event: "the validated edge DECAYED on fresh data → retired; registry now empty" },
   { date: "2026-06-08", event: "always-on cloud floor live on Railway — cycles self-driving, state persisted" },
 ];

@@ -26,7 +26,7 @@ const PARTS: Array<{
   {
     no: "HQ-003",
     name: "THE EXECUTOR",
-    desc: "Bybit spot rails — 100/100 live fills proven · Kelly-capped tickets",
+    desc: "Bitget testnet rails — real demo fills · Kelly-capped tickets",
   },
   {
     no: "HQ-004",

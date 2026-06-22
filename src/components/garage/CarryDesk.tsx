@@ -6,7 +6,7 @@
  * (long spot + short perp, market-neutral, predicts nothing; it harvests the funding the perp pays).
  *
  * Honest by construction: the validated rates are a DATED walk-forward result (scripts/79, 2026-06-07);
- * the live rates are read from real Bybit funding via /carry. The firm HARVESTS only when carry is rich
+ * the live rates are read from real Bitget funding via /carry. The firm HARVESTS only when carry is rich
  * (> risk-free) AND crash-robust — otherwise it SKIPS. Right now funding is thin, so it waits. The edge
  * is real; the discipline is taking it only when it pays.
  */
@@ -159,7 +159,7 @@ export default function CarryDesk() {
           <span className="font-display text-4xl font-extrabold leading-none text-bone/15">02</span>
           <div>
             <h2 className="font-display text-xl font-extrabold uppercase tracking-wide text-bone">Live carry — right now</h2>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-steel">read from real Bybit funding · {reached === false ? "desk unreachable, retrying" : asofLabel(c?.asof)}</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-steel">read from real Bitget funding · {reached === false ? "desk unreachable, retrying" : asofLabel(c?.asof)}</p>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-px bg-bone/10 lg:grid-cols-3">

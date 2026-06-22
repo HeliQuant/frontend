@@ -4,7 +4,7 @@
  * THE ENGINE CYCLE — the org's decision loop as a 4-stroke engine (Night Garage §6.2).
  *
  * One firm cycle IS a 4-stroke cycle:
- *   INTAKE      desks pull market telemetry (Hyperliquid, Bybit, DeFiLlama, whales, Allora…)
+ *   INTAKE      desks pull market telemetry (Bitget, Hyperliquid, DeFiLlama, whales, Allora…)
  *   COMPRESSION the bull-vs-bear debate compresses nine stances into one read
  *   COMBUSTION  the PM decision — ENTER fires the chartreuse spark; with no validated edge
  *               there is NO SPARK and the gearbox holds N (today's honest state)

@@ -37,7 +37,6 @@ const CREDS: Cred[] = [
   { key: "BITGET_PASSPHRASE", label: "Bitget passphrase", why: "the passphrase you set on the Bitget API key", group: "fuel", secret: true, placeholder: "optional" },
   { key: "BITGET_DEMO", label: "Bitget demo (0/1)", why: "1 = demo (no real funds, safe). 0 = mainnet — eyes open", group: "fuel", secret: false, placeholder: "1", defaultValue: "1" },
   { key: "BITGET_EXECUTE", label: "Bitget execute (0/1)", why: "1 = place real Bitget orders. 0 = paper", group: "fuel", secret: false, placeholder: "0", defaultValue: "0" },
-  { key: "HQ_DUAL_VENUE", label: "Dual venue (0/1)", why: "1 = a LONG opens on Bybit testnet + Bitget; SHORT on Bitget; else paper-for-learning", group: "fuel", secret: false, placeholder: "0", defaultValue: "0" },
   // ── optional power-ups ──
   { key: "DEPLOYER_PRIVATE_KEY", label: "Mantle wallet private key", why: "anchors decisions on-chain — testnet wallet only, never your main", group: "fuel", secret: true, placeholder: "optional — testnet only" },
   { key: "ALLORA_API_KEY", label: "Allora API key", why: "Macro desk — decentralized-AI 8h BTC/ETH prediction (degrades gracefully)", group: "fuel", secret: true, placeholder: "optional" },
