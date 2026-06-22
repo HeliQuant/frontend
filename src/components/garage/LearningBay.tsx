@@ -100,12 +100,16 @@ export default function LearningBay() {
     };
   }, []);
 
-  const cells = useMemo(() => (camp?.learned?.records ?? []).map(parseCond).sort((a, b) => a.pnl - b.pnl), [camp]);
+  // the firm's live Bitget basket — the lab tests these; non-basket leftovers from old runs are hidden
+  const BASKET = useMemo(() => new Set(["BTC", "ETH", "SOL", "HYPE", "SUI", "XRP"]), []);
+  const inBasket = (a?: string) => !a || BASKET.has(a.toUpperCase());
+
+  const cells = useMemo(() => (camp?.learned?.records ?? []).map(parseCond).filter((c) => inBasket(c.asset)).sort((a, b) => a.pnl - b.pnl), [camp]); // eslint-disable-line react-hooks/exhaustive-deps
   const cooling = useMemo(() => Object.entries(camp?.last_scan ?? {}).filter(([, v]) => v.startsWith("cooldown")), [camp]);
   const skips = camp?.recent_skips ?? [];
   const worstPnl = Math.min(-1, ...cells.map((c) => c.pnl));
 
-  const candidates = useMemo<EdgeRec[]>(() => Object.values(edges?.candidate ?? {}), [edges]);
+  const candidates = useMemo<EdgeRec[]>(() => Object.values(edges?.candidate ?? {}).filter((e) => inBasket(e.asset)), [edges]); // eslint-disable-line react-hooks/exhaustive-deps
   const validatedN = Object.keys(edges?.validated ?? {}).length;
   const lastRun = runDate(edges?.last_run);
   const [lo, hi] = desks?.bounds ?? [0.6, 1.4];
