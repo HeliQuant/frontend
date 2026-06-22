@@ -153,76 +153,59 @@ export default function CampaignView({ base, mode }: { base?: string; mode: "own
           {/* ⚡ BITGET EXECUTION CONSOLE — the venue made unmissable (teal = Bitget integration) */}
           <BitgetConsole data={data} />
 
-          {/* ── CAPITAL · paper accounting vs Bitget testnet (clearly separated) ── */}
+          {/* ── CAPITAL · the BIG question answered: how much profit, paper vs Bitget testnet ── */}
           {data?.capital && (() => {
             const c = data.capital;
-            const eqUp = c.equity_usd >= c.starting_capital_usd;
-            const roiUp = c.roi_pct >= 0;
             const bg = c.bitget_saldo;
-            const usd = (n: number) => "$" + n.toLocaleString("en-US", { maximumFractionDigits: 0 });
+            const usd0 = (n: number) => "$" + n.toLocaleString("en-US", { maximumFractionDigits: 0 });
+            const pnl2 = (n: number) => (n >= 0 ? "+" : "−") + "$" + Math.abs(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const HERO = "clamp(2.6rem, 7vw, 4rem)";
+            const pPnl = c.realized_pnl_usd + c.unrealized_pnl_usd;
+            const pUp = pPnl >= 0;
+            const roiUp = c.roi_pct >= 0;
             return (
               <div className="mt-8 grid gap-4 lg:grid-cols-2">
-                {/* 📄 PAPER ACCOUNTING — the source of truth */}
+                {/* 📄 PAPER ACCOUNTING — net profit up front */}
                 <div className="border-2 border-bone/25 bg-carbon">
                   <div className="flex items-center justify-between border-b-2 border-bone/15 px-5 py-2.5">
                     <p className="font-display text-sm font-bold uppercase tracking-wide text-bone">📄 Paper accounting</p>
-                    <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-steel">bankroll at live prices · source of truth</p>
+                    <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-steel">bankroll at live prices</p>
                   </div>
-                  <div className="grid grid-cols-3 gap-px bg-bone/10">
-                    <div className="bg-carbon p-4">
-                      <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-steel">equity</p>
-                      <p className="mt-1 font-display text-3xl font-extrabold leading-none" style={{ color: eqUp ? "var(--color-chartreuse)" : "var(--color-signal2)" }}>{usd(c.equity_usd)}</p>
-                      <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.12em] text-steel">from {usd(c.starting_capital_usd)}</p>
+                  <div className="p-5">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-steel">net profit · paper</p>
+                    <p className="font-display font-extrabold leading-none" style={{ fontSize: HERO, color: pUp ? "var(--color-chartreuse)" : "var(--color-signal2)" }}>{pnl2(pPnl)}</p>
+                    <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-1.5 border-t-2 border-bone/10 pt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-bone/70">
+                      <span>ROI <span className="font-bold" style={{ color: roiUp ? "var(--color-chartreuse)" : "var(--color-signal2)" }}>{roiUp ? "+" : ""}{c.roi_pct.toFixed(2)}%</span></span>
+                      <span>equity <span className="font-bold text-bone">{usd0(c.equity_usd)}</span> <span className="text-steel">from {usd0(c.starting_capital_usd)}</span></span>
                     </div>
-                    <div className="bg-carbon p-4">
-                      <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-steel">ROI</p>
-                      <p className="mt-1 font-display text-3xl font-extrabold leading-none" style={{ color: roiUp ? "var(--color-chartreuse)" : "var(--color-signal2)" }}>{roiUp ? "+" : ""}{c.roi_pct.toFixed(2)}%</p>
-                      <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.12em] text-steel">real + unreal</p>
-                    </div>
-                    <div className="bg-carbon p-4">
-                      <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-steel">P&amp;L</p>
-                      <p className="mt-1.5 font-mono text-[13px] text-bone/85">{c.realized_pnl_usd >= 0 ? "+" : "−"}${Math.abs(c.realized_pnl_usd).toFixed(2)} <span className="text-[9px] text-steel">real</span></p>
-                      <p className="mt-1 font-mono text-[13px] text-bone/85">{c.unrealized_pnl_usd >= 0 ? "+" : "−"}${Math.abs(c.unrealized_pnl_usd).toFixed(2)} <span className="text-[9px] text-steel">unreal</span></p>
-                    </div>
+                    <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.12em] text-steel">realized {pnl2(c.realized_pnl_usd)} · unrealized {pnl2(c.unrealized_pnl_usd)}</p>
                   </div>
                 </div>
 
-                {/* ⚡ BITGET TESTNET — real demo fills, no real funds */}
+                {/* ⚡ BITGET TESTNET — net profit up front (the venue people ask about) */}
                 <div className={`border-2 ${bg ? "border-bitget/55" : "border-bone/20"} bg-carbon`}>
                   <div className="flex items-center justify-between border-b-2 border-bone/15 px-5 py-2.5">
                     <p className="font-display text-sm font-bold uppercase tracking-wide" style={{ color: bg ? "var(--color-bitget)" : "rgba(242,239,230,0.4)" }}>⚡ Bitget testnet</p>
                     <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-steel">real demo fills · no real funds</p>
                   </div>
                   {bg ? (() => {
-                    const bRoi = bg.roi_pct ?? 0;
-                    const bReal = bg.realized_pnl_usd ?? 0;
-                    const bUnreal = bg.unrealized_pnl_usd ?? 0;
-                    const bRoiUp = bRoi >= 0;
+                    const bReal = bg.realized_pnl_usd ?? 0, bUnreal = bg.unrealized_pnl_usd ?? 0, bRoi = bg.roi_pct ?? 0;
+                    const bPnl = bReal + bUnreal, bUp = bPnl >= 0;
                     return (
-                    <div className="grid grid-cols-3 gap-px bg-bone/10">
-                      <div className="bg-carbon p-4">
-                        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-steel">balance</p>
-                        <p className="mt-1 font-display text-3xl font-extrabold leading-none text-bitget">{usd(bg.equity_usd)}</p>
-                        <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.12em] text-steel">
-                          avail {usd(bg.available_usd)}{bg.baseline_usd ? ` · base ${usd(bg.baseline_usd)}` : ""}
-                        </p>
+                      <div className="p-5">
+                        <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-steel">net profit · Bitget testnet</p>
+                        <p className="font-display font-extrabold leading-none" style={{ fontSize: HERO, color: bUp ? "var(--color-bitget)" : "var(--color-signal2)" }}>{pnl2(bPnl)}</p>
+                        <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-1.5 border-t-2 border-bone/10 pt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-bone/70">
+                          <span>ROI <span className="font-bold" style={{ color: bUp ? "var(--color-bitget)" : "var(--color-signal2)" }}>{bRoi >= 0 ? "+" : ""}{bRoi.toFixed(2)}%</span></span>
+                          <span>balance <span className="font-bold text-bitget">{usd0(bg.equity_usd)}</span> <span className="text-steel">avail {usd0(bg.available_usd)}</span></span>
+                        </div>
+                        <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.12em] text-steel">realized {pnl2(bReal)} · unrealized {pnl2(bUnreal)}{bg.baseline_usd ? ` · since base ${usd0(bg.baseline_usd)}` : ""}</p>
                       </div>
-                      <div className="bg-carbon p-4">
-                        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-steel">ROI</p>
-                        <p className="mt-1 font-display text-3xl font-extrabold leading-none" style={{ color: bRoiUp ? "var(--color-bitget)" : "var(--color-signal2)" }}>{bRoiUp ? "+" : ""}{bRoi.toFixed(2)}%</p>
-                        <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.12em] text-steel">since baseline</p>
-                      </div>
-                      <div className="bg-carbon p-4">
-                        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-steel">P&amp;L</p>
-                        <p className="mt-1.5 font-mono text-[13px] text-bone/85">{bReal >= 0 ? "+" : "−"}${Math.abs(bReal).toFixed(2)} <span className="text-[9px] text-steel">real</span></p>
-                        <p className="mt-1 font-mono text-[13px] text-bone/85">{bUnreal >= 0 ? "+" : "−"}${Math.abs(bUnreal).toFixed(2)} <span className="text-[9px] text-steel">unreal</span></p>
-                      </div>
-                    </div>
                     );
                   })() : (
                     <div className="px-5 py-7">
                       <p className="font-display text-2xl font-extrabold uppercase leading-none text-bone/40">not armed</p>
-                      <p className="mt-2 font-mono text-[10px] uppercase leading-relaxed tracking-[0.12em] text-steel/80">set BITGET_EXECUTE=1 + keys on the engine to trade Bitget testnet — the real demo saldo shows here.</p>
+                      <p className="mt-2 font-mono text-[10px] uppercase leading-relaxed tracking-[0.12em] text-steel/80">set BITGET_EXECUTE=1 + keys on the engine to trade Bitget testnet — the real demo profit shows here.</p>
                     </div>
                   )}
                 </div>
