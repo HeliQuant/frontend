@@ -139,7 +139,7 @@ export default function LearningBay() {
         {[
           { k: "validated edges · traded", v: `${validatedN}`, c: validatedN ? "text-chartreuse" : "text-bone" },
           { k: "tested · on probation · not traded", v: `${candidates.length}`, c: "text-bone/70" },
-          { k: "desks earning trust", v: `${desks?.desks?.length ?? 9}`, c: "text-bone" },
+          { k: "desks earning trust", v: `${desks?.desks?.length ?? 12}`, c: "text-bone" },
           { k: "conditions learned", v: `${camp?.learned?.tracked ?? 0}`, c: "text-bone" },
         ].map((s) => (
           <div key={s.k} className="bg-carbon px-5 py-4">

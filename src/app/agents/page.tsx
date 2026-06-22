@@ -24,10 +24,10 @@ export default function AgentsPage() {
             The <span className="text-chartreuse">crew</span>
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-bone/65">
-            &ldquo;Nine desks&rdquo; isn&apos;t a slide — it&apos;s ten registered agents on-chain. The firm and
-            each desk hold an ERC-8004 identity token in the IdentityRegistry, and their reputation is their
-            real track record, written to Mantle as outcomes resolve. The Regime desk is the ML itself
-            (XGBoost). Verify any of them on Mantlescan.
+            The firm runs <span className="text-bone">twelve desk-voices</span>; ten already hold an ERC-8004
+            identity on Mantle — the firm plus its nine core desks — each with a tokenId and an on-chain
+            reputation that accrues from its real track record as outcomes resolve. The Regime desk is the ML
+            itself (XGBoost). The rest earn identities as they prove out. Verify any on Mantlescan.
           </p>
 
           <div className="mt-12">
