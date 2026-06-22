@@ -98,6 +98,32 @@ const BAYS: Bay[] = [
         "The +96% convergence backtest lived here — and died on thin DEX liquidity (−73 bps a trade). See the crash test on the landing page. No executable venue, no bay time.",
     },
   },
+  {
+    no: "BAY-07",
+    ticker: "SOL",
+    name: "Solana",
+    pattern: { label: "efficient", frac: 0.04 / 0.15, note: "momentum loses OOS" },
+    carry: "−0.6%/yr live · no harvestable carry",
+    verdict: {
+      stamp: "NO EDGE",
+      tone: "bone",
+      story:
+        "Directional momentum loses out-of-sample and funding offers no carry. The bay stays instrumented; the engine stays off until a signal clears the cost line. Tracked on Bitget, traded by no one here without an edge.",
+    },
+  },
+  {
+    no: "BAY-08",
+    ticker: "XRP",
+    name: "XRP",
+    pattern: { label: "new", frac: 0.05 / 0.15, note: "profiling — just listed" },
+    carry: "+1.4%/yr live · thin (below risk-free)",
+    verdict: {
+      stamp: "ENROLLED",
+      tone: "chartreuse",
+      story:
+        "The newest bay — one of three assets that fill on the REAL Bitget testnet (with BTC + ETH). It runs the exact same gate as everything else: no validated edge yet, profiled live before any conviction. New tape earns trust the hard way.",
+    },
+  },
 ];
 
 const stampCls = (tone: Bay["verdict"]["tone"]) =>
