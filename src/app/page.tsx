@@ -54,10 +54,10 @@ export default function HomePage() {
         <div aria-hidden className="gr-hazard h-[14px] opacity-90" />
         <div className="mx-auto flex max-w-[1280px] flex-col gap-3 px-6 py-10 sm:px-10 md:flex-row md:items-center md:justify-between xl:px-4">
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-steel">
-            HELIQUANT · THE DISCIPLINED TRADING ENGINE
+            HELIQUANT · AUTONOMOUS MULTI-DESK TRADING FIRM · <span className="text-bitget">BITGET</span> × MANTLE
           </p>
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-steel/80">
-            honesty-by-design — <span className="text-chartreuse">we publish what doesn&apos;t work</span>
+            <span className="text-chartreuse">we publish the truth</span> — every number is real
           </p>
         </div>
       </footer>

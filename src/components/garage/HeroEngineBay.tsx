@@ -15,13 +15,15 @@ import { useReducedMotion } from "motion/react";
 import GearEngine from "./GearEngine";
 
 const TICKER = [
-  "REGIME CLASSIFIER 82.6% OOS",
-  "LEDGER +28.9% OOS — THAT EDGE LATER DECAYED → RETIRED BY THE LAB",
-  "+96.0% BACKTEST CRASH-TESTED → REJECTED AT −73 BPS SLIPPAGE",
-  "EVERY DECISION SEALED ON MANTLE · BLOCK 39,402,623",
+  "12 SPECIALIST DESKS · PM SIGN-OFF ON EVERY TRADE",
+  "FIRST ALLORA ORACLE LIVE ON MANTLE",
+  "LIVE INTEL · NANSEN · ELFA · HYPERLIQUID WHALES",
   "REAL FILLS ON BITGET TESTNET",
-  "24 HYPOTHESES TESTED → 23 SCRAPPED",
-  "WE PUBLISH WHAT DOESN'T WORK",
+  "REGIME CLASSIFIER 82.6% OOS",
+  "EVERY DECISION SEALED ON MANTLE · BLOCK 39,402,623",
+  "RETIRED OUR OWN +28.9% EDGE WHEN IT DECAYED — DISCIPLINE",
+  "+96% BACKTEST? WE REJECTED IT AT −73 BPS",
+  "WE PUBLISH THE TRUTH — NUMBERS, NOT HYPE",
 ];
 
 export default function HeroEngineBay() {
@@ -44,8 +46,8 @@ export default function HeroEngineBay() {
         {/* ── LEFT: the claim ── */}
         <div>
           <p className="gr-rise font-mono text-[11px] uppercase tracking-[0.3em] text-steel">
-            <span className="text-chartreuse">▮</span> AUTONOMOUS TRADING FIRM · BUILT LIKE AN
-            ENGINE · MANTLE
+            <span className="text-chartreuse">▮</span> AUTONOMOUS TRADING FIRM · 12 DESKS · EXECUTES ON{" "}
+            <span className="text-bitget">BITGET</span> · ANCHORED ON MANTLE
           </p>
 
           <h1
@@ -63,11 +65,11 @@ export default function HeroEngineBay() {
             className="gr-rise mt-7 max-w-xl text-pretty text-base leading-relaxed text-bone/70 sm:text-lg"
             style={{ animationDelay: "0.22s" }}
           >
-            A dozen voices feed the manifold. The debate compresses. The PM fires{" "}
-            <span className="font-mono text-chartreuse">ENTER</span> only on a validated edge —
-            today the registry is empty, so the gearbox holds{" "}
-            <span className="font-mono text-bone">N</span>. Every decision, including the
-            restraint, is sealed on-chain.
+            Twelve specialist desks — regime, smart-money, Allora macro, on-chain, vol-forecasting —
+            converge into a PM that executes on <span className="text-bitget">Bitget</span> and anchors
+            every call on Mantle. It fires <span className="font-mono text-chartreuse">ENTER</span> only on
+            a validated edge; when there isn&apos;t one the gearbox holds{" "}
+            <span className="font-mono text-bone">N</span>. The discipline to hold is the product.
           </p>
 
           <div className="gr-rise mt-9 flex flex-wrap items-center gap-4" style={{ animationDelay: "0.34s" }}>
@@ -99,7 +101,7 @@ export default function HeroEngineBay() {
           </div>
 
           <p className="gr-rise mt-7 font-mono text-[11px] uppercase tracking-[0.22em] text-steel" style={{ animationDelay: "0.46s" }}>
-            honesty-by-design — the numbers below include what failed
+            every figure below is real — the wins, the retired edge, the rejected backtests
           </p>
         </div>
 
